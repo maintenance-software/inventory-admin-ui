@@ -1,43 +1,38 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './leftsidebar.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {IconProp} from '@fortawesome/fontawesome-svg-core';
+import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
+import {RouteComponentProps} from "react-router";
 
-const OPTIONS: {option: string, label: string, icon:IconProp, selected: boolean}[] = [
+const OPTIONS: {path: string, label: string, icon:IconProp}[] = [
     {
-        option: 'home',
         label: 'Home',
         icon: 'home',
-        selected: true
+        path: '/home'
     },
     {
-        option: 'user',
         label: 'Users',
         icon: 'user',
-        selected: false
+        path: '/users'
     },
     {
-        option: 'reports',
         label: 'Reports',
         icon: 'chart-area',
-        selected: false
+        path: '/reports'
     }
 ];
 
-export const Leftsidebar: React.FC = () => {
-    let selectedOption = OPTIONS.find( o => o.selected);
-    if(!selectedOption)
-        selectedOption = OPTIONS[0];
-    const [option, setOption] = useState(selectedOption);
-
+const leftsidebar: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     const options =  OPTIONS.map((o, index) => (
         <li key={index}>
-            <a href="#" onClick={e => setOption(o)}>
-                <div className={o.option === option.option? 'sidebar-icon active-bg active-color' : 'sidebar-icon'}>
+            <Link to={o.path}>
+                <div className={o.path === props.location.pathname? 'sidebar-icon active-bg active-color' : 'sidebar-icon'}>
                     <FontAwesomeIcon icon={o.icon}/>
                 </div>
-                <div className={o.option === option.option? 'label active-color': 'label'}>{o.label}</div>
-            </a>
+                <div className={o.path === props.location.pathname? 'label active-color': 'label'}>{o.label}</div>
+            </Link>
         </li>
     ));
 
@@ -47,3 +42,5 @@ export const Leftsidebar: React.FC = () => {
         </ul>
     );
 };
+
+export const Leftsidebar = withRouter(leftsidebar);
