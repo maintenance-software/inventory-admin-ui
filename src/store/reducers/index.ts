@@ -1,17 +1,20 @@
-import { combineReducers, Reducer } from 'redux';
-import { RootAction, SET_APP_NAME } from '../actions';
-import { RootState, INITIAL_STATE } from '..';
+import { Reducer } from 'redux';
+import { SET_APP_NAME, AppActionType } from '../actions';
+import { IRootState, INITIAL_STATE } from '..';
+import { userReducer } from './users.reducer';
 
-export const rootReducer: Reducer<RootState, RootAction> = (state: RootState = INITIAL_STATE, action: RootAction): RootState => {
+export const rootReducer: Reducer<IRootState, AppActionType> = (state: IRootState = INITIAL_STATE, action: AppActionType): IRootState => {
   switch (action.type) {
     case SET_APP_NAME: {
         return {
-            appName: action.payload
+            appName: action.payload,
+            users: state.users.concat()
           }
     }
     default:
-        return state;
+        return {
+          appName: state.appName,
+          users: userReducer(state.users, action)
+        };
    }
-}
-
-
+};

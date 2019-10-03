@@ -2,18 +2,22 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import {rootReducer} from './reducers';
 import { RootAction } from './actions';
+import { IUser } from '../api/users.api';
 
-export interface RootState {
+export interface IRootState {
   appName: string;
+  users: IUser[];
 }
 
-export const INITIAL_STATE: RootState = {appName: 'Test App'};
+export const INITIAL_STATE: IRootState = {
+  appName: 'Test App',
+  users: []
+};
 
 export const configureStore = (initialState = INITIAL_STATE) => {
- return createStore<RootState, RootAction, any, any>(
+ return createStore<IRootState, RootAction, any, any>(
    rootReducer,
    initialState,
    applyMiddleware(thunk)
  );
 };
-
