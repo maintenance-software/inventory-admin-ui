@@ -6,6 +6,7 @@ import { configureStore } from './store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import App from './components/App';
+import './i18n';
 
 ReactDOM.render(<Provider store={configureStore()}><App/></Provider>, document.getElementById('root'));
 

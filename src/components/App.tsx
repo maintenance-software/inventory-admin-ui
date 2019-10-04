@@ -16,7 +16,6 @@ import { IRootState } from '../store';
 import {Leftsidebar} from "./leftsidebar/leftsidebar";
 import { Home } from './home';
 import Users from './users';
-
 library.add(faEnvelope, faKey);
 library.add(faBars, faKey);
 library.add(faTasks, faKey);

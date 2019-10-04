@@ -1,21 +1,20 @@
 import { useState, useEffect } from "react";
-import { IUser } from "../api/users.api";
 
-export const useFetch = (promise: Promise<IUser[]>) => {
-  const [data, setData] = useState<IUser[]>([]);
+export const useFetch = (promise: Promise<any>, lang: string) => {
+  const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = () => {
-    promise.then(users => {
-      console.log(users);
-      setData(users);
+  const fetchLocalizations = () => {
+    promise.then(localizations => {
+      console.log(localizations);
+      setData(localizations);
       setLoading(false);
     });    
   }
 
   useEffect(() => {
-    fetchUser();
-  }, []);
+    fetchLocalizations();
+  }, [lang]);
   return [data, loading];
 }
 
