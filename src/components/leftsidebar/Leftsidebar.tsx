@@ -1,5 +1,5 @@
 import React from 'react';
-import './leftsidebar.scss';
+import './Leftsidebar.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {IconProp} from '@fortawesome/fontawesome-svg-core';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -8,17 +8,17 @@ import {useTranslation} from "react-i18next";
 
 const OPTIONS: {path: string, localKey: string, icon:IconProp}[] = [
     {
-      localKey: 'main.home',
+      localKey: 'menu.home',
       icon: 'home',
       path: '/home'
     },
     {
-      localKey: 'main.users',
+      localKey: 'menu.users',
       icon: 'user',
       path: '/users'
     },
     {
-      localKey: 'main.reports',
+      localKey: 'menu.reports',
       icon: 'chart-area',
       path: '/reports'
     }

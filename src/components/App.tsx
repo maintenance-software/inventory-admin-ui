@@ -2,19 +2,9 @@ import React, {useState} from 'react';
 import { useSelector } from 'react-redux';
 import {HashRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import './App.scss';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faHome
-  , faUser
-  , faChartArea
-  , faEnvelope
-  , faBars
-  , faTasks
-  , faKey 
-  , faPlus
-} from '@fortawesome/free-solid-svg-icons';
 import { IRootState } from '../store';
-import {Leftsidebar} from "./leftsidebar/leftsidebar";
-import { Home } from './home';
+import {Leftsidebar} from "./leftsidebar/Leftsidebar";
+import { Home } from './home/home';
 import Users from './users';
 import {
   Button,
@@ -31,14 +21,6 @@ import {
 import {useTranslation} from "react-i18next";
 import {fetchLocalizations} from "../api/localization.api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-
-library.add(faEnvelope, faKey);
-library.add(faBars, faKey);
-library.add(faTasks, faKey);
-library.add(faHome, faKey);
-library.add(faUser, faKey);
-library.add(faChartArea, faKey);
-library.add(faPlus, faKey);
 
 const App: React.FC = () => {
   // const appName = useSelector((state: IRootState) => state.appName);

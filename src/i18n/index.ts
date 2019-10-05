@@ -1,10 +1,11 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import defaultTranslation from "./default.lang.json";
+import * as translations from './translations';
+import {flattenObject} from "../utils/globalUtil";
 
 const resources = {
   en: {
-    translation: defaultTranslation
+    translation: flattenObject(translations)
   }
 };
 
@@ -19,4 +20,3 @@ i18n
       escapeValue: false // react already safes from xss
     }
   });
-export default i18n;
