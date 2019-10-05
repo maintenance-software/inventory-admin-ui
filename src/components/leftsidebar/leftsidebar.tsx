@@ -2,36 +2,41 @@ import React from 'react';
 import './leftsidebar.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {IconProp} from '@fortawesome/fontawesome-svg-core';
-import { Link } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
-import {RouteComponentProps} from "react-router";
+import { Link, useLocation, useParams } from 'react-router-dom';
+import {useTranslation} from "react-i18next";
 
-const OPTIONS: {path: string, label: string, icon:IconProp}[] = [
+
+const OPTIONS: {path: string, localKey: string, icon:IconProp}[] = [
     {
-        label: 'Home',
-        icon: 'home',
-        path: '/home'
+      localKey: 'main.home',
+      icon: 'home',
+      path: '/home'
     },
     {
-        label: 'Users',
-        icon: 'user',
-        path: '/users'
+      localKey: 'main.users',
+      icon: 'user',
+      path: '/users'
     },
     {
-        label: 'Reports',
-        icon: 'chart-area',
-        path: '/reports'
+      localKey: 'main.reports',
+      icon: 'chart-area',
+      path: '/reports'
     }
 ];
 
-const leftsidebar: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
+export const Leftsidebar: React.FC = () => {
+  const [t, i18n] = useTranslation();
+  let location = useLocation();
+  // let params = useParams();
+  // console.log(location);
+  // console.log(params);
     const options =  OPTIONS.map((o, index) => (
         <li key={index}>
             <Link to={o.path}>
-                <div className={o.path === props.location.pathname? 'sidebar-icon active-bg active-color' : 'sidebar-icon'}>
+                <div className={o.path === location.pathname? 'sidebar-icon active-bg active-color' : 'sidebar-icon'}>
                     <FontAwesomeIcon icon={o.icon}/>
                 </div>
-                <div className={o.path === props.location.pathname? 'label active-color': 'label'}>{o.label}</div>
+                <div className={o.path === location.pathname? 'label active-color': 'label'}>{t(o.localKey)}</div>
             </Link>
         </li>
     ));
@@ -42,5 +47,3 @@ const leftsidebar: React.FC<RouteComponentProps> = (props: RouteComponentProps) 
         </ul>
     );
 };
-
-export const Leftsidebar = withRouter(leftsidebar);

@@ -7,36 +7,24 @@ import { fetchUsersThunk } from '../../store/actions/users.action';
 import { IRootState } from '../../store';
 import { useTranslation } from 'react-i18next';
 
-import { fetchLocalizations } from '../../api/localization.api';
-
 const Users: React.FC =  () => {
-  const [lang, setLang] = useState<string>('en');
   const [t, i18n] = useTranslation();
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchUsersThunk)
   }, []);
 
-  const temp = async (newLang: string) => {
-    const localizations = await fetchLocalizations(newLang);
-    for (const key in localizations) {
-      // @ts-ignore
-      i18n.addResource(newLang, 'translation', key, localizations[key]);
-    }
-    await i18n.changeLanguage(newLang);
-    setLang(newLang);
-  };
-
   const users = useSelector((state: IRootState) => state.users);
-  //  const [users, setUsers] = useState<IUser[]>([]);  
-  //  console.log(users);
+   //  const [users, setUsers] = useState<IUser[]>([]);
+   //  console.log(users);
+   // const [lang, setLang] = useState<string>('en');
 
 
   return (
     <div className="user-container">
         <div className="row justify-content-between p-2 align-items-center">
             <h6 className="text-primary my-auto">User Management</h6>
-            <button className="btn btn-outline-primary btn-sm" onClick = {(e) => temp('es')}>
+            <button className="btn btn-outline-primary btn-sm">
               {t('user.button.add')}
               <FontAwesomeIcon icon="plus"/>
             </button>

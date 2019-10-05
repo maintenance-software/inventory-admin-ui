@@ -1,4 +1,7 @@
 {
-    "bienvenido react": "Bienvenido react app",
-    "user.button.add": "Agregar Usuario"
+  "bienvenido react": "Bienvenido react app",
+  "main.home": "Inicio",
+  "main.users": "Usuarios",
+  "main.reports": "Reportes",
+  "user.button.add": "Agregar Usuario"
 }

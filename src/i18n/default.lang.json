@@ -1,4 +1,8 @@
 {
-    "Welcome to React": "Welcome to React and react-i18next",
-    "user.button.add": "ADD USER"
+   "Welcome to React": "Welcome to React and react-i18next",
+   "main.home": "Home",
+   "main.users": "Users",
+   "main.reports": "Reports",
+   "users.management": "User Management",
+   "user.button.add": "Add New"
 }
