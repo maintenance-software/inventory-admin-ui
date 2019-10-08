@@ -2,4 +2,12 @@
 
 .user-container {
     @extend .container;
+   .user-card-container {
+      @extend .container;
+      @extend .d-flex;
+      @extend .flex-wrap;
+      @extend .justify-content-start;
+      @extend .p-2;
+      @extend .bg-success;
+   }
 }

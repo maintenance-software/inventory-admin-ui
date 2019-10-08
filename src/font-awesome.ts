@@ -7,6 +7,7 @@ import { faHome
    , faTasks
    , faKey
    , faPlus
+   , faEllipsisV
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faEnvelope, faKey);
@@ -16,3 +17,4 @@ library.add(faHome, faKey);
 library.add(faUser, faKey);
 library.add(faChartArea, faKey);
 library.add(faPlus, faKey);
+library.add(faEllipsisV, faKey);

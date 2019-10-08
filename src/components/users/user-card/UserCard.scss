@@ -1,0 +1,32 @@
+@import '~bootstrap/scss/bootstrap.scss';
+
+.user-card {
+   @extend .card;
+   width: 25rem;
+   margin: .5rem;
+   .user-card-body {
+      @extend .card-body;
+      @extend .d-flex;
+      @extend .p-2;
+      .user-avatar {
+         @extend .d-flex;
+         h6 {
+            @extend .bg-light;
+            @extend .font-weight-bold;
+            @extend .my-auto;
+            @extend .d-flex;
+            @extend .align-items-center;
+            @extend .justify-content-center;
+            width: 5rem;
+            height: 5rem;
+            border-radius: 50%;
+            font-size: 2rem;
+         }
+      }
+
+      .user-options {
+         @extend .btn;
+         @extend .btn-link;
+      }
+   }
+}

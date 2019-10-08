@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsersThunk } from '../../store/actions/users.action';
 import { IRootState } from '../../store';
 import { useTranslation } from 'react-i18next';
+import UserCard from "./user-card/UserCard";
 
 const Users: React.FC =  () => {
   const [t, i18n] = useTranslation();
@@ -29,15 +30,9 @@ const Users: React.FC =  () => {
               <FontAwesomeIcon icon="plus"/>
             </button>
         </div>
-        <div className="row d-flex flex-grow-1 p-2 bg-light">
+        <div className="user-card-container">
           {users.map((u, i) => (
-            <div key={i} className="card w-25">
-              <div className="card-body">
-                <h5 className="card-title">{u.username}</h5>
-                <p className="card-text">{u.email}</p>
-                <a href="#" className="btn btn-primary">Go somewhere</a>
-              </div>
-            </div>
+            <UserCard key={i} user={u}/>
           ))}
         </div>
     </div>
