@@ -15,7 +15,7 @@ const OPTIONS: {path: string, localKey: string, icon:IconProp}[] = [
     {
       localKey: 'menu.users',
       icon: 'user',
-      path: '/users'
+      path: '/persons'
     },
     {
       localKey: 'menu.reports',
@@ -29,14 +29,14 @@ export const Leftsidebar: React.FC = () => {
   let location = useLocation();
   // let params = useParams();
   // console.log(location);
-  // console.log(params);
+  // console.log(params);  
     const options =  OPTIONS.map((o, index) => (
         <li key={index}>
             <Link to={o.path}>
-                <div className={o.path === location.pathname? 'sidebar-icon active-bg active-color' : 'sidebar-icon'}>
+                <div className={location.pathname.startsWith(o.path)? 'sidebar-icon active-bg active-color' : 'sidebar-icon'}>
                     <FontAwesomeIcon icon={o.icon}/>
                 </div>
-                <div className={o.path === location.pathname? 'label active-color': 'label'}>{t(o.localKey)}</div>
+                <div className={location.pathname.startsWith(o.path)? 'label active-color': 'label'}>{t(o.localKey)}</div>
             </Link>
         </li>
     ));

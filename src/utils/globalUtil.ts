@@ -3,6 +3,10 @@ const _flatten = (object: any): any => {
 };
 const flattenObject = (object: any) => Object.assign({}, ..._flatten(object));
 
-export {flattenObject};
+const buildFullName = (firstName: string, lastName: string) => {
+   return lastName + (firstName? ', ' + firstName : '');
+};
+
+export {flattenObject, buildFullName};
 
 

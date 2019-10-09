@@ -1,14 +1,15 @@
 import React from 'react';
-import './UserCard.scss';
+import './PersonCard.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {IUser} from "../../../api/users.api";
+import { IPerson } from '../../../../api/person/persons.api';
+import { buildFullName } from '../../../../utils/globalUtil';
 
-export interface IUserCardProps {
-   user: IUser;
-}
+export interface IPersonCardProps {
+   person: IPerson;
+};
 
-const UserCard: React.FC<IUserCardProps> =  (props) => {
-   const {user} = props;
+const PersonCard: React.FC<IPersonCardProps> =  (props) => {
+   const {person} = props;
     return (
       <div className="user-card">
         <div className="user-card-body">
@@ -16,8 +17,8 @@ const UserCard: React.FC<IUserCardProps> =  (props) => {
               <h6>AV</h6>
            </div>
            <div className="d-flex flex-column flex-grow-1">
-              <h5 className="card-title">{user.username}</h5>
-              <a href="#" className="btn btn-primary">{user.email}</a>
+              <h5 className="card-title">{buildFullName(person.firstName, person.lastName)}</h5>
+              <a href="#" className="btn btn-primary">{person.lastName}</a>
            </div>
            <div>
               <a href="#" className="user-options">
@@ -29,4 +30,4 @@ const UserCard: React.FC<IUserCardProps> =  (props) => {
       </div>
     );
 };
-export default UserCard;
+export default PersonCard;

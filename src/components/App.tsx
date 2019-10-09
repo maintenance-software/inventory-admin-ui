@@ -5,7 +5,7 @@ import './App.scss';
 import { IRootState } from '../store';
 import {Leftsidebar} from "./leftsidebar/Leftsidebar";
 import { Home } from './home/home';
-import Users from './users';
+import Persons from './persons';
 import {
   Button,
   Dropdown,
@@ -66,12 +66,8 @@ const App: React.FC = () => {
             <div className='d-flex flex-fill mt-3  ml-4 mr-4 bg-white'>
               <Switch>
                 <Redirect exact from="/" to="/home"/>
-                <Route path="/home">
-                  <Home/>
-                </Route>
-                <Route path="/users">
-                  <Users/>
-                </Route>
+                <Route path="/home" component={Home}/>
+                <Route path="/persons" component={Persons}/>
               </Switch>            
             </div>
         </div>

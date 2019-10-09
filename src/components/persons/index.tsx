@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import './users.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IUser } from '../../api/users.api';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsersThunk } from '../../store/actions/users.action';
 import { IRootState } from '../../store';
 import { useTranslation } from 'react-i18next';
-import UserCard from "./user-card/UserCard";
+import { fetchPersonsThunk } from '../../store/actions/persons.action';
+import { IPerson } from '../../api/person/persons.api';
+import PersonCard from './person-list/person-card/PersonCard';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import Persons from './person-list/Persons';
+import EditPerson from './edit-person/EditPerson';
 
-const Users: React.FC =  () => {
+const PersonPage: React.FC =  () => {
   const [t, i18n] = useTranslation();
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchUsersThunk)
+    dispatch(fetchPersonsThunk)
   }, []);
 
-  const users = useSelector((state: IRootState) => state.users);
+  const { path, url } = useRouteMatch();
    //  const [users, setUsers] = useState<IUser[]>([]);
    //  console.log(users);
    // const [lang, setLang] = useState<string>('en');
@@ -23,22 +25,15 @@ const Users: React.FC =  () => {
 
   return (
     <div className="user-container">
-        <div className="row justify-content-between p-2 align-items-center">
-            <h6 className="text-primary my-auto">User Management</h6>
-            <button className="btn btn-outline-primary btn-sm">
-              {t('user.button.add')}
-              <FontAwesomeIcon icon="plus"/>
-            </button>
-        </div>
-        <div className="user-card-container">
-          {users.map((u, i) => (
-            <UserCard key={i} user={u}/>
-          ))}
-        </div>
+      <Switch>
+        <Route exact path={path} component={Persons}/>
+        <Route path={`${path}/:personId`} component={EditPerson}/>        
+      </Switch> 
+        
     </div>
   );
 };
-export default Users;
+export default PersonPage;
 
 /*
 const Users = () => {

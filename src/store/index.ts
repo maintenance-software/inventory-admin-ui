@@ -3,15 +3,23 @@ import thunk from 'redux-thunk';
 import {rootReducer} from './reducers';
 import { RootAction } from './actions';
 import { IUser } from '../api/users.api';
+import { IPerson } from '../api/person/persons.api';
 
 export interface IRootState {
   appName: string;
   users: IUser[];
-}
+  personScope: IPersonScope;
+};
+
+export interface IPersonScope {
+  person: IPerson|null;
+  persons: IPerson[];
+};
 
 export const INITIAL_STATE: IRootState = {
   appName: 'Test App',
-  users: []
+  users: [],
+  personScope: {person: null, persons:[]}
 };
 
 export const configureStore = (initialState = INITIAL_STATE) => {
