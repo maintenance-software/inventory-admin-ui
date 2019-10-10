@@ -13,12 +13,13 @@ import EditPerson from './edit-person/EditPerson';
 const PersonPage: React.FC =  () => {
   const [t, i18n] = useTranslation();
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchPersonsThunk)
-  }, []);
-
   const { path, url } = useRouteMatch();
-   //  const [users, setUsers] = useState<IUser[]>([]);
+
+//  useEffect(() => {
+//   dispatch(fetchPersonsThunk)
+//  }, []);
+
+  //  const [users, setUsers] = useState<IUser[]>([]);
    //  console.log(users);
    // const [lang, setLang] = useState<string>('en');
 
