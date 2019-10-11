@@ -21,3 +21,8 @@ export const getPersonById = async (personId: number) => {
   const response: AxiosResponse<IPerson> = await axios.get<IPerson>('api/persons/' + personId);
   return response.data;
 };
+
+export const savePersonW$ = async (person: IPerson) => {
+  const response: AxiosResponse<IPerson> = await axios.put<IPerson>('api/persons', person);
+  return response.data;
+};

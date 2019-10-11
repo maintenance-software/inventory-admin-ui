@@ -12,14 +12,34 @@ export interface IRootState {
 };
 
 export interface IPersonScope {
-  person: IPerson|null;
+  person: IPerson;
   persons: IPerson[];
 };
 
 export const INITIAL_STATE: IRootState = {
   appName: 'Test App',
   users: [],
-  personScope: {person: null, persons:[]}
+  personScope: {
+    person: {
+      personId: 0,
+      firstName: '',
+      lastName: '',
+      documentType: '',
+      documentId: '',
+      address: '',
+      contactInfo: [],
+      account: {
+        userId: 0,
+        active: false,        
+        username: '',
+        password: '',
+        email: '',
+        privileges: [],
+        roles: []    
+      }
+    },
+    persons:[]
+  }
 };
 
 export const configureStore = (initialState = INITIAL_STATE) => {

@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
 import { IRootState } from "..";
-import { IPerson, fetchPersons, getPersonById } from "../../api/person/persons.api";
+import { IPerson, fetchPersons, getPersonById, savePersonW$ } from "../../api/person/persons.api";
 
 export const FETCH_PERSONS = 'FETCH_PERSONS';
 export const GET_PERSON_BY_ID = 'GET_PERSON_BY_ID';
@@ -33,6 +33,12 @@ export const fetchPersonsThunk = (dispatch: Dispatch<FetchPersonsAction>, getSta
 
 export const getPersonByIdThunk = (personId: number) => (dispatch: Dispatch<GetPersonByIdAction>, getState: () => IRootState) => {
     return getPersonById(personId).then(person => {
+        dispatch(getPersonByIdAction(person));
+    });
+};
+
+export const savePersonThunk = (person: IPerson) => (dispatch: Dispatch<GetPersonByIdAction>, getState: () => IRootState) => {
+    return savePersonW$(person).then(person => {
         dispatch(getPersonByIdAction(person));
     });
 };
