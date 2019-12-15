@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import * as Yup from "yup";
 import {IPerson, IPersons} from "../../../graphql/persons.type";
 import { gql } from 'apollo-boost';
-import {useMutation, useQuery} from "@apollo/react-hooks";
+import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
 
 export const GET_PERSON_BY_ID = gql`
   query ($personId: Int!){
@@ -46,7 +46,6 @@ const EditPersonForm: React.FC<IPerson> =  (person) => {
   const [savePerson, { error, data, loading, called }] = useMutation<{ savePerson: IPerson }, IPerson>(SAVE_PERSON);
   const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IPerson>({
     initialValues: person,
-    // isInitialValid: true,
     validationSchema: Yup.object().shape({
       firstName: Yup.string(),
       lastName: Yup.string().required('This filed is required'),
@@ -110,18 +109,42 @@ const EditPersonForm: React.FC<IPerson> =  (person) => {
 };
 
 const EditPerson: React.FC<IEditProps> =  (props) => {
-  const params = useParams();
-  const [t, i18n] = useTranslation();
+   const [t, i18n] = useTranslation();
+   const params = useParams();
+   const personId = +params.personId;
+   const [getPersonById, { called, loading, data }] = useLazyQuery<{persons: IPersons}, any>(GET_PERSON_BY_ID);
   useEffect(() => {
-
+     if(personId && personId > 0) {
+        getPersonById({variables: { personId: personId }});
+     }
   }, []);
-   const personQL = useQuery<{persons: IPersons}, any>(GET_PERSON_BY_ID, {variables: { personId: +params.personId }});
-   if (personQL.loading || !personQL.data) return <div>Loading</div>;
-   const person = personQL.data.persons.person;
 
-  if(person.personId === 0) {
-    return (<div>Loading...</div>);
-  }
+   if (loading)
+      return <div>Loading</div>;
+
+   let person = null;
+
+   if(data) {
+      person = data.persons.person;
+   } else {
+      person = {personId: 0,
+         firstName: '',
+         lastName: '',
+         documentType: '',
+         documentId: '',
+         address: '',
+         contactInfo: []
+         , account: {
+            userId: 0,
+            username: '',
+            email: '',
+            password: '',
+            active: false,
+            privileges: [],
+            roles: []
+         }
+      };
+   }
 
   return (
     <div>
