@@ -1,25 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import './Persons.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../../../store';
 import { useTranslation } from 'react-i18next';
-import { fetchPersonsThunk } from '../../../store/actions/persons.action';
-import { IPerson } from '../../../api/person/persons.api';
 import PersonCard from './person-card/PersonCard';
+import { gql } from 'apollo-boost';
+import { useQuery } from '@apollo/react-hooks';
+import {IPersons} from "../../../graphql/persons.type";
+
+export const GET_PERSONS_GQL = gql`
+  query {
+    persons {
+      list(queryString: "") {
+         personId
+         firstName
+         lastName
+         account {
+            userId
+            username
+            email
+         }
+      }
+    }
+  }
+`;
+
 
 const Persons: React.FC =  () => {
   const [t, i18n] = useTranslation();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchPersonsThunk)
+    // dispatch(fetchPersonsThunk)
   }, []);
 
-  const persons: IPerson[] = useSelector((state: IRootState) => state.personScope.persons);
+  // const persons: IPerson[] = useSelector((state: IRootState) => state.personScope.persons);
    //  const [users, setUsers] = useState<IUser[]>([]);
    //  console.log(users);
    // const [lang, setLang] = useState<string>('en');
+   const personQL = useQuery<{persons: IPersons}, any>(GET_PERSONS_GQL);
+   if (personQL.loading || !personQL.data) return <div>Loading</div>;
 
+   const persons = personQL.data.persons.list;
 
   return (
     <>
@@ -39,28 +59,3 @@ const Persons: React.FC =  () => {
   );
 };
 export default Persons;
-
-/*
-const Users = () => {
-  const [data, loading] = useFetch('/api/users');
-  const datas = data as any[];
-  return (
-    <>
-    <div>
-      <h1>Users</h1>{loading ? ("Loading...") : 
-      (
-        <ul>
-          {
-              datas.map(({ userId, username, password }) => 
-                (<li key={`user-${userId}`}>{username}</li>)
-              )
-          }
-        </ul>
-      )}
-    </div>
-    </>
-  );
-};
-
-export default Users;
-*/

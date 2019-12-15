@@ -1,12 +1,12 @@
 import React from 'react';
 import './PersonCard.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IPerson } from '../../../../api/person/persons.api';
 import { buildFullName } from '../../../../utils/globalUtil';
+import {IPerson} from "../../../../graphql/persons.type";
 
 export interface IPersonCardProps {
    person: IPerson;
-};
+}
 
 const PersonCard: React.FC<IPersonCardProps> =  (props) => {
    const {person} = props;

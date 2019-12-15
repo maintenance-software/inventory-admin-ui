@@ -1,19 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Formik, Field, Form, ErrorMessage, useFormik } from 'formik';
-import { IPerson } from '../../../api/person/persons.api';
-import { getPersonByIdThunk, savePersonThunk } from '../../../store/actions/persons.action';
-import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../../../store';
 import { useParams } from 'react-router-dom';
 import * as Yup from "yup";
+import {IPerson, IPersons} from "../../../graphql/persons.type";
+import { gql } from 'apollo-boost';
+import {useMutation, useQuery} from "@apollo/react-hooks";
+
+export const GET_PERSON_BY_ID = gql`
+  query ($personId: Int!){
+    persons {
+      person(entityId: $personId) {
+         personId
+         firstName
+         lastName
+         documentType
+         documentId
+         account {
+            userId
+            username
+            email
+         }
+      }
+    }
+  }
+`;
+
+const SAVE_PERSON = gql`
+  mutation savePerson($personId: Int!, $firstName: String!, $lastName: String!, $documentType: String!, $documentId: String!) {
+    savePerson(personId: $personId, firstName: $firstName, lastName: $lastName, documentType: $documentType, documentId: $documentId) {
+       personId
+       firstName
+       lastName
+       documentType
+       documentId
+    }
+  }
+`;
 
 interface IEditProps {
   person: IPerson;
-};
+}
 
 const EditPersonForm: React.FC<IPerson> =  (person) => {
-  const dispatch = useDispatch();
+  const [savePerson, { error, data }] = useMutation<{ savePerson: IPerson }, IPerson>(SAVE_PERSON);
   const { getFieldProps, handleSubmit, errors, touched, isValid } = useFormik<IPerson>({
     initialValues: person,
     isInitialValid: true,
@@ -25,7 +55,7 @@ const EditPersonForm: React.FC<IPerson> =  (person) => {
     }),
     onSubmit: (values, bag) => {
       console.log(values);
-      dispatch(savePersonThunk(values));
+       savePerson({ variables: values });
     }
   });
   const [firstName, firstNameField] = getFieldProps("firstName", "text");
@@ -62,22 +92,17 @@ const EditPersonForm: React.FC<IPerson> =  (person) => {
       </form>
     </div>
   );
-}
+};
 
 const EditPerson: React.FC<IEditProps> =  (props) => {
   const params = useParams();
   const [t, i18n] = useTranslation();
-  const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getPersonByIdThunk(params.personId));
+
   }, []);
-
-  const person: IPerson = useSelector((state: IRootState) => state.personScope.person);
-
-  console.log(person);
-
-  
-  //setValues(person);
+   const personQL = useQuery<{persons: IPersons}, any>(GET_PERSON_BY_ID, {variables: { personId: +params.personId }});
+   if (personQL.loading || !personQL.data) return <div>Loading</div>;
+   const person = personQL.data.persons.person;
 
   if(person.personId === 0) {
     return (<div>Loading...</div>);

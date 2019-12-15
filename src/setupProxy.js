@@ -5,4 +5,9 @@ module.exports = function(app) {
         target: 'http://192.168.0.100:3000',
         changeOrigin: true,
     }));
+
+    app.use('/graphql', proxy({
+        target: 'http://192.168.0.100:3000',
+        changeOrigin: true,
+    }));
 };

@@ -1,8 +1,6 @@
 import React, {useState} from 'react';
-import { useSelector } from 'react-redux';
 import {HashRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import './App.scss';
-import { IRootState } from '../store';
 import {Leftsidebar} from "./leftsidebar/Leftsidebar";
 import { Home } from './home/home';
 import Persons from './persons';
