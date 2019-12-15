@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useTranslation } from 'react-i18next';
 import PersonCard from './person-list/person-card/PersonCard';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';

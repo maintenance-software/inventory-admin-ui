@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Formik, Field, Form, ErrorMessage, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import { useParams } from 'react-router-dom';
 import * as Yup from "yup";
 import {IPerson, IPersons} from "../../../graphql/persons.type";
@@ -43,10 +43,10 @@ interface IEditProps {
 }
 
 const EditPersonForm: React.FC<IPerson> =  (person) => {
-  const [savePerson, { error, data }] = useMutation<{ savePerson: IPerson }, IPerson>(SAVE_PERSON);
-  const { values, getFieldProps, getFieldMeta, handleSubmit, errors, touched, isValid } = useFormik<IPerson>({
+  const [savePerson, { error, data, loading, called }] = useMutation<{ savePerson: IPerson }, IPerson>(SAVE_PERSON);
+  const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, touched, isValid } = useFormik<IPerson>({
     initialValues: person,
-    isInitialValid: true,
+    // isInitialValid: true,
     validationSchema: Yup.object().shape({
       firstName: Yup.string(),
       lastName: Yup.string().required('This filed is required'),
@@ -57,6 +57,13 @@ const EditPersonForm: React.FC<IPerson> =  (person) => {
        savePerson({ variables: values });
     }
   });
+
+   useEffect(() => {
+      if(data && data.savePerson) {
+         console.log(data.savePerson);
+         resetForm({values: data.savePerson});
+      }
+   }, [data]);
 
   const firstName = getFieldProps("firstName");
   const firstNameField = getFieldMeta('firstName');
