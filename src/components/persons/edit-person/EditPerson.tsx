@@ -44,7 +44,7 @@ interface IEditProps {
 
 const EditPersonForm: React.FC<IPerson> =  (person) => {
   const [savePerson, { error, data, loading, called }] = useMutation<{ savePerson: IPerson }, IPerson>(SAVE_PERSON);
-  const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, touched, isValid } = useFormik<IPerson>({
+  const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IPerson>({
     initialValues: person,
     // isInitialValid: true,
     validationSchema: Yup.object().shape({
@@ -103,7 +103,7 @@ const EditPersonForm: React.FC<IPerson> =  (person) => {
           {documentIdField.touched && documentIdField.error && (<span>{documentIdField.error}</span>)}
         </div>
 
-        <button disabled={!isValid} type="submit">Enviar</button>
+        <button disabled={!isValid || !dirty} type="submit">Enviar</button>
       </form>
     </div>
   );
