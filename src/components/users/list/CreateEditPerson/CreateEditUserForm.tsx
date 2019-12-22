@@ -29,10 +29,8 @@ const EditUserForm: React.FC<{userForm: UserForm, callback: Function}> =  ({user
     }),
     onSubmit: (values, bag) => {
        callback(values, bag.resetForm);
-       // bag.resetForm();
     }
   });
-   // console.log(errors);
    const username = getFieldProps('username');
    const usernameField = getFieldMeta('username');
 

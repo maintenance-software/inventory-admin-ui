@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
@@ -6,6 +6,7 @@ import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
 import {IUser, IUsers} from "../../../../graphql/users.type";
 import EditUserForm, {UserForm} from "./CreateEditUserForm";
 import {useHistory} from "react-router";
+import {GET_USERS_GQL} from "../Users";
 
 export const GET_USER_BY_ID = gql`
   query getUserById($userId: Int!){
@@ -65,9 +66,9 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
    const history = useHistory();
    const [savePerson, mutation] = useMutation<{ savePerson: {account: IUser} }, any>(SAVE_USER);
    const [getUserById, { called, loading, data }] = useLazyQuery<{users: IUsers}, any>(GET_USER_BY_ID);
-
+   const [hasError, setHasError] = useState(false);
    const userId = +params.userId;
-   let resetFormCallback: any;
+
   useEffect(() => {
      if(userId && userId > 0) {
         getUserById({variables: { userId: userId }});
@@ -80,10 +81,12 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
             getUserById({variables: { userId: mutation.data.savePerson.account.userId}});
             history.push(mutation.data.savePerson.account.userId.toString());
          }
+      } else {
+         // setHasError(true);
       }
    }, [mutation.data]);
 
-   if (loading)
+   if (loading || (!data && userId > 0))
       return <div>Loading</div>;
 
    let user: IUser = {
@@ -133,12 +136,11 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
          email: userForm.email,
          status: userForm.status === 'ACTIVE',
       };
-      if(userId > 0) {
-         savePerson({ variables: mutationRequest, refetchQueries: ['getUserById']});
-      } else {
-         savePerson({ variables: mutationRequest});
+      const refetchQueries = [{query: GET_USERS_GQL, variables: {}}];
+      if(user.userId > 0) {
+         refetchQueries.push({query: GET_USER_BY_ID, variables: {userId: user.userId}});
       }
-      console.log(userForm);
+      savePerson({ variables: mutationRequest, refetchQueries:refetchQueries});
       resetForm({values: userForm});
    };
 

@@ -8,10 +8,11 @@ import { useQuery } from '@apollo/react-hooks';
 import {IUsers} from "../../../graphql/users.type";
 import {Table} from "reactstrap";
 import {SearchInput} from "../../SearchInput/SearchInput";
+import {useHistory} from "react-router";
 
 
 export const GET_USERS_GQL = gql`
-  query {
+  query listUsers{
     users {
       list(queryString: "") {
          userId
@@ -31,15 +32,7 @@ export const GET_USERS_GQL = gql`
 
 const Users: React.FC =  () => {
   const [t, i18n] = useTranslation();
-  // const dispatch = useDispatch();
-  useEffect(() => {
-    // dispatch(fetchPersonsThunk)
-  }, []);
-
-  // const persons: IPerson[] = useSelector((state: IRootState) => state.personScope.persons);
-   //  const [users, setUsers] = useState<IUser[]>([]);
-   //  console.log(users);
-   // const [lang, setLang] = useState<string>('en');
+   const history = useHistory();
    const userQL = useQuery<{users: IUsers}, any>(GET_USERS_GQL);
    if (userQL.loading || !userQL.data) return <div>Loading</div>;
 
@@ -49,7 +42,7 @@ const Users: React.FC =  () => {
     <>
        <div className="row justify-content-between p-2 align-items-center">
           <div>
-             <button className="btn btn-light">
+             <button className="btn btn-light" onClick={() => history.push('users/0')}>
                 <FontAwesomeIcon icon="user-plus"/>
                 {t('user.button.add')}
              </button>
@@ -68,7 +61,7 @@ const Users: React.FC =  () => {
           </thead>
           <tbody>
           {users.map((u, i) => (
-             <tr style={{cursor:'pointer'}}>
+             <tr key={u.userId} onClick={() => history.push('users/' + u.userId)} style={{cursor:'pointer'}}>
                 <td className="align-middle p-1"><UserCard key={i} user={u}/></td>
                 <td className="align-middle">Admin, Anonymous</td>
                 <td className="align-middle">Read, Write, Delete</td>
