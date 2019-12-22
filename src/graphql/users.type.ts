@@ -1,3 +1,10 @@
+import {IPerson} from "./persons.type";
+
+export interface IUsers {
+   user: IUser;
+   list: IUser[];
+}
+
 export interface IUser {
    active: boolean;
    userId: number;
@@ -6,4 +13,5 @@ export interface IUser {
    email: string;
    privileges: string[];
    roles: string[];
+   person: IPerson;
 }

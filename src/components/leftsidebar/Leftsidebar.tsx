@@ -15,7 +15,7 @@ const OPTIONS: {path: string, localKey: string, icon:IconProp}[] = [
     {
       localKey: 'menu.users',
       icon: 'user',
-      path: '/persons'
+      path: '/users'
     },
     {
       localKey: 'menu.reports',

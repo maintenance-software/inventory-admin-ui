@@ -1,0 +1,21 @@
+.custom-input-text {
+  background-color: white;
+  display: flex;
+  border-radius: 1rem;
+  align-items: center!important;
+  align-content: center!important;
+  overflow: hidden;
+  box-shadow: 0 0 0.2rem #77797b;
+  //height: 2.2em;
+  width: auto;
+  input {
+    border: none;
+    margin: auto .2rem;
+  }
+  .input-text-icon {
+    padding-right: .5rem;
+  }
+   input:focus{
+      outline:none;
+   }
+}

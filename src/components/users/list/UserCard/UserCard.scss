@@ -1,13 +1,14 @@
 @import '~bootstrap/scss/bootstrap.scss';
 
 .user-card {
-   @extend .card;
-   width: 25rem;
-   margin: .5rem;
+   //@extend .card;
+   //width: 25rem;
+   margin: 0;
+   background-color: transparent;
    .user-card-body {
       @extend .card-body;
       @extend .d-flex;
-      @extend .p-2;
+      @extend .p-0;
       .user-avatar {
          @extend .d-flex;
          h6 {
@@ -17,16 +18,11 @@
             @extend .d-flex;
             @extend .align-items-center;
             @extend .justify-content-center;
-            width: 5rem;
-            height: 5rem;
+            width: 4rem;
+            height: 4rem;
             border-radius: 50%;
             font-size: 2rem;
          }
-      }
-
-      .user-options {
-         @extend .btn;
-         @extend .btn-link;
       }
    }
 }

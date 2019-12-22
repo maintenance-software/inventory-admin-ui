@@ -1,5 +1,3 @@
-import {IUser} from "./users.type";
-
 
 export interface IPersons {
    person: IPerson;
@@ -14,5 +12,4 @@ export interface IPerson {
    documentId: string;
    address: any;
    contactInfo: any[];
-   account: IUser;
 }

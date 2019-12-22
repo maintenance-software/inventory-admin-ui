@@ -3,7 +3,7 @@ import {HashRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import './App.scss';
 import {Leftsidebar} from "./leftsidebar/Leftsidebar";
 import { Home } from './home/home';
-import Persons from './persons';
+import Users from './users';
 import {
   Button,
   Dropdown,
@@ -65,7 +65,7 @@ const App: React.FC = () => {
               <Switch>
                 <Redirect exact from="/" to="/home"/>
                 <Route path="/home" component={Home}/>
-                <Route path="/persons" component={Persons}/>
+                <Route path="/users" component={Users}/>
               </Switch>            
             </div>
         </div>

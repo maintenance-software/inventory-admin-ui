@@ -7,6 +7,10 @@ const buildFullName = (firstName: string, lastName: string) => {
    return lastName + (firstName? ', ' + firstName : '');
 };
 
-export {flattenObject, buildFullName};
+const buildShortName = (firstName: string, lastName: string) => {
+   return (firstName? firstName.toUpperCase().charAt(0) : '') + lastName.toUpperCase().charAt(0)
+};
+
+export {flattenObject, buildFullName, buildShortName};
 
 

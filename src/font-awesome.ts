@@ -8,6 +8,8 @@ import { faHome
    , faKey
    , faPlus
    , faEllipsisV
+   , faSearch
+   , faUserPlus
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faEnvelope, faKey);
@@ -18,3 +20,5 @@ library.add(faUser, faKey);
 library.add(faChartArea, faKey);
 library.add(faPlus, faKey);
 library.add(faEllipsisV, faKey);
+library.add(faSearch, faKey);
+library.add(faUserPlus, faKey);
