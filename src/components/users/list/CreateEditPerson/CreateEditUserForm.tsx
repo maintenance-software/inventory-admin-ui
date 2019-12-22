@@ -3,40 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {FormikHelpers, useFormik} from 'formik';
 import { useParams } from 'react-router-dom';
 import * as Yup from "yup";
-import {DocumentNode, gql} from 'apollo-boost';
-import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
-import {IUser, IUsers} from "../../../../graphql/users.type";
 import {Col, CustomInput, Form, FormFeedback, FormGroup, FormText, Input, Label, Row} from "reactstrap";
-import {IPerson} from "../../../../graphql/persons.type";
-import {useHistory} from "react-router";
-import {GET_USER_BY_ID} from "./CreateEditUser";
-
-const SAVE_USER = gql`
-  mutation savePerson(
-    $personId: Int!
-  , $firstName: String!
-  , $lastName: String!
-  , $documentType: String!
-  , $documentId: String!
-  , $userId: Int!
-  , $username: String!
-  , $password: String!
-  , $email: String!
-  , $status: Boolean!
-  , 
-  ) {
-    savePerson(personId: $personId, firstName: $firstName, lastName: $lastName, documentType: $documentType, documentId: $documentId) {
-       personId
-       firstName
-       lastName
-       documentType
-       documentId
-       account(userId: $userId, username: $username, email: $email, password: $password, active: $status) {
-         userId
-       }
-    }
-  }
-`;
 
 export interface UserForm {
    username: string;
@@ -49,20 +16,7 @@ export interface UserForm {
    language: string;
 }
 
-const EditUserForm: React.FC<IUser> =  (user) => {
-   const userForm: UserForm = {
-      username: user.username,
-      email: user.email,
-      status: user.active? 'ACTIVE':'INACTIVE',
-      expiration: true,
-      firstName: user.person.firstName,
-      lastName: user.person.lastName,
-      roles: [],
-      language: 'es'
-   };
-
-   let history = useHistory();
-   const [savePerson, { error, data, loading, called }] = useMutation<{ savePerson: {account: IUser} }, any>(SAVE_USER);
+const EditUserForm: React.FC<{userForm: UserForm, callback: Function}> =  ({userForm, callback}) => {
    const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<UserForm>({
     initialValues: userForm,
     validationSchema: Yup.object().shape({
@@ -74,41 +28,11 @@ const EditUserForm: React.FC<IUser> =  (user) => {
        // documentId: Yup.number().required('Invalid entry'),
     }),
     onSubmit: (values, bag) => {
-       const mutationRequest = {
-          personId: user.person.personId,
-          firstName: values.firstName,
-          lastName: values.lastName,
-          documentType: '',
-          documentId: new Date().getTime().toString(),
-          userId: user.userId,
-          username: values.username,
-          password: '123',
-          email: values.email,
-          status: values.status === 'ACTIVE',
-       };
-       // savePerson({ variables: mutationRequest, refetchQueries: ['getUserById']});
-
-       // const test = (mutationResult): { query: DocumentNode, variables?: any} => {
-       //   return {
-       //      query: GET_USER_BY_ID,
-       //      variables: {userId: 5}
-       //   }
-       // };
-       // savePerson({ variables: mutationRequest, refetchQueries: ['getUserById']});
-
-       savePerson({ variables: mutationRequest});
+       callback(values, bag.resetForm);
+       // bag.resetForm();
     }
   });
-
-   useEffect(() => {
-      if(data && data.savePerson) {
-         // console.log(data.savePerson);
-         // resetForm({values: data.savePerson});
-         console.log(data.savePerson.account.userId.toString());
-         history.push(data.savePerson.account.userId.toString());
-      }
-   }, [data]);
-
+   // console.log(errors);
    const username = getFieldProps('username');
    const usernameField = getFieldMeta('username');
 
