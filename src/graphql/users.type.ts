@@ -6,7 +6,9 @@ export interface IUsers {
 }
 
 export interface IUser {
-   active: boolean;
+   status: EntityStatus;
+   language: string;
+   expiration: boolean;
    userId: number;
    username: string;
    password: string;
@@ -14,4 +16,10 @@ export interface IUser {
    privileges: string[];
    roles: string[];
    person: IPerson;
+}
+
+
+export enum EntityStatus {
+   ACTIVE = 'ACTIVE',
+   INACTIVE = 'INACTIVE'
 }

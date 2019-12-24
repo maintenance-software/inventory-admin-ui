@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
 import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
-import {IUser, IUsers} from "../../../../graphql/users.type";
+import {EntityStatus, IUser, IUsers} from "../../../../graphql/users.type";
 import EditUserForm, {UserForm} from "./CreateEditUserForm";
 import {useHistory} from "react-router";
 import {GET_USERS_GQL} from "../Users";
@@ -15,7 +15,9 @@ export const GET_USER_BY_ID = gql`
          userId
          username
          email
-         active
+         status
+         language
+         expiration
          person {
             personId
             firstName
@@ -39,8 +41,9 @@ const SAVE_USER = gql`
   , $username: String!
   , $password: String!
   , $email: String!
-  , $status: Boolean!
-  , 
+  , $status: String!
+  , $language: String!
+  , $expiration: Boolean!
   ) {
     savePerson(personId: $personId, firstName: $firstName, lastName: $lastName, documentType: $documentType, documentId: $documentId) {
        personId
@@ -48,7 +51,7 @@ const SAVE_USER = gql`
        lastName
        documentType
        documentId
-       account(userId: $userId, username: $username, email: $email, password: $password, active: $status) {
+       account(userId: $userId, username: $username, email: $email, password: $password, status: $status, language: $language, expiration: $expiration) {
          userId
        }
     }
@@ -94,7 +97,9 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
       username: '',
       email: '',
       password: '',
-      active: false,
+      status: EntityStatus.INACTIVE,
+      language: 'es_BO',
+      expiration: false,
       privileges: [],
       roles: [],
       person: {
@@ -115,12 +120,12 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
    const userForm: UserForm = {
       username: user.username,
       email: user.email,
-      status: user.active? 'ACTIVE':'INACTIVE',
-      expiration: true,
+      status: user.status,
+      expiration: user.expiration,
       firstName: user.person.firstName,
       lastName: user.person.lastName,
       roles: [],
-      language: 'es'
+      language: user.language
    };
 
    const callback = (userForm: UserForm, resetForm: Function) => {
@@ -134,7 +139,9 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
          username: userForm.username,
          password: '123',
          email: userForm.email,
-         status: userForm.status === 'ACTIVE',
+         status: userForm.status,
+         language: userForm.language,
+         expiration: userForm.expiration
       };
       const refetchQueries = [{query: GET_USERS_GQL, variables: {}}];
       if(user.userId > 0) {

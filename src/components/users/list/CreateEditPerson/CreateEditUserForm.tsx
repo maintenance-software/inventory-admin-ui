@@ -115,9 +115,9 @@ const EditUserForm: React.FC<{userForm: UserForm, callback: Function}> =  ({user
                 <FormGroup>
                    <Label for="language">Language</Label>
                    <Input type="select" name="language" {...language}>
-                      <option value='en'>English</option>
-                      <option value='es'>Spanish</option>
-                      <option value='fr'>French</option>
+                      <option value='es_BO'>Español Bolivia</option>
+                      <option value='en_US'>English USA</option>
+                      <option value='es_US'>Español USA</option>
                    </Input>
                 </FormGroup>
              </Col>
