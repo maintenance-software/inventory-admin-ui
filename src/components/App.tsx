@@ -19,6 +19,7 @@ import {
 import {useTranslation} from "react-i18next";
 import {fetchLocalizations} from "../api/localization.api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import ItemPage from './items';
 
 const App: React.FC = () => {
   // const appName = useSelector((state: IRootState) => state.appName);
@@ -41,7 +42,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className='container-fluid d-flex p-0 m-0 App'>
+      <div className='d-flex flex-fill p-0 m-0 root-app'>
         <aside className='left-sidebar bg-white h-100'>
           <Navbar color="light" light expand="md" className="d-flex justify-content-between">
             <UncontrolledDropdown setActiveFromChild size="sm">
@@ -59,13 +60,14 @@ const App: React.FC = () => {
           <Leftsidebar/>
         </aside>
 
-        <div className='d-flex flex-fill flex-column'>
-            <header className='d-flex top-header mb-2 ml-4 mr-4 bg-white'>header</header>
-            <div className='d-flex flex-fill mt-3  ml-4 mr-4 bg-white'>
+        <div className="d-flex flex-fill flex-column p-0 m-0">
+            <header className="d-flex top-header mb-1 ml-2 mr-2 bg-white">header</header>
+            <div className="d-flex flex-fill mt-1  ml-2 mr-2 bg-white">
               <Switch>
                 <Redirect exact from="/" to="/home"/>
                 <Route path="/home" component={Home}/>
                 <Route path="/users" component={Users}/>
+                <Route path="/items" component={ItemPage}/>
               </Switch>            
             </div>
         </div>
