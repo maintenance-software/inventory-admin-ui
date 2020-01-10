@@ -11,7 +11,6 @@ export interface IItem {
    unit: string;
    defaultPrice: number;
    description: number;
-   code: string;
    images: string[];
    createdDate: string;
    modifiedDate: string;
