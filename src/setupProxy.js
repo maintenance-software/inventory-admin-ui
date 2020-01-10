@@ -7,7 +7,7 @@ module.exports = function(app) {
     }));
 
     app.use('/graphql', proxy({
-        target: 'http://localhost:4200',
+        target: 'http://192.168.0.100:3000',
         changeOrigin: true,
     }));
 };

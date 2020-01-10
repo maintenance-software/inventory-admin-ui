@@ -31,7 +31,6 @@ export const GET_ITEMS_GQL = gql`
         unit
         defaultPrice
         description
-        code
         images
         createdDate
         modifiedDate
@@ -166,7 +165,7 @@ const ItemTable:React.FC<ITable<IItem>> = ({ columns,
                </Pagination>
 
                <div className="pagination">
-                  <select
+                  <select className="form-control"
                      value={pageSize}
                      onChange={e => {
                         setPageSize(Number(e.target.value))

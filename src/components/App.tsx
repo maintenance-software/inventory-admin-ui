@@ -42,35 +42,40 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className='d-flex flex-fill p-0 m-0 root-app'>
-        <aside className='left-sidebar bg-white h-100'>
-          <Navbar color="light" light expand="md" className="d-flex justify-content-between">
-            <UncontrolledDropdown setActiveFromChild size="sm">
-              <DropdownToggle caret color="light">{lang.toUpperCase()}</DropdownToggle>
-              <DropdownMenu>
-                <DropdownItem active={lang === 'en'} onClick={() => onChangeLang('en')}>English</DropdownItem>
-                <DropdownItem active={lang === 'es'} onClick={() => onChangeLang('es')}>Español</DropdownItem>
-                <DropdownItem active={lang === 'fr'} onClick={() => onChangeLang('fr')}>Frances</DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
-            <Button color="ligth" size="sm">
-              <FontAwesomeIcon icon="bars"/>
-            </Button>
-          </Navbar>
-          <Leftsidebar/>
-        </aside>
+      <div className="fluid-container h-100 w-100 p-0 m-0 root-app">
+        <div className="row flex-nowrap h-100 w-100 m-0 p-0">
+          <aside className="col-2 left-sidebar bg-white h-100">
+            <Navbar color="light" light expand="md" className="d-flex justify-content-between">
+              <UncontrolledDropdown setActiveFromChild size="sm">
+                <DropdownToggle caret color="light">{lang.toUpperCase()}</DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem active={lang === 'en'} onClick={() => onChangeLang('en')}>English</DropdownItem>
+                  <DropdownItem active={lang === 'es'} onClick={() => onChangeLang('es')}>Español</DropdownItem>
+                  <DropdownItem active={lang === 'fr'} onClick={() => onChangeLang('fr')}>Frances</DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
+              <Button color="ligth" size="sm">
+                <FontAwesomeIcon icon="bars"/>
+              </Button>
+            </Navbar>
+            <Leftsidebar/>
+          </aside>
 
-        <div className="d-flex flex-fill flex-column p-0 m-0">
-            <header className="d-flex top-header mb-1 ml-2 mr-2 bg-white">header</header>
-            <div className="d-flex flex-fill mt-1  ml-2 mr-2 bg-white">
-              <Switch>
-                <Redirect exact from="/" to="/home"/>
-                <Route path="/home" component={Home}/>
-                <Route path="/users" component={Users}/>
-                <Route path="/items" component={ItemPage}/>
-              </Switch>            
+          <div className="col p-0 m-0">
+            <header className="top-header mb-2 ml-2 mr-2 bg-white">
+              Header
+            </header>
+            <div className="d-flex flex-fill mt-2  ml-2 mr-2 bg-white">
+                <Switch>
+                  <Redirect exact from="/" to="/home"/>
+                  <Route path="/home" component={Home}/>
+                  <Route path="/users" component={Users}/>
+                  <Route path="/items" component={ItemPage}/>
+                </Switch>
             </div>
+          </div>
         </div>
+        
       </div>
     </Router>    
   );
