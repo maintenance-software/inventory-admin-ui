@@ -15,7 +15,7 @@ import {IUser} from "../../../graphql/users.type";
 
 
 export const GET_ITEMS_GQL = gql`
-  query fetchItems($pageIndex: Int!, $pageSize: Int!) {
+  query fetchItems($pageIndex: Int, $pageSize: Int) {
   items {
     page(pageIndex: $pageIndex, pageSize: $pageSize) {
       totalCount
