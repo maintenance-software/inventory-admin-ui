@@ -15,7 +15,7 @@ import {IUser} from "../../../graphql/users.type";
 
 
 export const GET_ITEMS_GQL = gql`
-  query fetchItems($pageIndex: Int!, $pageSize: Int!) {
+  query fetchItems($pageIndex: Int, $pageSize: Int) {
   items {
     page(pageIndex: $pageIndex, pageSize: $pageSize) {
       totalCount
@@ -192,7 +192,7 @@ const Items: React.FC =  () => {
    const history = useHistory();
    const [fetchData, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(GET_ITEMS_GQL);
    const columns: Column<IItem>[] = [
-      { Header: 'Code', accessor: 'code'},
+      { Header: '#', accessor: '#'},
       { Header: 'Name', accessor: 'name' },
       { Header: 'Description', accessor: 'description' },
       { Header: 'Unit', accessor: 'unit' },

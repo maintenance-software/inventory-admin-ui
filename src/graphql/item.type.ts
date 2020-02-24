@@ -8,9 +8,9 @@ export interface IItems {
 export interface IItem {
    itemId: number;
    name: string;
+   description: string;
    unit: string;
    defaultPrice: number;
-   description: number;
    images: string[];
    createdDate: string;
    modifiedDate: string;
@@ -20,6 +20,35 @@ export interface IItem {
 export interface ICategory {
    categoryId: number;
    name: string;
+}
+
+
+export const getItemDefaultInstance = ():IItem => ({
+   itemId: 0,
+   name: '',
+   description: '',
+   unit: '',
+   defaultPrice: 0,      
+   images: [],
+   createdDate: '',
+   modifiedDate: '',
+   category: {
+      categoryId: 0,
+      name: ''
+   }
+});
+
+export enum Units {
+   BOX,
+   CM,
+   DZ,
+   FT,
+   G,
+   IN,
+   KG,
+   M,
+   PCS,
+   MG,
 }
 
 

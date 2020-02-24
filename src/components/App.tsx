@@ -61,7 +61,7 @@ const App: React.FC = () => {
             <Leftsidebar/>
           </aside>
 
-          <div className="col p-0 m-0">
+          <div className="col d-flex flex-column p-0 m-0">
             <header className="top-header mb-2 ml-2 mr-2 bg-white">
               Header
             </header>
