@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import Users from './list/Users';
-import CreateEditUser from "./list/CreateEditPerson/CreateEditUser";
+import CreateEditUser from "./CreateEditPerson/CreateEditUser";
 
 const UserPage: React.FC =  () => {
   const [t, i18n] = useTranslation();
