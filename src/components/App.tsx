@@ -75,11 +75,11 @@ const App: React.FC = () => {
                <div>
 
                   <div className="input-group">
-                     <input type="text" className="form-control form-control-sm bg-light border-0 small" placeholder="Search for..."
+                     <input type="text" className="form-control form-control bg-light border-0 small" placeholder="Search for..."
                             aria-label="Search" aria-describedby="basic-addon2"/>
                         <div className="input-group-append">
-                           <button className="btn btn-primary btn-sm" type="button">
-                              <FontAwesomeIcon icon='search' size='sm' fixedWidth />
+                           <button className="btn btn-primary btn" type="button">
+                              <FontAwesomeIcon icon='search' fixedWidth />
                            </button>
                         </div>
                   </div>

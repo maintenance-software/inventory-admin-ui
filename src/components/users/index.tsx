@@ -10,7 +10,7 @@ const UserPage: React.FC =  () => {
   const { path, url } = useRouteMatch();
 
   return (
-    <div className="user-container">
+    <div className="container-fluid">
       <Switch>
         <Route exact path={path} component={Users}/>
         <Route path={`${path}/:userId`} component={CreateEditUser}/>

@@ -18,6 +18,11 @@ import {
    , faPencilAlt
    , faEdit
    , faUserEdit
+   , faArrowLeft
+   , faAngleDoubleLeft
+   , faAngleDoubleRight
+   , faAngleLeft
+   , faAngleRight
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faEnvelope, faKey);
@@ -37,3 +42,7 @@ library.add(faPencilRuler, faKey);
 library.add(faPencilAlt, faKey);
 library.add(faEdit, faKey);
 library.add(faUserEdit, faKey);
+library.add(faAngleDoubleLeft, faKey);
+library.add(faAngleDoubleRight, faKey);
+library.add(faAngleLeft, faKey);
+library.add(faAngleRight, faKey);

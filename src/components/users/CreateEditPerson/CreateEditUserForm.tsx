@@ -74,7 +74,7 @@ const EditUserForm: React.FC<{userForm: UserForm, callback: Function}> =  ({user
              <FormFeedback>email is invalid</FormFeedback>
           </FormGroup>
 
-          <Row form>
+          <Row>
              <Col md={6}>
                 <FormGroup>
                    <Label for="firstName">First Name</Label>
@@ -91,16 +91,7 @@ const EditUserForm: React.FC<{userForm: UserForm, callback: Function}> =  ({user
              </Col>
           </Row>
 
-          <FormGroup>
-             <Label for="roles">Roles</Label>
-             <Input type="select" name="roles" id="roles" multiple>
-                <option value="admin">Admin</option>
-                <option value="test">Tester</option>
-                <option value="anonymous">Anonymous</option>
-             </Input>
-          </FormGroup>
-
-          <Row form>
+          <Row>
              <Col md={6}>
                 <FormGroup>
                    <Label for="status">Status</Label>
