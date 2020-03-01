@@ -2,15 +2,19 @@ import React, {useEffect, useState} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
-import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
-import {EntityStatus, IPrivilege, IUser, IUsers} from "../../../graphql/users.type";
+import { useLazyQuery, useMutation } from "@apollo/react-hooks";
+import { EntityStatus, IPrivilege, IUser, IUsers } from "../../../graphql/users.type";
 import EditUserForm, {UserForm} from "./CreateEditUserForm";
 import {useHistory} from "react-router";
 import {GET_USERS_GQL} from "../list/Users";
-import {Button, Card, CardText, CardTitle, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane} from "reactstrap";
-import classnames from 'classnames';
 import UserRoleComp from "./UserRoleComp";
 import UserPrivilegeComp from "./PrivilegeUserComp";
+import Typography from "@material-ui/core/Typography/Typography";
+import Box from "@material-ui/core/Box/Box";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import {Theme} from "@material-ui/core";
+import Tabs from "@material-ui/core/Tabs/Tabs";
+import Tab from "@material-ui/core/Tab/Tab";
 
 export const GET_USER_BY_ID = gql`
   query getUserById($userId: Int!){
@@ -85,6 +89,49 @@ interface IEditProps {
    user: IUser;
 }
 
+interface TabPanelProps {
+   children?: React.ReactNode;
+   index: any;
+   value: any;
+}
+
+const TabPanel = (props: TabPanelProps) => {
+   const { children, value, index, ...other } = props;
+
+   return (
+      <Typography
+         component="div"
+         role="tabpanel"
+         hidden={value !== index}
+         id={`vertical-tabpanel-${index}`}
+         aria-labelledby={`vertical-tab-${index}`}
+         {...other}
+      >
+         {value === index && <Box p={3}>{children}</Box>}
+      </Typography>
+   );
+};
+
+const a11yProps = (index: any) => {
+   return {
+      id: `vertical-tab-${index}`,
+      'aria-controls': `vertical-tabpanel-${index}`,
+   };
+};
+
+const useStyles = makeStyles((theme: Theme) => ({
+   root: {
+      flexGrow: 1,
+      backgroundColor: theme.palette.background.paper,
+      display: 'flex',
+      height: 224,
+   },
+   tabs: {
+      borderRight: `1px solid ${theme.palette.divider}`,
+   },
+}));
+
+
 interface PersonUserRequestMutation {
    personId: number,
    firstName: string,
@@ -108,6 +155,8 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
    const params = useParams();
    const history = useHistory();
    const [activeTab, setActiveTab] = useState('1');
+   const classes = useStyles();
+   const [value, setValue] = React.useState(0);
    const [savePerson, mutation] = useMutation<{ savePerson: {account: IUser} }, any>(SAVE_USER);
    const [getUserById, { called, loading, data }] = useLazyQuery<{users: IUsers}, any>(GET_USER_BY_ID);
    const [hasError, setHasError] = useState(false);
@@ -253,49 +302,37 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
       }
    });
 
+   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+      setValue(newValue);
+   };
 
    return (
-    <div>
-       <Nav tabs>
-          <NavItem>
-             <NavLink
-                className={classnames({ active: activeTab === '1' })}
-                onClick={() => { toggle('1'); }}
-             >
-                User Details
-             </NavLink>
-          </NavItem>
-          <NavItem>
-             <NavLink
-                className={classnames({ active: activeTab === '2' })}
-                onClick={() => { toggle('2'); }}
-             >
-                Roles
-             </NavLink>
-          </NavItem>
-          <NavItem>
-             <NavLink
-                className={classnames({ active: activeTab === '3' })}
-                onClick={() => { toggle('3'); }}
-             >
-                Permissions
-             </NavLink>
-          </NavItem>
-
-       </Nav>
-       <TabContent activeTab={activeTab} className='py-3 px-1'>
-          <TabPane tabId="1">
-             <EditUserForm userForm={userForm} callback={callback}/>
-          </TabPane>
-          <TabPane tabId="2">
-             <UserRoleComp userRoles={user.roles} onSaveUserRoles = {onSaveUserRoles}/>
-          </TabPane>
-          <TabPane tabId="3">
-             <UserPrivilegeComp userPrivileges={user.privileges} onSaveUserPermission={onSaveUserPermission} userRolePrivileges={userRolePrivileges}/>
-          </TabPane>
-       </TabContent>
-
-    </div>
+      <div className={classes.root}>
+         <Tabs
+            orientation="vertical"
+            value={value}
+            onChange={handleChange}
+            aria-label="Vertical tabs example"
+            className={classes.tabs}
+         >
+            <Tab label="USER DETAILS" {...a11yProps(0)} />
+            <Tab label="ROLES" {...a11yProps(1)} />
+            <Tab label="PERMISSION" {...a11yProps(2)} />
+            <Tab label="SETTINGS" {...a11yProps(3)} />
+         </Tabs>
+         <TabPanel value={value} index={0}>
+            <EditUserForm userForm={userForm} callback={callback}/>
+         </TabPanel>
+         <TabPanel value={value} index={1}>
+            <UserRoleComp userRoles={user.roles} onSaveUserRoles = {onSaveUserRoles}/>
+         </TabPanel>
+         <TabPanel value={value} index={2}>
+            <UserPrivilegeComp userPrivileges={user.privileges} onSaveUserPermission={onSaveUserPermission} userRolePrivileges={userRolePrivileges}/>
+         </TabPanel>
+         <TabPanel value={value} index={3}>
+            In develop
+         </TabPanel>
+      </div>
   );
 };
 export default CreateEditUser;

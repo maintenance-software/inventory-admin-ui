@@ -48,6 +48,8 @@ const useStyles = makeStyles((theme: Theme) =>
       root: {
          width: '100%',
          maxWidth: '40rem',
+         padding: '0',
+         margin: '0',
          backgroundColor: theme.palette.background.paper,
       },
       inline: {
@@ -66,7 +68,7 @@ const useSearchInputStyles = makeStyles((theme: Theme) =>
    createStyles({
       root: {
          padding: '0',
-         margin: '1rem .5rem',
+         margin: '0',
          display: 'flex',
          alignItems: 'center',
          width: '40rem',
@@ -149,7 +151,7 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
 
   return (
     <Grid container direction="column" justify="center"
-          alignItems="center" spacing={1}>
+          alignItems="center">
           <List className={classes.root}>
 
              <ListItem key={3213144} alignItems="center">
