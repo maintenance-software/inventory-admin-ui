@@ -36,6 +36,7 @@ export interface IRole {
    roleId: number;
    key: number;
    name: string;
+   description: string;
    privileges: IPrivilege[];
 }
 
@@ -43,6 +44,7 @@ export interface IPrivilege{
    privilegeId: number;
    key: number;
    name: string;
+   description: string;
 }
 
 export enum EntityStatus {

@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
 import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
-import {EntityStatus, IUser, IUsers} from "../../../graphql/users.type";
+import {EntityStatus, IPrivilege, IUser, IUsers} from "../../../graphql/users.type";
 import EditUserForm, {UserForm} from "./CreateEditUserForm";
 import {useHistory} from "react-router";
 import {GET_USERS_GQL} from "../list/Users";
 import {Button, Card, CardText, CardTitle, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane} from "reactstrap";
 import classnames from 'classnames';
 import UserRoleComp from "./UserRoleComp";
+import UserPrivilegeComp from "./PrivilegeUserComp";
 
 export const GET_USER_BY_ID = gql`
   query getUserById($userId: Int!){
@@ -56,13 +57,9 @@ const SAVE_USER = gql`
   , $lastName: String!
   , $documentType: String!
   , $documentId: String!
-  , $userId: Int!
-  , $username: String!
-  , $password: String!
-  , $email: String!
-  , $status: String!
-  , $language: String!
-  , $expiration: Boolean!
+  , $user: UserArg!
+  , $privilegeIds: [Int!]
+  , $roleIds: [Int!]
   ) {
     savePerson(personId: $personId, firstName: $firstName, lastName: $lastName, documentType: $documentType, documentId: $documentId) {
        personId
@@ -70,8 +67,14 @@ const SAVE_USER = gql`
        lastName
        documentType
        documentId
-       account(userId: $userId, username: $username, email: $email, password: $password, status: $status, language: $language, expiration: $expiration) {
+       account(user: $user) {
          userId
+         privileges(privilegeIds: $privilegeIds) {
+            privilegeId
+         }
+         roles(roleIds: $roleIds) {
+            roleId
+         }
        }
     }
   }
@@ -80,6 +83,24 @@ const SAVE_USER = gql`
 
 interface IEditProps {
    user: IUser;
+}
+
+interface PersonUserRequestMutation {
+   personId: number,
+   firstName: string,
+   lastName: string,
+   documentType: string,
+   documentId: string,
+   user: {
+      userId: number,
+      username: string,
+      email: string,
+      status: string,
+      language: string,
+      expiration: boolean
+   },
+   privilegeIds: number[],
+   roleIds: number[],
 }
 
 const CreateEditUser: React.FC<IEditProps> =  (props) => {
@@ -153,29 +174,87 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
    };
 
    const callback = (userForm: UserForm, resetForm: Function) => {
-      const mutationRequest = {
+      const mutationRequest: PersonUserRequestMutation = {
          personId: user.person.personId,
          firstName: userForm.firstName,
          lastName: userForm.lastName,
          documentType: '',
          documentId: new Date().getTime().toString(),
-         userId: user.userId,
-         username: userForm.username,
-         password: '123',
-         email: userForm.email,
-         status: userForm.status,
-         language: userForm.language,
-         expiration: userForm.expiration
+         user: {
+            userId: user.userId,
+            username: userForm.username,
+            email: userForm.email,
+            status: userForm.status,
+            language: userForm.language,
+            expiration: userForm.expiration
+         },
+         privilegeIds: user.privileges.map(p => p.privilegeId),
+         roleIds: user.roles.map(r => r.roleId)
       };
+      onSavePersonUser(mutationRequest);
+      resetForm({values: userForm});
+   };
+
+   const onSaveUserPermission = (privilegeIds: number[]) => {
+      const request: PersonUserRequestMutation = {
+         personId: user.person.personId,
+         firstName: user.person.firstName,
+         lastName: user.person.lastName,
+         documentType: '',
+         documentId: new Date().getTime().toString(),
+         user: {
+            userId: user.userId,
+            username: user.username,
+            email: user.email,
+            status: user.status,
+            language: user.language,
+            expiration: user.expiration
+         },
+         privilegeIds: privilegeIds,
+         roleIds: user.roles.map(r => r.roleId)
+      };
+      onSavePersonUser(request);
+   };
+
+   const onSaveUserRoles = (roleIds: number[]) => {
+      const request: PersonUserRequestMutation = {
+         personId: user.person.personId,
+         firstName: user.person.firstName,
+         lastName: user.person.lastName,
+         documentType: '',
+         documentId: new Date().getTime().toString(),
+         user: {
+            userId: user.userId,
+            username: user.username,
+            email: user.email,
+            status: user.status,
+            language: user.language,
+            expiration: user.expiration
+         },
+         privilegeIds: user.privileges.map(p => p.privilegeId),
+         roleIds: roleIds
+      };
+      onSavePersonUser(request);
+   };
+
+
+   const onSavePersonUser = (request: PersonUserRequestMutation) => {
       const refetchQueries = [{query: GET_USERS_GQL, variables: {}}];
       if(user.userId > 0) {
          refetchQueries.push({query: GET_USER_BY_ID, variables: {userId: user.userId}});
       }
-      savePerson({ variables: mutationRequest, refetchQueries:refetchQueries});
-      resetForm({values: userForm});
+      savePerson({ variables: request, refetchQueries:refetchQueries});
    };
 
-  return (
+   let userRolePrivileges:IPrivilege[] = [];
+   user.roles.map(r => r.privileges).flat().forEach( t => {
+      if(userRolePrivileges.findIndex(p => p.privilegeId === t.privilegeId) === -1) {
+         userRolePrivileges.push(t)
+      }
+   });
+
+
+   return (
     <div>
        <Nav tabs>
           <NavItem>
@@ -209,10 +288,10 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
              <EditUserForm userForm={userForm} callback={callback}/>
           </TabPane>
           <TabPane tabId="2">
-             <UserRoleComp userRoles={user.roles}/>
+             <UserRoleComp userRoles={user.roles} onSaveUserRoles = {onSaveUserRoles}/>
           </TabPane>
           <TabPane tabId="3">
-             test permission tab
+             <UserPrivilegeComp userPrivileges={user.privileges} onSaveUserPermission={onSaveUserPermission} userRolePrivileges={userRolePrivileges}/>
           </TabPane>
        </TabContent>
 

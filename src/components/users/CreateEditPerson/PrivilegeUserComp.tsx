@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
 import {useQuery} from "@apollo/react-hooks";
 import "react-toggle/style.css"
-import { IRole } from "../../../graphql/users.type";
+import {IPrivilege} from "../../../graphql/users.type";
 import {useHistory} from "react-router";
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import {createStyles, Theme} from "@material-ui/core";
@@ -21,15 +21,15 @@ import IconButton from "@material-ui/core/IconButton/IconButton";
 import InputBase from "@material-ui/core/InputBase/InputBase";
 import SearchIcon from '@material-ui/icons/Search';
 import CancelIcon from '@material-ui/icons/Cancel';
+import SaveIcon from '@material-ui/icons/Save';
 import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
-import SaveIcon from '@material-ui/icons/Save';
 
-export const GET_ROLES = gql`
-  query fetchRoles{
-    roles {
+export const GET_PRIVILEGES = gql`
+  query fetchPrivileges{
+    privileges {
       list {
-         roleId
+         privilegeId
          key
          name
          description
@@ -37,11 +37,6 @@ export const GET_ROLES = gql`
     }
   }
 `;
-
-interface IUserRoleProps {
-   userRoles: IRole[];
-   onSaveUserRoles: Function;
-}
 
 const useStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -56,12 +51,6 @@ const useStyles = makeStyles((theme: Theme) =>
    }),
 );
 
-const useButtonStyles = makeStyles(theme => ({
-   button: {
-      margin: theme.spacing(1),
-   },
-}));
-
 const useSearchInputStyles = makeStyles((theme: Theme) =>
    createStyles({
       root: {
@@ -69,7 +58,7 @@ const useSearchInputStyles = makeStyles((theme: Theme) =>
          margin: '1rem .5rem',
          display: 'flex',
          alignItems: 'center',
-         width: '40rem',
+         width: '30rem',
       },
       input: {
          marginLeft: theme.spacing(1),
@@ -85,15 +74,28 @@ const useSearchInputStyles = makeStyles((theme: Theme) =>
    }),
 );
 
-const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
+const useButtonStyles = makeStyles(theme => ({
+   button: {
+      margin: theme.spacing(1),
+   },
+}));
+
+interface IUserPrivilegeProps {
+   userPrivileges: IPrivilege[];
+   userRolePrivileges: IPrivilege[];
+   onSaveUserPermission: Function;
+}
+
+const UserPrivilegeComp: React.FC<IUserPrivilegeProps> =  (props) => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
-   const { called, loading, data } = useQuery<{roles: {list: IRole[]}}, any>(GET_ROLES);
+   const { called, loading, data } = useQuery<{privileges: {list: IPrivilege[]}}, any>(GET_PRIVILEGES);
    const classes = useStyles();
    const searchInputClasses = useSearchInputStyles();
    const buttonClasses = useButtonStyles();
-   const [checked, setChecked] = useState(props.userRoles.map(r => r.roleId));
+
+   const [checked, setChecked] = useState(props.userPrivileges.concat(props.userRolePrivileges).map(r => r.privilegeId));
    const [globalChecked, setGlobalChecked] = useState(false);
    const [searchInput, setSearchInput] = useState('');
 
@@ -106,16 +108,12 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
       setSearchInput('');
    };
 
-   const onSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
-      return false;
-   };
-
    const handleGlobalToggle = (event: React.ChangeEvent<{ checked: boolean}>) => {
       if(event.target.checked) {
          if(data)
-            setChecked(data.roles.list.map(r => r.roleId));
+            setChecked(data.privileges.list.map(r => r.privilegeId));
       } else {
-         setChecked([]);
+         setChecked(props.userRolePrivileges.map(p => p.privilegeId));
       }
       setGlobalChecked(event.target.checked);
    };
@@ -132,33 +130,33 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
    };
 
    const onClearChanges = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setChecked(props.userRoles.map(r => r.roleId));
+      setChecked(props.userPrivileges.concat(props.userRolePrivileges).map(p => p.privilegeId));
       setGlobalChecked(false);
    };
 
-   const onSaveUserRoles = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      props.onSaveUserRoles(checked);
+
+
+   const onSaveUserPermission = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      const privilegeIds = checked.filter(p => !props.userRolePrivileges.find(rp => rp.privilegeId === p));
+      props.onSaveUserPermission(privilegeIds);
    };
 
    useEffect(() => { }, []);
 
-
    if (loading || !data)
       return <div>Loading</div>;
-
 
   return (
     <Grid container direction="column" justify="center"
           alignItems="center" spacing={1}>
           <List className={classes.root}>
-
              <ListItem key={3213144} alignItems="center">
                 <Paper className={searchInputClasses.root}>
                    <InputBase
                       value={searchInput}
                       onChange={onChangeSearch}
                       className={searchInputClasses.input}
-                      placeholder="Search Roles"
+                      placeholder="Search Privileges"
                       inputProps={{ 'aria-label': 'search roles' }}
                    />
                    <SearchIcon/>
@@ -171,7 +169,7 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
                    <Button
                       variant="contained"
                       color="primary"
-                      onClick={onSaveUserRoles}
+                      onClick={onSaveUserPermission}
                       className={buttonClasses.button}
                       startIcon={<SaveIcon/>}
                    >
@@ -198,7 +196,7 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
                 </ListItemSecondaryAction>
              </ListItem>
 
-             {data.roles.list.filter(r => r.name.toUpperCase().indexOf((searchInput || '').toUpperCase().trim()) !== -1).map((r, i) =>(
+             {data.privileges.list.filter(r => r.name.toUpperCase().indexOf((searchInput || '').toUpperCase().trim()) !== -1).map((r, i) =>(
                 <>
                    {(i || '') && <Divider variant="inset" component="li"/>}
                    <ListItem key={i} alignItems="flex-start">
@@ -213,9 +211,10 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
                          <Checkbox
                             edge="end"
                             color='primary'
-                            onChange={handleToggle(r.roleId)}
-                            checked={checked.indexOf(r.roleId) !== -1}
-                            inputProps={{ 'aria-labelledby': `checkbox-list-secondary-label-${r.roleId}` }}
+                            onChange={handleToggle(r.privilegeId)}
+                            checked={checked.indexOf(r.privilegeId) !== -1}
+                            disabled={props.userRolePrivileges.map(p => p.privilegeId).indexOf(r.privilegeId) !== -1}
+                            inputProps={{ 'aria-labelledby': `checkbox-list-secondary-label-${r.privilegeId}` }}
                          />
                       </ListItemSecondaryAction>
                    </ListItem>
@@ -225,4 +224,4 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
     </Grid>
   );
 };
-export default UserRoleComp;
+export default UserPrivilegeComp;
