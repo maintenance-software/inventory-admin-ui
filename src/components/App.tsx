@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {HashRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+import {HashRouter as Router, Switch, Route, Redirect, useRouteMatch} from "react-router-dom";
 import './App.scss';
 import {Leftsidebar} from "./leftsidebar/Leftsidebar";
 import { Home } from './home/home';
@@ -28,6 +28,7 @@ import UserSettings from "./session/settings";
 import {Container, Grid} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Paper from "@material-ui/core/Paper/Paper";
+import ResourceRoutes from "./Resources/Routes";
 
 const useStyles = makeStyles(theme => ({
    root: {
@@ -44,6 +45,18 @@ const useStyles = makeStyles(theme => ({
       // color: theme.palette.text.secondary,
    }
 }));
+
+const PageNotFoundComp: React.FC =  () => {
+   return (
+      <div>Page Not found!!</div>
+   );
+};
+
+const InvalidRoutePageComp: React.FC =  () => {
+   return (
+      <div>Invalid route</div>
+   );
+};
 
 const App: React.FC = () => {
   // const appName = useSelector((state: IRootState) => state.appName);
@@ -117,9 +130,12 @@ const App: React.FC = () => {
                          <Redirect exact from="/" to="/home"/>
                          <Route path="/home" component={Home}/>
                          <Route path="/users" component={Users}/>
+                         <Route path="/resources" component={ResourceRoutes}/>
                          <Route path="/items" component={ItemPage}/>
                          <Route path="/session/profile" component={UserProfile}/>
                          <Route path="/session/settings" component={UserSettings}/>
+                         <Route path="/pageNotFound" component={PageNotFoundComp}/>
+                         <Route path="/invalidRoute" component={InvalidRoutePageComp}/>
                       </Switch>
                    </Paper>
                 </Grid>
