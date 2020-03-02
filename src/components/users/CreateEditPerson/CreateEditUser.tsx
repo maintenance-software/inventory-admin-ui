@@ -126,6 +126,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       flexGrow: 1,
       backgroundColor: theme.palette.background.paper,
       display: 'flex',
+      flexWrap: 'nowrap',
       height: '100%!important',
       width: '100%!important'
    },
