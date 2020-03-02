@@ -106,10 +106,10 @@ const TabPanel = (props: TabPanelProps) => {
          hidden={value !== index}
          id={`vertical-tabpanel-${index}`}
          aria-labelledby={`vertical-tab-${index}`}
-         style={{backgroundColor: 'green', display: 'flex', flex: 1}}
+         style={{display: 'flex', flex: 1}}
          {...other}
       >
-         {value === index && <Box p={1}>{children}</Box>}
+         {value === index && <Box display='flex' flexGrow={1} p={1}>{children}</Box>}
       </Typography>
    );
 };

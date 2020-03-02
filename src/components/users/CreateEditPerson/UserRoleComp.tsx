@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
          width: '100%',
          maxWidth: '40rem',
          padding: '0',
-         margin: '0',
+         marginTop: '.5rem',
          backgroundColor: theme.palette.background.paper,
       },
       inline: {
@@ -70,7 +70,7 @@ const useSearchInputStyles = makeStyles((theme: Theme) =>
          margin: '0',
          display: 'flex',
          alignItems: 'center',
-         width: '40rem',
+         // minwidth: '40rem',
       },
       input: {
          marginLeft: theme.spacing(1),
@@ -149,57 +149,51 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
 
 
   return (
-     <Grid container direction="row" justify="center"
-           alignItems="center">
-       <List className={classes.root}>
-          <ListItem key={3213144} alignItems="center">
-             <Paper className={searchInputClasses.root}>
-                <InputBase
-                   value={searchInput}
-                   onChange={onChangeSearch}
-                   className={searchInputClasses.input}
-                   placeholder="Search Roles"
-                   inputProps={{ 'aria-label': 'search roles' }}
-                />
-                <SearchIcon/>
-                <Divider className={searchInputClasses.divider} orientation="vertical" />
-                <IconButton onClick={onClearInput} color="secondary" className={searchInputClasses.iconButton} aria-label="directions">
-                   <CancelIcon/>
-                </IconButton>
-             </Paper>
-             <Grid container justify="flex-end" alignItems="flex-start" className={searchInputClasses.root}>
-                <Button
-                   variant="contained"
-                   color="primary"
-                   onClick={onSaveUserRoles}
-                   className={buttonClasses.button}
-                   startIcon={<SaveIcon/>}
-                >
-                   Save
-                </Button>
-                <Button
-                   variant="contained"
-                   color="secondary"
-                   onClick={onClearChanges}
-                   className={buttonClasses.button}
-                   startIcon={<CancelIcon/>}
-                >
-                   Cancel
-                </Button>
-             </Grid>
-             <ListItemSecondaryAction>
-                <Checkbox
-                   edge="end"
-                   onChange={handleGlobalToggle}
-                   checked={globalChecked}
-                   color='default'
-                   inputProps={{ 'aria-labelledby': 'checkbox-list-secondary-label-0' }}
-                />
-             </ListItemSecondaryAction>
-          </ListItem>
-       </List>
-       <List className={classes.root}
-             style={{maxHeight: '32rem', overflow: 'auto'}}
+     <Grid container direction="column" justify="flex-start" alignItems="flex-start">
+        <Grid container direction="row" justify="flex-start" wrap='nowrap'>
+           <Paper className={searchInputClasses.root}>
+              <InputBase
+                 value={searchInput}
+                 onChange={onChangeSearch}
+                 className={searchInputClasses.input}
+                 placeholder="Search Roles"
+                 inputProps={{ 'aria-label': 'search roles' }}
+              />
+              <SearchIcon/>
+              <Divider className={searchInputClasses.divider} orientation="vertical" />
+              <IconButton onClick={onClearInput} color="secondary" className={searchInputClasses.iconButton} aria-label="directions">
+                 <CancelIcon/>
+              </IconButton>
+           </Paper>
+           <Grid container wrap='nowrap'>
+              <Checkbox
+                 edge="end"
+                 onChange={handleGlobalToggle}
+                 checked={globalChecked}
+                 color='default'
+                 inputProps={{ 'aria-labelledby': 'checkbox-list-secondary-label-0' }}
+              />
+              <Button
+                 variant="contained"
+                 color="primary"
+                 onClick={onSaveUserRoles}
+                 className={buttonClasses.button}
+                 startIcon={<SaveIcon/>}
+              >
+                 Save
+              </Button>
+              <Button
+                 variant="contained"
+                 color="secondary"
+                 onClick={onClearChanges}
+                 className={buttonClasses.button}
+                 startIcon={<CancelIcon/>}
+              >
+                 Cancel
+              </Button>
+           </Grid>
+        </Grid>
+       <List className={classes.root} style={{maxHeight: '33rem', overflow: 'auto'}}
        >
           {data.roles.list.filter(r => r.name.toUpperCase().indexOf((searchInput || '').toUpperCase().trim()) !== -1).map((r, i) =>(
              <>
