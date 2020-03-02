@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
 import {useQuery} from "@apollo/react-hooks";
-import "react-toggle/style.css"
 import {IPrivilege} from "../../../graphql/users.type";
 import {useHistory} from "react-router";
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -149,80 +148,81 @@ const UserPrivilegeComp: React.FC<IUserPrivilegeProps> =  (props) => {
       return <div>Loading</div>;
 
   return (
-    <Grid container direction="column" justify="center"
-          alignItems="center">
-          <List className={classes.root}>
-             <ListItem key={3213144} alignItems="center">
-                <Paper className={searchInputClasses.root}>
-                   <InputBase
-                      value={searchInput}
-                      onChange={onChangeSearch}
-                      className={searchInputClasses.input}
-                      placeholder="Search Privileges"
-                      inputProps={{ 'aria-label': 'search roles' }}
-                   />
-                   <SearchIcon/>
-                   <Divider className={searchInputClasses.divider} orientation="vertical" />
-                   <IconButton onClick={onClearInput} color="secondary" className={searchInputClasses.iconButton} aria-label="directions">
-                      <CancelIcon/>
-                   </IconButton>
-                </Paper>
-                <Grid container justify="flex-end" alignItems="flex-start" className={searchInputClasses.root}>
-                   <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={onSaveUserPermission}
-                      className={buttonClasses.button}
-                      startIcon={<SaveIcon/>}
-                   >
-                      Save
-                   </Button>
-                   <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={onClearChanges}
-                      className={buttonClasses.button}
-                      startIcon={<CancelIcon/>}
-                   >
-                      Cancel
-                   </Button>
-                </Grid>
-                <ListItemSecondaryAction>
-                   <Checkbox
-                      edge="end"
-                      onChange={handleGlobalToggle}
-                      checked={globalChecked}
-                      color='default'
-                      inputProps={{ 'aria-labelledby': 'checkbox-list-secondary-label-0' }}
-                   />
-                </ListItemSecondaryAction>
-             </ListItem>
-
-             {data.privileges.list.filter(r => r.name.toUpperCase().indexOf((searchInput || '').toUpperCase().trim()) !== -1).map((r, i) =>(
-                <>
-                   {(i || '') && <Divider variant="inset" component="li"/>}
-                   <ListItem key={i} alignItems="flex-start">
-                      <ListItemAvatar>
-                         <Avatar alt={r.name} src="/static/images/avatar/role.jpg" />
-                      </ListItemAvatar>
-                      <ListItemText
-                         primary={r.name}
-                         secondary={r.description || '-- None --'}
-                      />
-                      <ListItemSecondaryAction>
-                         <Checkbox
-                            edge="end"
-                            color='primary'
-                            onChange={handleToggle(r.privilegeId)}
-                            checked={checked.indexOf(r.privilegeId) !== -1}
-                            disabled={props.userRolePrivileges.map(p => p.privilegeId).indexOf(r.privilegeId) !== -1}
-                            inputProps={{ 'aria-labelledby': `checkbox-list-secondary-label-${r.privilegeId}` }}
-                         />
-                      </ListItemSecondaryAction>
-                   </ListItem>
-                </>
-             ))}
-          </List>
+     <Grid container direction="row" justify="center"
+           alignItems="center">
+        <List className={classes.root}>
+           <ListItem key={3213144} alignItems="center">
+              <Paper className={searchInputClasses.root}>
+                 <InputBase
+                    value={searchInput}
+                    onChange={onChangeSearch}
+                    className={searchInputClasses.input}
+                    placeholder="Search Permissions"
+                    inputProps={{ 'aria-label': 'search permissions' }}
+                 />
+                 <SearchIcon/>
+                 <Divider className={searchInputClasses.divider} orientation="vertical" />
+                 <IconButton onClick={onClearInput} color="secondary" className={searchInputClasses.iconButton} aria-label="directions">
+                    <CancelIcon/>
+                 </IconButton>
+              </Paper>
+              <Grid container justify="flex-end" alignItems="flex-start" className={searchInputClasses.root}>
+                 <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={onSaveUserPermission}
+                    className={buttonClasses.button}
+                    startIcon={<SaveIcon/>}
+                 >
+                    Save
+                 </Button>
+                 <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={onClearChanges}
+                    className={buttonClasses.button}
+                    startIcon={<CancelIcon/>}
+                 >
+                    Cancel
+                 </Button>
+              </Grid>
+              <ListItemSecondaryAction>
+                 <Checkbox
+                    edge="end"
+                    onChange={handleGlobalToggle}
+                    checked={globalChecked}
+                    color='default'
+                    inputProps={{ 'aria-labelledby': 'checkbox-list-secondary-label-0' }}
+                 />
+              </ListItemSecondaryAction>
+           </ListItem>
+        </List>
+        <List className={classes.root} style={{maxHeight: '32rem', overflow: 'auto'}}>
+           {data.privileges.list.filter(r => r.name.toUpperCase().indexOf((searchInput || '').toUpperCase().trim()) !== -1).map((r, i) =>(
+              <>
+                 {(i || '') && <Divider variant="inset" component="li"/>}
+                 <ListItem key={i} alignItems="flex-start">
+                    <ListItemAvatar>
+                       <Avatar alt={r.name} src="/static/images/avatar/role.jpg" />
+                    </ListItemAvatar>
+                    <ListItemText
+                       primary={r.name}
+                       secondary={r.description || '-- None --'}
+                    />
+                    <ListItemSecondaryAction>
+                       <Checkbox
+                          edge="end"
+                          color='primary'
+                          onChange={handleToggle(r.privilegeId)}
+                          checked={checked.indexOf(r.privilegeId) !== -1}
+                          disabled={props.userRolePrivileges.map(p => p.privilegeId).indexOf(r.privilegeId) !== -1}
+                          inputProps={{ 'aria-labelledby': `checkbox-list-secondary-label-${r.privilegeId}` }}
+                       />
+                    </ListItemSecondaryAction>
+                 </ListItem>
+              </>
+           ))}
+        </List>
     </Grid>
   );
 };

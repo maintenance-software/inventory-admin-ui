@@ -15,6 +15,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Theme} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
+import Grid from "@material-ui/core/Grid/Grid";
 
 export const GET_USER_BY_ID = gql`
   query getUserById($userId: Int!){
@@ -105,9 +106,10 @@ const TabPanel = (props: TabPanelProps) => {
          hidden={value !== index}
          id={`vertical-tabpanel-${index}`}
          aria-labelledby={`vertical-tab-${index}`}
+         style={{backgroundColor: 'green', display: 'flex', flex: 1}}
          {...other}
       >
-         {value === index && <Box p={3}>{children}</Box>}
+         {value === index && <Box p={1}>{children}</Box>}
       </Typography>
    );
 };
@@ -124,7 +126,8 @@ const useStyles = makeStyles((theme: Theme) => ({
       flexGrow: 1,
       backgroundColor: theme.palette.background.paper,
       display: 'flex',
-      height: 224,
+      height: '100%!important',
+      width: '100%!important'
    },
    tabs: {
       borderRight: `1px solid ${theme.palette.divider}`,
@@ -307,7 +310,7 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
    };
 
    return (
-      <div className={classes.root}>
+      <Grid container className={classes.root}>
          <Tabs
             orientation="vertical"
             value={value}
@@ -332,7 +335,7 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
          <TabPanel value={value} index={3}>
             In develop
          </TabPanel>
-      </div>
+      </Grid>
   );
 };
 export default CreateEditUser;

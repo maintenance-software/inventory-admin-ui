@@ -39,6 +39,7 @@ const useStyles = makeStyles(theme => ({
    },
    paper: {
       padding: theme.spacing(2),
+      flex: 1
       // textAlign: 'center',
       // color: theme.palette.text.secondary,
    }
@@ -111,7 +112,7 @@ const App: React.FC = () => {
                 </Grid>
 
                 <Grid item container style={{flexGrow: 1}}>
-                   <Paper className={classes.paper} style={{flex: 1}}>
+                   <Paper className={classes.paper}>
                       <Switch>
                          <Redirect exact from="/" to="/home"/>
                          <Route path="/home" component={Home}/>
