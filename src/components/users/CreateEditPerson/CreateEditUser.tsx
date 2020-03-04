@@ -206,7 +206,7 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
          lastName: '',
          documentType: '',
          documentId: '',
-         address: '',
+         address: null,
          contactInfo: []
       }
    };

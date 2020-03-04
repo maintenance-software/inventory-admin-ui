@@ -60,14 +60,6 @@ export const FETCH_PERSONS_GQL = gql`
   }
 `;
 
-export const HumanResourceComp1: React.FC =  () => {
-   const [t, i18n] = useTranslation();
-   const { path, url } = useRouteMatch();
-   return (
-      <div>test page 2</div>
-   );
-};
-
 const useStyles1 = makeStyles((theme: Theme) =>
    createStyles({
       root: {

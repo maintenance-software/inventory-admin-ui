@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import {Redirect} from "react-router";
-import {HumanResourceComp, HumanResourceComp1} from "./Human";
+import { HumanResourceComp } from "./Human";
+import CreateEditPersonComp from "./Human/CreateEditPerson/CreateEditPersonComp";
 
 
 const HumanResourceRoutes: React.FC =  () => {
@@ -11,7 +12,7 @@ const HumanResourceRoutes: React.FC =  () => {
    return (
       <Switch>
          <Route exact path={path} component={HumanResourceComp}/>
-         <Route path={`${path}/:personId`} component={HumanResourceComp1}/>
+         <Route path={`${path}/:personId`} component={CreateEditPersonComp}/>
       </Switch>
    );
 };
