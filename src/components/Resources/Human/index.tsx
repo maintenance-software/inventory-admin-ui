@@ -22,6 +22,21 @@ import {useLazyQuery} from "@apollo/react-hooks";
 import {IUsers} from "../../../graphql/users.type";
 import {IPerson} from "../../../graphql/persons.type";
 import {IPage} from "../../../graphql/page.type";
+import Grid from "@material-ui/core/Grid/Grid";
+import Checkbox from "@material-ui/core/Checkbox/Checkbox";
+import Button from "@material-ui/core/Button/Button";
+import SaveIcon from '@material-ui/icons/Save';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AddIcon from '@material-ui/icons/Add';
+import ListIcon from '@material-ui/icons/List';
+import EditIcon from '@material-ui/icons/Edit';
+import InputBase from "@material-ui/core/InputBase/InputBase";
+import SearchIcon from '@material-ui/icons/Search';
+import Divider from "@material-ui/core/Divider/Divider";
+import {SearchInput} from "../../SearchInput/SearchInput";
+
+
+
 
 export const FETCH_PERSONS_GQL = gql`
   query fetchPersons($pageIndex: Int, $pageSize: Int){
@@ -58,6 +73,35 @@ const useStyles1 = makeStyles((theme: Theme) =>
       root: {
          flexShrink: 0,
          marginLeft: theme.spacing(2.5),
+      },
+   }),
+);
+
+const useButtonStyles = makeStyles(theme => ({
+   button: {
+      margin: theme.spacing(1),
+   },
+}));
+
+const useSearchInputStyles = makeStyles((theme: Theme) =>
+   createStyles({
+      root: {
+         padding: '0',
+         margin: '0',
+         display: 'flex',
+         alignItems: 'center',
+         // width: '30rem',
+      },
+      input: {
+         marginLeft: theme.spacing(1),
+         flex: 1,
+      },
+      iconButton: {
+         padding: 10,
+      },
+      divider: {
+         height: 28,
+         margin: 4,
       },
    }),
 );
@@ -125,7 +169,7 @@ const useStyles2 = makeStyles({
       width: '100%',
    },
    container: {
-      height: '34rem',
+      height: '31rem',
    },
 });
 
@@ -133,7 +177,8 @@ export const HumanResourceComp: React.FC = () => {
    const classes = useStyles2();
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(5);
-
+   const buttonClasses = useButtonStyles();
+   const searchInputClasses = useSearchInputStyles();
    const [fetchPersons, { called, loading, data }] = useLazyQuery<{persons: {page: IPage<IPerson>}}, any>(FETCH_PERSONS_GQL);
    useEffect(() => {
       fetchPersons({variables: { pageIndex: pageIndex, pageSize: pageSize}});
@@ -160,21 +205,80 @@ export const HumanResourceComp: React.FC = () => {
 
    return (
       <Paper className={classes.root}>
+         <Grid container direction="row" justify="flex-start" wrap='nowrap'>
+            <Grid container wrap='nowrap'>
+               <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  startIcon={<AddIcon/>}
+                  className={buttonClasses.button}
+               >
+                  Add
+               </Button>
+               <Button
+                  variant="contained"
+                  color="default"
+                  size="small"
+                  startIcon={<EditIcon/>}
+                  className={buttonClasses.button}
+               >
+                  Edit
+               </Button>
+               <Button
+                  variant="contained"
+                  color="secondary"
+                  size='small'
+                  startIcon={<CancelIcon/>}
+                  className={buttonClasses.button}
+               >
+                  Delete
+               </Button>
+               <Button
+                  variant="contained"
+                  color="default"
+                  size='small'
+                  startIcon={<ListIcon/>}
+                  className={buttonClasses.button}
+               >
+                  Options
+               </Button>
+            </Grid>
+            <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
+               <SearchInput placeholder="Search"/>
+            </Grid>
+         </Grid>
+
+
          <TableContainer className={classes.container}>
             <Table stickyHeader>
                <TableHead>
-                  <TableRow>
-                     <TableCell>X</TableCell>
+                  <TableRow style={{padding: '0'}}>
+                     <TableCell style={{padding: '0'}}>
+                        <Checkbox
+                           edge="end"
+                           color='default'
+                           style={{paddingTop: '0', paddingBottom: '0'}}
+                           inputProps={{ 'aria-labelledby': 'checkbox-list-secondary-label-0' }}
+                        />
+                     </TableCell>
                      <TableCell>Document Id</TableCell>
                      <TableCell>First Name</TableCell>
                      <TableCell>Last Name</TableCell>
-                     <TableCell>CARGO</TableCell>
+                     <TableCell component="th">CARGO</TableCell>
                   </TableRow>
                </TableHead>
                <TableBody>
                   {data.persons.page.content.map(row => (
                      <TableRow key={row.personId}>
-                        <TableCell>L</TableCell>
+                        <TableCell style={{padding: '0'}}>
+                           <Checkbox
+                              edge="end"
+                              color='default'
+                              style={{paddingTop: '0', paddingBottom: '0'}}
+                              inputProps={{ 'aria-labelledby': 'checkbox-list-secondary-label-0' }}
+                           />
+                        </TableCell>
                         <TableCell>{row.documentId}</TableCell>
                         <TableCell>{row.firstName}</TableCell>
                         <TableCell>{row.lastName}</TableCell>
