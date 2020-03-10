@@ -4,6 +4,8 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import {Redirect} from "react-router";
 import { HumanResourceComp } from "./Human";
 import CreateEditPersonComp from "./Human/CreateEditPerson/CreateEditPersonComp";
+import {ToolsResourceComp} from "./Tools";
+import {CreateEditItemToolComp} from "./Tools/CreateItemToolPerson/CreateEditItemToolComp";
 
 
 const HumanResourceRoutes: React.FC =  () => {
@@ -17,6 +19,16 @@ const HumanResourceRoutes: React.FC =  () => {
    );
 };
 
+const ToolsResourceRoutes: React.FC =  () => {
+   const { path } = useRouteMatch();
+   return (
+      <Switch>
+         <Route exact path={path} component={ToolsResourceComp}/>
+         <Route path={`${path}/:itemId`} component={CreateEditItemToolComp}/>
+      </Switch>
+   );
+};
+
 
 const ResourceRoutes: React.FC =  () => {
   const [t, i18n] = useTranslation();
@@ -25,6 +37,7 @@ const ResourceRoutes: React.FC =  () => {
   return (
      <Switch>
         <Route path={`${path}/human`} component={HumanResourceRoutes}/>
+        <Route path={`${path}/tools`} component={ToolsResourceRoutes}/>
         <Redirect exact from={`${path}/`} to="/invalidRoute" />
      </Switch>
   );

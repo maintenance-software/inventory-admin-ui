@@ -1,0 +1,281 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Address {
+    addressId: Int!
+    city: String!
+    country: String!
+    createdDate: String!
+    modifiedDate: String
+    state: String!
+    street1: String!
+    street2: String!
+    street3: String!
+    zip: String!
+}
+
+type Category {
+    categoryId: Int!
+    createdDate: String!
+    description: String!
+    modifiedDate: String
+    name: String!
+}
+
+type ContactInfo {
+    contact: String!
+    contactId: Int!
+    contactType: String!
+    createdDate: String!
+    modifiedDate: String
+}
+
+"Custom Description for Client Defined User Type"
+type Deity {
+    fullName: String!
+    power: String
+    tests(yourFullName: String!): NoDeity!
+}
+
+type Inventories {
+    inventory(entityId: Int!): Inventory!
+    list: [Inventory!]!
+}
+
+type Inventory {
+    createdDate: String!
+    description: String!
+    inventoryId: Int!
+    inventoryItems(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_InventoryItem!
+    modifiedDate: String
+    name: String!
+}
+
+type InventoryItem {
+    createdDate: String!
+    dateExpiry: String
+    inventory: Inventory!
+    inventoryItemId: Int!
+    item: Item!
+    level: Int!
+    location: String!
+    maxLevelAllowed: Int!
+    minLevelAllowed: Int!
+    modifiedDate: String
+    price: Float!
+}
+
+type InventoryItems {
+    inventoryItem(entityId: Int!): InventoryItem!
+    page(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_InventoryItem!
+}
+
+type Item {
+    category: Category!
+    code: String!
+    createdDate: String!
+    defaultPrice: Float!
+    description: String
+    images: [String!]!
+    inventoryItems(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_InventoryItem!
+    itemId: Int!
+    itemType: String!
+    manufacturer: String
+    model: String
+    modifiedDate: String
+    name: String!
+    notes: String
+    partNumber: String
+    status: String!
+    unit: String!
+}
+
+type Items {
+    item(entityId: Int!): Item!
+    page(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_Item!
+}
+
+type Mutation {
+    saveCategory(categoryId: Int!, description: String!, name: String!): Category!
+    saveInventory(active: Boolean!, description: String!, inventoryId: Int!, name: String!): Inventory!
+    saveInventoryItem(code: String!, dateExpiry: String, inventoryId: Int!, inventoryItemId: Int!, itemId: Int!, level: Int!, location: String!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!): InventoryItem!
+    saveItem(categoryId: Int!, code: String!, defaultPrice: Float!, description: String, images: [String!]!, itemId: Int!, itemType: String!, manufacturer: String, model: String, name: String!, notes: String, partNumber: String, status: String!, unit: String!): Item!
+    savePerson(documentId: String!, documentType: String!, firstName: String!, lastName: String!, personId: Int!): Person!
+    savePrivilege(active: Boolean!, description: String, key: String!, name: String!, privilegeId: Int!): Privilege!
+    saveRole(active: Boolean!, description: String, key: String!, name: String!, roleId: Int!): Role!
+}
+
+"Custom Description for Client Defined User Type"
+type NoDeity {
+    noFullName: String!
+    nopower: String
+}
+
+type PageInfo {
+    hasNext: Boolean!
+    hasPreview: Boolean!
+    pageIndex: Int!
+    pageSize: Int!
+}
+
+type Page_InventoryItem {
+    content: [InventoryItem!]!
+    pageInfo: PageInfo!
+    sort: Sort!
+    totalCount: Int!
+}
+
+type Page_Item {
+    content: [Item!]!
+    pageInfo: PageInfo!
+    sort: Sort!
+    totalCount: Int!
+}
+
+type Page_Person {
+    content: [Person!]!
+    pageInfo: PageInfo!
+    sort: Sort!
+    totalCount: Int!
+}
+
+type Person {
+    account(user: UserArg): User
+    address(address: AddressArg): Address
+    contactInfo(contactInfo: [ContactInfoArg!]): [ContactInfo!]!
+    createdDate: String!
+    documentId: String!
+    documentType: String!
+    firstName: String!
+    lastName: String!
+    modifiedDate: String
+    personId: Int!
+}
+
+type Persons {
+    page(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_Person!
+    person(entityId: Int!): Person!
+}
+
+type Privilege {
+    active: Boolean!
+    createdDate: String
+    description: String
+    key: String!
+    modifiedDate: String
+    name: String!
+    privilegeId: Int!
+}
+
+type Privileges {
+    list(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [Privilege!]!
+    privilege(entityId: Int!): Privilege!
+}
+
+type Query {
+    categories(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [Category!]!
+    deity(mythology: String, name: String!): Deity!
+    inventories: Inventories!
+    inventoryItems: InventoryItems!
+    items: Items!
+    persons: Persons!
+    privileges: Privileges!
+    roles: Roles!
+    session: Session!
+    users: Users!
+}
+
+type Role {
+    active: Boolean!
+    createdDate: String!
+    description: String
+    key: String!
+    modifiedDate: String
+    name: String!
+    privileges: [Privilege!]!
+    roleId: Int!
+}
+
+type Roles {
+    list(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [Role!]!
+    role(entityId: Int!): Role!
+}
+
+type Session {
+    authId: String!
+    email: String!
+    firstName: String!
+    language: String!
+    lastName: String!
+    permissions: [String!]!
+    username: String!
+}
+
+type Sort {
+    direction: String!
+    isSorted: Boolean!
+    isUnsorted: Boolean!
+}
+
+type User {
+    createdDate: String!
+    email: String!
+    expiration: Boolean!
+    language: String!
+    modifiedDate: String
+    newPasswordRequired: Boolean!
+    person: Person!
+    privileges(privilegeIds: [Int!]): [Privilege!]!
+    roles(roleIds: [Int!]): [Role!]!
+    status: String!
+    userId: Int!
+    username: String!
+}
+
+type Users {
+    changePassword(newPassword: String!, password: String!, userId: Int!): Boolean!
+    list(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [User!]!
+    resetPassword(entityId: Int!): String!
+    updatePassword(password: String!, userId: Int!): Boolean!
+    user(entityId: Int!): User!
+}
+
+"The item that holds the address information"
+input AddressArg {
+    addressId: Int!
+    city: String!
+    country: String!
+    state: String!
+    street1: String!
+    street2: String!
+    street3: String!
+    zip: String!
+}
+
+"The item that holds the contact Info information"
+input ContactInfoArg {
+    contact: String!
+    contactId: Int!
+    contactType: String!
+}
+
+"This field holds predicate information"
+input Predicate {
+    field: String!
+    operator: String!
+    value: String!
+}
+
+"The item that holds the user information"
+input UserArg {
+    email: String!
+    expiration: Boolean!
+    language: String!
+    status: String!
+    userId: Int!
+    username: String!
+}
