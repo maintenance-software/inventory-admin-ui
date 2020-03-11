@@ -1,26 +1,17 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {FormikHelpers, useFormik} from 'formik';
-import { useParams } from 'react-router-dom';
+import {useFormik} from 'formik';
 import * as Yup from "yup";
-import {Col, CustomInput, Form, FormFeedback, FormGroup, FormText, Input, Label, Row} from "reactstrap";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles, Theme} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField/TextField";
 import Grid from "@material-ui/core/Grid/Grid";
-import CardMedia from "@material-ui/core/CardMedia/CardMedia";
-import Paper from "@material-ui/core/Paper/Paper";
-import FormControl from "@material-ui/core/FormControl/FormControl";
-import InputLabel from "@material-ui/core/InputLabel/InputLabel";
-import Select from "@material-ui/core/Select/Select";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText/FormHelperText";
 import Button from "@material-ui/core/Button/Button";
-import AddIcon from "@material-ui/core/SvgIcon/SvgIcon";
 import CancelIcon from '@material-ui/icons/Cancel';
 import SaveIcon from '@material-ui/icons/Save';
-import {EntityStatus} from "../../../../graphql/users.type";
-import {ICategory, ItemType} from "../../../../graphql/item.type";
+import {ICategory, Units} from "../../../../graphql/item.type";
+
 const useFormStyles = makeStyles((theme: Theme) =>
    createStyles({
       root: {
@@ -54,6 +45,12 @@ const useButtonStyles = makeStyles(theme => ({
 }));
 
 export interface IItemFormProps {
+   itemForm: IItemForm;
+   categories: ICategory[];
+   onSaveItemToolCallback: Function;
+}
+
+export interface IItemForm {
    code: string;
    defaultPrice: number;
    description: string;
@@ -66,64 +63,52 @@ export interface IItemFormProps {
    status: string;
    unit: string;
    categoryId: number;
-   onSaveItemToolCallback: Function;
 }
 
-export const EditItemToolForm: React.FC<IItemFormProps> =  (props) => {
+export const EditItemToolForm: React.FC<IItemFormProps> =  ({itemForm, categories, onSaveItemToolCallback}) => {
    const formClasses = useFormStyles();
-   const selectFormClasses = useSelectFormStyles();
    const buttonClasses = useButtonStyles();
-   const [age, setAge] = React.useState('CI');
-   const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IItemFormProps>({
-    initialValues: props,
+   const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IItemForm>({
+    initialValues: itemForm,
     validationSchema: Yup.object().shape({
-       // firstName: Yup.string(),
-       // lastName: Yup.string().required('This filed is required'),
-       // email: Yup.string().required('Username is required').email('Invalid email'),
-       // documentId: Yup.number().required('This filed is required')
+       name: Yup.string().required('This filed is required'),
+       code: Yup.string().required('This filed is required'),
+       defaultPrice: Yup.number(),
+       categoryId: Yup.number().required()
     }),
     onSubmit: (values, bag) => {
-       props.onSaveItemToolCallback(values, bag.resetForm);
+       onSaveItemToolCallback(values, bag.resetForm);
     }
   });
 
-  const firstName = getFieldProps("firstName");
-  const firstNameField = getFieldMeta('firstName');
+   const name = getFieldProps("name");
+   const nameField = getFieldMeta('name');
 
-   const lastName = getFieldProps("lastName");
-   const lastNameField = getFieldMeta("lastName");
+   const code = getFieldProps("code");
+   const codeField = getFieldMeta('code');
 
-   const email = getFieldProps('email');
-   const emailField = getFieldMeta('email');
+   const description = getFieldProps("description");
+   // const descriptionField = getFieldMeta('description');
 
-   const documentId = getFieldProps("documentId");
-   const documentIdField = getFieldMeta("documentId");
+   const manufacturer = getFieldProps("manufacturer");
+   // const manufacturerField = getFieldMeta('manufacturer');
 
-   const address = getFieldProps("address");
-   const addressField = getFieldMeta("address");
+   const model = getFieldProps("model");
+   // const modelField = getFieldMeta('model');
 
-   const city = getFieldProps("city");
-   const cityField = getFieldMeta("city");
-
-   const state = getFieldProps("state");
-   const stateField = getFieldMeta("state");
-
-   const country = getFieldProps("country");
-   const countryField = getFieldMeta("country");
-
-   const workPhone = getFieldProps("workPhone");
-   const workPhoneField = getFieldMeta("workPhone");
-
-   const cellPhone = getFieldProps("cellPhone");
-   const cellPhoneField = getFieldMeta("cellPhone");
-
-   const whatsapp = getFieldProps("whatsapp");
-   const whatsappField = getFieldMeta("whatsapp");
+   const partNumber = getFieldProps("partNumber");
+   // const partNumberField = getFieldMeta('partNumber');
 
 
-   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-      setAge(event.target.value as string);
-   };
+   const defaultPrice = getFieldProps("defaultPrice");
+   // const defaultPriceField = getFieldMeta('defaultPrice');
+
+   const unit = getFieldProps("unit");
+   const unitField = getFieldMeta('unit');
+
+   const categoryId = getFieldProps("categoryId");
+   const categoryIdField = getFieldMeta('categoryId');
+
 
   return (
     <Grid container>
@@ -154,31 +139,44 @@ export const EditItemToolForm: React.FC<IItemFormProps> =  (props) => {
           </Grid>
 
           <Grid container>
-             <Grid item container xs={6} spacing={2}>
-                <Grid item xs={12}><TextField style={{width: '100%'}} error={firstNameField.touched && !!firstNameField.error} id="first-name" label="First Name" {...firstName}/></Grid>
-                <Grid item xs={12}><TextField style={{width: '100%'}} required error={lastNameField.touched && !!lastNameField.error} id="last-name" label="Last Name" {...lastName}/></Grid>
-                <Grid item xs={12}><TextField style={{width: '100%'}} required error={emailField.touched && !!emailField.error} id="email" label="Email" {...email}/></Grid>
+             <Grid container  spacing={2}>
+                <Grid item xs={8}>
+                   <TextField  id="name" label="Name" style={{width: '100%'}} required error={nameField.touched && !!nameField.error} {...name}/>
+                </Grid>
+                <Grid item xs={4}>
+                   <TextField  id="code" label="Code" style={{width: '100%'}} required error={codeField.touched && !!codeField.error} {...code}/>
+                </Grid>
+                <Grid item xs={12}>
+                   <TextField  id="description" label="Description" style={{width: '100%'}} {...description}/>
+                </Grid>
              </Grid>
-             <Grid item xs={6}></Grid>
-          </Grid>
-          <Grid container  spacing={2}>
-             <Grid item xs={4}>
-                <TextField  id="document-id" label="Document Id" required error={documentIdField.touched && !!documentIdField.error} {...documentId}/>
-             </Grid>
-             <Grid item xs={8}>
-                <TextField  id="address" label="Address" style={{width: '100%'}} {...address}/>
-             </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-             <Grid item xs={4}><TextField  id="city" label="City" {...city}/></Grid>
-             <Grid item xs={4}><TextField  id="state" label="State" {...state}/></Grid>
-             <Grid item xs={4}><TextField  id="country" label="Country" {...country}/></Grid>
           </Grid>
 
           <Grid container spacing={2}>
-             <Grid item xs={4}><TextField  id="work-phone" label="Work Phone" {...workPhone}/></Grid>
-             <Grid item xs={4}><TextField  id="cell-phone" label="Cell Phone" {...cellPhone}/></Grid>
-             <Grid item xs={4}><TextField  id="whatsapp" label="Whatsapp" {...whatsapp}/></Grid>
+             <Grid item xs={4}><TextField  id="manufacturer" label="Manufacturer" {...manufacturer}/></Grid>
+             <Grid item xs={4}><TextField  id="model" label="Model" {...model}/></Grid>
+             <Grid item xs={4}><TextField  id="partNumber" label="Part Number" {...partNumber}/></Grid>
+          </Grid>
+
+
+          <Grid container spacing={2}>
+             <Grid item xs={4}>
+                <TextField  id="category" label="Category" select  style={{width: '100%'}} required error={categoryIdField.touched && !!categoryIdField.error} {...categoryId}>
+                   <MenuItem key={-1} value="">--Select--</MenuItem>
+                   {categories.map(c => (
+                      <MenuItem key={c.categoryId} value={c.categoryId}>{c.name}</MenuItem>
+                   ))}
+                </TextField>
+             </Grid>
+             <Grid item xs={4}>
+                <TextField  id="units" label="Units" select  style={{width: '100%'}} required error={unitField.touched && !!unitField.error} {...unit}>
+                   <MenuItem key={1} value="">--Select--</MenuItem>
+                   {Object.values(Units).map(u => (<MenuItem key={u} value={u}>{u}</MenuItem>))}
+                </TextField>
+             </Grid>
+             <Grid item xs={4}>
+                <TextField  id="default-price" label="Default Price" style={{width: '100%'}} {...defaultPrice}/>
+             </Grid>
           </Grid>
 
        </form>

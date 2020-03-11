@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {gql} from 'apollo-boost';
-import {useLazyQuery, useMutation} from "@apollo/react-hooks";
+import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import Typography from "@material-ui/core/Typography/Typography";
 import Box from "@material-ui/core/Box/Box";
@@ -13,8 +13,8 @@ import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
 import {IPerson} from "../../../../graphql/persons.type";
 import {FETCH_TOOLS_ITEMS_GQL} from "../index";
-import {getItemDefaultInstance, IItem, IItems, ItemType} from "../../../../graphql/item.type";
-import {EditItemToolForm, IItemFormProps} from "./CreateEditItemToolForm";
+import {getItemDefaultInstance, ICategory, IItem, IItems, ItemType} from "../../../../graphql/item.type";
+import {EditItemToolForm, IItemForm, IItemFormProps} from "./CreateEditItemToolForm";
 import {EntityStatus} from "../../../../graphql/users.type";
 
 export const GET_ITEM_TOOL_BY_ID = gql`
@@ -23,13 +23,17 @@ export const GET_ITEM_TOOL_BY_ID = gql`
       item (entityId: $itemId) {
          itemId
          code
-         name
+         defaultPrice
          description
-         partNumber
+         images
+         itemType
          manufacturer
          model
-         itemType
+         name
+         notes
+         partNumber
          status
+         unit
          category {
             categoryId
             name
@@ -79,9 +83,14 @@ const SAVE_ITEM_TOOL = gql`
   }
 `;
 
-interface IEditItemToolProps {
-   item: IItem;
-}
+export const FETCH_CATEGORIES = gql`
+   query fetchCategories {
+      categories {
+         categoryId
+         name
+      }
+   }
+`;
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -146,7 +155,7 @@ interface ItemMutationRequest {
    categoryId: number;
 }
 
-export const CreateEditItemToolComp: React.FC<IEditItemToolProps> =  (props) => {
+export const CreateEditItemToolComp: React.FC =  () => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
@@ -155,6 +164,7 @@ export const CreateEditItemToolComp: React.FC<IEditItemToolProps> =  (props) => 
    const [value, setValue] = React.useState(0);
    const [saveItem, mutation] = useMutation<{ saveItem: IItem }, any>(SAVE_ITEM_TOOL);
    const [getItemToolById, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(GET_ITEM_TOOL_BY_ID);
+   const categoryQL = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES);
    const [hasError, setHasError] = useState(false);
    const itemId = +params.itemId;
    const toggle = (tab: string) => {
@@ -188,24 +198,27 @@ export const CreateEditItemToolComp: React.FC<IEditItemToolProps> =  (props) => 
       item = data.items.item;
    }
 
-   const itemForm: IItemFormProps = {
-      code: item.code,
-      defaultPrice: item.defaultPrice,
-      description: item.description,
-      images: item.images,
-      manufacturer: item.manufacturer,
-      model: item.model,
-      name: item.name,
-      notes: item.notes,
-      partNumber: item.partNumber,
-      status: EntityStatus[item.status],
-      unit: item.unit,
-      categoryId: item.category.categoryId,
-      onSaveItemToolCallback: (itemForm: IItemFormProps, resetForm: Function) => {
+   const itemFormProps: IItemFormProps = {
+      itemForm: {
+         code: item.code,
+         defaultPrice: item.defaultPrice,
+         description: item.description,
+         images: item.images,
+         manufacturer: item.manufacturer || '',
+         model: item.model || '',
+         name: item.name || '',
+         notes: item.notes || '',
+         partNumber: item.partNumber || '',
+         status: EntityStatus[item.status],
+         unit: item.unit,
+         categoryId: item.category.categoryId
+      },
+      categories: categoryQL.data && categoryQL.data.categories || [],
+      onSaveItemToolCallback: (itemForm: IItemForm, resetForm: Function) => {
          const mutationRequest: ItemMutationRequest = {
             itemId: item.itemId,
             code: itemForm.code,
-            defaultPrice: itemForm.defaultPrice || 0.0,
+            defaultPrice: +itemForm.defaultPrice || 0.0,
             description: itemForm.description,
             images: itemForm.images || [],
             itemType: ItemType.TOOLS,
@@ -250,7 +263,7 @@ export const CreateEditItemToolComp: React.FC<IEditItemToolProps> =  (props) => 
             <Tab label="SETTINGS" {...a11yProps(3)} />
          </Tabs>
          <TabPanel value={value} index={0}>
-            <EditItemToolForm {...itemForm}/>
+            <EditItemToolForm {...itemFormProps}/>
          </TabPanel>
          <TabPanel value={value} index={1}>
             {/*<UserRoleComp userRoles={user.roles} onSaveUserRoles = {onSaveUserRoles}/>*/}
