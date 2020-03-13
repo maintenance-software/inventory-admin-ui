@@ -23,38 +23,7 @@ import ListIcon from '@material-ui/icons/List';
 import EditIcon from '@material-ui/icons/Edit';
 import {SearchInput} from "../../SearchInput/SearchInput";
 import { TablePaginationActions } from "../../../utils/TableUtils";
-import {IItem, IItems} from "../../../graphql/item.type";
-
-
-export const FETCH_TOOLS_ITEMS_GQL = gql`
-  query fetchToolsItems($pageIndex: Int, $pageSize: Int){
-    items {
-      page(pageIndex: $pageIndex, pageSize: $pageSize, filters: [{field: "itemType",operator: "=", value: "TOOLS"}]) {
-         totalCount
-         content {
-            itemId
-            code
-            name
-            description
-            partNumber
-            manufacturer
-            model
-            itemType
-            category {
-               categoryId
-               name
-            }
-         }
-         pageInfo {
-            hasNext
-            hasPreview
-            pageSize
-            pageIndex
-         }
-      }
-    }
-  }
-`;
+import {FETCH_ITEMS_GQL, IItem, IItems} from "../../../graphql/item.type";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -98,9 +67,9 @@ export const ToolsResourceComp: React.FC = () => {
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(5);
    const buttonClasses = useButtonStyles();
-   const [fetchPersons, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_TOOLS_ITEMS_GQL);
+   const [fetchPersons, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_ITEMS_GQL);
    useEffect(() => {
-      fetchPersons({variables: { pageIndex: pageIndex, pageSize: pageSize}});
+      fetchPersons({variables: { pageIndex: pageIndex, pageSize: pageSize, filters: [{field: "itemType",operator: "=", value: "TOOLS"}]}});
    }, []);
 
    useEffect(() => {

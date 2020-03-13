@@ -1,3 +1,4 @@
+import {gql} from 'apollo-boost';
 import {IPage} from "./page.type";
 import {EntityStatus} from "./users.type";
 
@@ -19,8 +20,8 @@ export interface IItem {
    notes: string;
    partNumber: string;
    status: EntityStatus;
-   unit: string;
    category: ICategory;
+   unit: IUnit;
    createdDate: string;
    modifiedDate: string;
 }
@@ -29,6 +30,13 @@ export interface ICategory {
    categoryId: number;
    name: string;
 }
+
+export interface IUnit {
+   unitId: number;
+   key: string;
+   label: string;
+}
+
 
 export enum Units {
    BOX,
@@ -63,7 +71,11 @@ export const getItemDefaultInstance = ():IItem => ({
    notes: '',
    partNumber: '',
    status: EntityStatus.INACTIVE,
-   unit: '',
+   unit: {
+      unitId: 0,
+      key: '',
+      label: ''
+   },
    category: {
       categoryId: 0,
       name: ''
@@ -71,3 +83,123 @@ export const getItemDefaultInstance = ():IItem => ({
    createdDate: '',
    modifiedDate: ''
 });
+
+export const FETCH_ITEMS_GQL = gql`
+   query fetchToolsItems($pageIndex: Int, $pageSize: Int, $filters: [Predicate!]){
+      items {
+         page(pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+            totalCount
+            content {
+               itemId
+               code
+               name
+               description
+               partNumber
+               manufacturer
+               model
+               itemType
+               category {
+                  categoryId
+                  name
+               }
+            }
+            pageInfo {
+               hasNext
+               hasPreview
+               pageSize
+               pageIndex
+            }
+         }
+      }
+   }
+`;
+
+
+export const GET_ITEM_TOOL_BY_ID = gql`
+   query getItemToolById($itemId: Int!) {
+      items {
+         item (entityId: $itemId) {
+            itemId
+            code
+            defaultPrice
+            description
+            images
+            itemType
+            manufacturer
+            model
+            name
+            notes
+            partNumber
+            status
+            unit {
+               unitId
+               key
+               label
+            }
+            category {
+               categoryId
+               name
+            }
+         }
+      }
+   }
+`;
+
+export const SAVE_ITEM_TOOL = gql`
+   mutation saveItem(
+      $itemId: Int!,
+      $code: String!,
+      $defaultPrice: Float!,
+      $description: String,
+      $images: [String!]!,
+      $itemType: String!,
+      $manufacturer: String,
+      $model: String,
+      $name: String!,
+      $notes: String,
+      $partNumber: String,
+      $status: String!,
+      $unitId: Int!,
+      $categoryId: Int!,
+   ) {
+      saveItem(itemId: $itemId
+         , categoryId: $categoryId
+         , code: $code
+         , defaultPrice: $defaultPrice
+         , description: $description
+         , images: $images
+         , itemType: $itemType
+         , manufacturer: $manufacturer
+         , model: $model
+         , name: $name
+         , notes: $notes
+         , partNumber: $partNumber
+         , status: $status
+         , unitId: $unitId
+      ) {
+         itemId
+         category {
+            categoryId
+         }
+      }
+   }
+`;
+
+export const FETCH_CATEGORIES = gql`
+   query fetchCategories {
+      categories {
+         categoryId
+         name
+      }
+   }
+`;
+
+export const FETCH_UNITS = gql`
+   query fetchUnits {
+      units {
+         unitId
+         key
+         label
+      }
+   }
+`;

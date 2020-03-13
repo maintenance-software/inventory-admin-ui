@@ -99,7 +99,7 @@ const CreateEditItem: React.FC<IEditProps> =  (props) => {
    const itemForm: ItemForm = {
       name: item.name,
       description: item.description,
-      unit: item.unit,
+      unit: item.unit.key,
       defaultPrice: item.defaultPrice,
       categoryId: item.category.categoryId
    };

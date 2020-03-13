@@ -10,7 +10,7 @@ import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import Button from "@material-ui/core/Button/Button";
 import CancelIcon from '@material-ui/icons/Cancel';
 import SaveIcon from '@material-ui/icons/Save';
-import {ICategory, Units} from "../../../../graphql/item.type";
+import {ICategory, IUnit} from "../../../../graphql/item.type";
 
 const useFormStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -46,6 +46,7 @@ const useButtonStyles = makeStyles(theme => ({
 
 export interface IItemFormProps {
    itemForm: IItemForm;
+   units: IUnit[];
    categories: ICategory[];
    onSaveItemToolCallback: Function;
 }
@@ -61,11 +62,11 @@ export interface IItemForm {
    notes: string;
    partNumber: string;
    status: string;
-   unit: string;
+   unitId: number;
    categoryId: number;
 }
 
-export const EditItemToolForm: React.FC<IItemFormProps> =  ({itemForm, categories, onSaveItemToolCallback}) => {
+export const EditItemToolForm: React.FC<IItemFormProps> =  ({itemForm, categories, units, onSaveItemToolCallback}) => {
    const formClasses = useFormStyles();
    const buttonClasses = useButtonStyles();
    const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IItemForm>({
@@ -103,8 +104,8 @@ export const EditItemToolForm: React.FC<IItemFormProps> =  ({itemForm, categorie
    const defaultPrice = getFieldProps("defaultPrice");
    // const defaultPriceField = getFieldMeta('defaultPrice');
 
-   const unit = getFieldProps("unit");
-   const unitField = getFieldMeta('unit');
+   const unitId = getFieldProps("unitId");
+   const unitIdField = getFieldMeta('unitId');
 
    const categoryId = getFieldProps("categoryId");
    const categoryIdField = getFieldMeta('categoryId');
@@ -169,9 +170,11 @@ export const EditItemToolForm: React.FC<IItemFormProps> =  ({itemForm, categorie
                 </TextField>
              </Grid>
              <Grid item xs={4}>
-                <TextField  id="units" label="Units" select  style={{width: '100%'}} required error={unitField.touched && !!unitField.error} {...unit}>
+                <TextField  id="units" label="Units" select  style={{width: '100%'}} required error={unitIdField.touched && !!unitIdField.error} {...unitId}>
                    <MenuItem key={1} value="">--Select--</MenuItem>
-                   {Object.values(Units).map(u => (<MenuItem key={u} value={u}>{u}</MenuItem>))}
+                   {units.map(u => (
+                      <MenuItem key={u.unitId} value={u.unitId}>{u.label}</MenuItem>
+                   ))}
                 </TextField>
              </Grid>
              <Grid item xs={4}>

@@ -34,13 +34,6 @@ type ContactInfo {
     modifiedDate: String
 }
 
-"Custom Description for Client Defined User Type"
-type Deity {
-    fullName: String!
-    power: String
-    tests(yourFullName: String!): NoDeity!
-}
-
 type Inventories {
     inventory(entityId: Int!): Inventory!
     list: [Inventory!]!
@@ -91,7 +84,7 @@ type Item {
     notes: String
     partNumber: String
     status: String!
-    unit: String!
+    unit: Unit!
 }
 
 type Items {
@@ -103,16 +96,10 @@ type Mutation {
     saveCategory(categoryId: Int!, description: String!, name: String!): Category!
     saveInventory(active: Boolean!, description: String!, inventoryId: Int!, name: String!): Inventory!
     saveInventoryItem(code: String!, dateExpiry: String, inventoryId: Int!, inventoryItemId: Int!, itemId: Int!, level: Int!, location: String!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!): InventoryItem!
-    saveItem(categoryId: Int!, code: String!, defaultPrice: Float!, description: String, images: [String!]!, itemId: Int!, itemType: String!, manufacturer: String, model: String, name: String!, notes: String, partNumber: String, status: String!, unit: String!): Item!
+    saveItem(categoryId: Int!, code: String!, defaultPrice: Float!, description: String, images: [String!]!, itemId: Int!, itemType: String!, manufacturer: String, model: String, name: String!, notes: String, partNumber: String, status: String!, unitId: Int!): Item!
     savePerson(documentId: String!, documentType: String!, firstName: String!, lastName: String!, personId: Int!): Person!
     savePrivilege(active: Boolean!, description: String, key: String!, name: String!, privilegeId: Int!): Privilege!
     saveRole(active: Boolean!, description: String, key: String!, name: String!, roleId: Int!): Role!
-}
-
-"Custom Description for Client Defined User Type"
-type NoDeity {
-    noFullName: String!
-    nopower: String
 }
 
 type PageInfo {
@@ -177,8 +164,7 @@ type Privileges {
 }
 
 type Query {
-    categories(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [Category!]!
-    deity(mythology: String, name: String!): Deity!
+    categories: [Category!]!
     inventories: Inventories!
     inventoryItems: InventoryItems!
     items: Items!
@@ -186,6 +172,7 @@ type Query {
     privileges: Privileges!
     roles: Roles!
     session: Session!
+    units: [Unit!]!
     users: Users!
 }
 
@@ -219,6 +206,14 @@ type Sort {
     direction: String!
     isSorted: Boolean!
     isUnsorted: Boolean!
+}
+
+type Unit {
+    createdDate: String!
+    key: String!
+    label: String!
+    modifiedDate: String
+    unitId: Int!
 }
 
 type User {

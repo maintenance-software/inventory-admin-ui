@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
-import {gql} from 'apollo-boost';
 import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import Typography from "@material-ui/core/Typography/Typography";
@@ -11,86 +10,20 @@ import {Theme} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
-import {IPerson} from "../../../../graphql/persons.type";
-import {FETCH_TOOLS_ITEMS_GQL} from "../index";
-import {getItemDefaultInstance, ICategory, IItem, IItems, ItemType} from "../../../../graphql/item.type";
+import {
+   FETCH_CATEGORIES,
+   FETCH_UNITS,
+   GET_ITEM_TOOL_BY_ID,
+   FETCH_ITEMS_GQL,
+   getItemDefaultInstance,
+   ICategory,
+   IItem,
+   IItems,
+   ItemType, IUnit,
+   SAVE_ITEM_TOOL
+} from "../../../../graphql/item.type";
 import {EditItemToolForm, IItemForm, IItemFormProps} from "./CreateEditItemToolForm";
 import {EntityStatus} from "../../../../graphql/users.type";
-
-export const GET_ITEM_TOOL_BY_ID = gql`
-  query getItemToolById($itemId: Int!) {
-    items {
-      item (entityId: $itemId) {
-         itemId
-         code
-         defaultPrice
-         description
-         images
-         itemType
-         manufacturer
-         model
-         name
-         notes
-         partNumber
-         status
-         unit
-         category {
-            categoryId
-            name
-         }            
-      }
-    }
-  }
-`;
-
-const SAVE_ITEM_TOOL = gql`
-  mutation saveItem(
-        $itemId: Int!,
-        $code: String!,
-        $defaultPrice: Float!,
-        $description: String,
-        $images: [String!]!,
-        $itemType: String!,
-        $manufacturer: String,
-        $model: String,
-        $name: String!,
-        $notes: String,
-        $partNumber: String,
-        $status: String!,
-        $unit: String!,
-        $categoryId: Int!,
-  ) {
-    saveItem(itemId: $itemId
-       , categoryId: $categoryId
-       , code: $code
-       , defaultPrice: $defaultPrice
-       , description: $description
-       , images: $images
-       , itemType: $itemType
-       , manufacturer: $manufacturer
-       , model: $model
-       , name: $name
-       , notes: $notes
-       , partNumber: $partNumber
-       , status: $status
-       , unit: $unit
-    ) {
-        itemId
-        category {
-          categoryId
-        }
-    }
-  }
-`;
-
-export const FETCH_CATEGORIES = gql`
-   query fetchCategories {
-      categories {
-         categoryId
-         name
-      }
-   }
-`;
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -151,7 +84,7 @@ interface ItemMutationRequest {
    notes: string;
    partNumber: string;
    status: EntityStatus;
-   unit: string;
+   unitId: number;
    categoryId: number;
 }
 
@@ -165,6 +98,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
    const [saveItem, mutation] = useMutation<{ saveItem: IItem }, any>(SAVE_ITEM_TOOL);
    const [getItemToolById, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(GET_ITEM_TOOL_BY_ID);
    const categoryQL = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES);
+   const unitQL = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
    const [hasError, setHasError] = useState(false);
    const itemId = +params.itemId;
    const toggle = (tab: string) => {
@@ -210,10 +144,11 @@ export const CreateEditItemToolComp: React.FC =  () => {
          notes: item.notes || '',
          partNumber: item.partNumber || '',
          status: EntityStatus[item.status],
-         unit: item.unit,
+         unitId: item.unit.unitId,
          categoryId: item.category.categoryId
       },
-      categories: categoryQL.data && categoryQL.data.categories || [],
+      categories: (categoryQL.data && categoryQL.data.categories) || [],
+      units: (unitQL.data && unitQL.data.units) || [],
       onSaveItemToolCallback: (itemForm: IItemForm, resetForm: Function) => {
          const mutationRequest: ItemMutationRequest = {
             itemId: item.itemId,
@@ -228,7 +163,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
             notes: itemForm.notes,
             partNumber: itemForm.partNumber,
             status: itemForm.status as EntityStatus,
-            unit: itemForm.unit || '',
+            unitId: itemForm.unitId,
             categoryId: itemForm.categoryId
          };
          onSaveItem(mutationRequest);
@@ -237,7 +172,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
    };
 
    const onSaveItem = (request: ItemMutationRequest) => {
-      const refetchQueries = [{query: FETCH_TOOLS_ITEMS_GQL, variables: {}}];
+      const refetchQueries: any = [{query: FETCH_ITEMS_GQL, variables: {filters: [{field: "itemType",operator: "=", value: "TOOLS"}]}}];
       if(item.itemId > 0) {
          refetchQueries.push({query: GET_ITEM_TOOL_BY_ID, variables: {itemId: item.itemId}});
       }
