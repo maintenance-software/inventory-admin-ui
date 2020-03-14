@@ -33,7 +33,7 @@ const ToolsResourceRoutes: React.FC =  () => {
 const ResourceRoutes: React.FC =  () => {
   const [t, i18n] = useTranslation();
   const { path, url } = useRouteMatch();
-  console.log(url);
+  // console.log(url);
   return (
      <Switch>
         <Route path={`${path}/human`} component={HumanResourceRoutes}/>

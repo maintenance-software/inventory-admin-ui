@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useParams} from 'react-router-dom';
+import {useParams, useRouteMatch} from 'react-router-dom';
 import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import Typography from "@material-ui/core/Typography/Typography";
@@ -24,6 +24,8 @@ import {
 } from "../../../../graphql/item.type";
 import {EditItemToolForm, IItemForm, IItemFormProps} from "./CreateEditItemToolForm";
 import {EntityStatus} from "../../../../graphql/users.type";
+import {buildPath, clearCache} from "../../../../utils/globalUtil";
+import {awaitExpression} from "@babel/types";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -92,10 +94,11 @@ export const CreateEditItemToolComp: React.FC =  () => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
+   const { path, url } = useRouteMatch();
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [saveItem, mutation] = useMutation<{ saveItem: IItem }, any>(SAVE_ITEM_TOOL);
+   const [saveItem] = useMutation<{ saveItem: IItem }, any>(SAVE_ITEM_TOOL);
    const [getItemToolById, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(GET_ITEM_TOOL_BY_ID);
    const categoryQL = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES);
    const unitQL = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
@@ -106,22 +109,11 @@ export const CreateEditItemToolComp: React.FC =  () => {
          setActiveTab(tab);
    };
 
-  useEffect(() => {
+   useEffect(() => {
      if(itemId && itemId > 0) {
         getItemToolById({variables: { itemId }});
      }
   }, []);
-
-   useEffect(() => {
-      if(mutation.data && mutation.data.saveItem) {
-         if(itemId <= 0) {
-            getItemToolById({variables: { itemId: mutation.data.saveItem.itemId}});
-            history.push(mutation.data.saveItem.itemId.toString());
-         }
-      } else {
-         // setHasError(true);
-      }
-   }, [mutation.data]);
 
    if (loading || (!data && itemId > 0))
       return <div>Loading</div>;
@@ -149,7 +141,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
       },
       categories: (categoryQL.data && categoryQL.data.categories) || [],
       units: (unitQL.data && unitQL.data.units) || [],
-      onSaveItemToolCallback: (itemForm: IItemForm, resetForm: Function) => {
+      onSaveItemToolCallback: async (itemForm: IItemForm, resetForm: Function) => {
          const mutationRequest: ItemMutationRequest = {
             itemId: item.itemId,
             code: itemForm.code,
@@ -166,17 +158,17 @@ export const CreateEditItemToolComp: React.FC =  () => {
             unitId: itemForm.unitId,
             categoryId: itemForm.categoryId
          };
-         onSaveItem(mutationRequest);
-         resetForm({values: itemForm});
+         const response = await saveItem({
+            variables: mutationRequest
+            , update: (cache) => {
+               clearCache(cache, 'items.item');
+               clearCache(cache, 'items.page');
+            }
+         });
+         if(!response.data) return;
+         getItemToolById({variables: { itemId: response.data.saveItem.itemId }});
+         history.push(response.data.saveItem.itemId.toString());
       }
-   };
-
-   const onSaveItem = (request: ItemMutationRequest) => {
-      const refetchQueries: any = [{query: FETCH_ITEMS_GQL, variables: {filters: [{field: "itemType",operator: "=", value: "TOOLS"}]}}];
-      if(item.itemId > 0) {
-         refetchQueries.push({query: GET_ITEM_TOOL_BY_ID, variables: {itemId: item.itemId}});
-      }
-      saveItem({ variables: request, refetchQueries:refetchQueries});
    };
 
    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {

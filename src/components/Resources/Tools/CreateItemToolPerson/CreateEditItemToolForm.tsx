@@ -9,8 +9,11 @@ import Grid from "@material-ui/core/Grid/Grid";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import Button from "@material-ui/core/Button/Button";
 import CancelIcon from '@material-ui/icons/Cancel';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SaveIcon from '@material-ui/icons/Save';
 import {ICategory, IUnit} from "../../../../graphql/item.type";
+import {useHistory} from "react-router";
+import IconButton from "@material-ui/core/IconButton/IconButton";
 
 const useFormStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -67,6 +70,7 @@ export interface IItemForm {
 }
 
 export const EditItemToolForm: React.FC<IItemFormProps> =  ({itemForm, categories, units, onSaveItemToolCallback}) => {
+   const history = useHistory();
    const formClasses = useFormStyles();
    const buttonClasses = useButtonStyles();
    const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IItemForm>({
@@ -115,6 +119,9 @@ export const EditItemToolForm: React.FC<IItemFormProps> =  ({itemForm, categorie
     <Grid container>
        <form className={formClasses.root} noValidate autoComplete="off" onSubmit={handleSubmit}>
           <Grid container wrap='nowrap'>
+             <IconButton aria-label="go-back" size="small" className={buttonClasses.button} onClick={() => history.goBack()}>
+                <ArrowBackIcon/>
+             </IconButton>
              <Button
                 variant="contained"
                 color="primary"
