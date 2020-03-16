@@ -4,7 +4,9 @@ import {EntityStatus} from "./users.type";
 
 export interface IItems {
    item: IItem;
-   page: IPage<IItem>
+   page: IPage<IItem>;
+   saveItem: IItem;
+   changeItemStatus: boolean;
 }
 
 export interface IItem {
@@ -85,9 +87,9 @@ export const getItemDefaultInstance = ():IItem => ({
 });
 
 export const FETCH_ITEMS_GQL = gql`
-   query fetchToolsItems($pageIndex: Int, $pageSize: Int, $filters: [Predicate!]){
+   query fetchToolsItems($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]){
       items {
-         page(pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+         page(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
             totalCount
             content {
                itemId
@@ -162,7 +164,8 @@ export const SAVE_ITEM_TOOL = gql`
       $unitId: Int!,
       $categoryId: Int!,
    ) {
-      saveItem(itemId: $itemId
+      items {
+         saveItem(itemId: $itemId
          , categoryId: $categoryId
          , code: $code
          , defaultPrice: $defaultPrice
@@ -176,11 +179,23 @@ export const SAVE_ITEM_TOOL = gql`
          , partNumber: $partNumber
          , status: $status
          , unitId: $unitId
-      ) {
-         itemId
-         category {
-            categoryId
+         ) {
+            itemId
+            category {
+               categoryId
+            }
          }
+      }
+   }
+`;
+
+export const CHANGE_ITEM_STATUS = gql`
+   mutation changeItemStatus(
+      $itemIds: [Int!]!,
+      $status: String!
+   ) {
+      items {
+         changeItemStatus(entityIds: $itemIds, status: $status)
       }
    }
 `;

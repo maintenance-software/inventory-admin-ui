@@ -98,7 +98,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [saveItem] = useMutation<{ saveItem: IItem }, any>(SAVE_ITEM_TOOL);
+   const [saveItem] = useMutation<{ items: IItems }, any>(SAVE_ITEM_TOOL);
    const [getItemToolById, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(GET_ITEM_TOOL_BY_ID);
    const categoryQL = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES);
    const unitQL = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
@@ -166,8 +166,8 @@ export const CreateEditItemToolComp: React.FC =  () => {
             }
          });
          if(!response.data) return;
-         getItemToolById({variables: { itemId: response.data.saveItem.itemId }});
-         history.push(response.data.saveItem.itemId.toString());
+         getItemToolById({variables: { itemId: response.data.items.saveItem.itemId }});
+         history.push(response.data.items.saveItem.itemId.toString());
       }
    };
 

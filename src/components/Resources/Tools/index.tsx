@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, FormEvent} from 'react';
 import { useTranslation } from 'react-i18next';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import TableContainer from "@material-ui/core/TableContainer/TableContainer";
@@ -10,7 +10,7 @@ import Paper from '@material-ui/core/Paper';
 
 import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableHead from "@material-ui/core/TableHead/TableHead";
-import {useLazyQuery} from "@apollo/react-hooks";
+import { useLazyQuery, useMutation } from "@apollo/react-hooks";
 import Grid from "@material-ui/core/Grid/Grid";
 import Checkbox from "@material-ui/core/Checkbox/Checkbox";
 import Button from "@material-ui/core/Button/Button";
@@ -21,10 +21,13 @@ import ListIcon from '@material-ui/icons/List';
 import EditIcon from '@material-ui/icons/Edit';
 import {SearchInput} from "../../SearchInput/SearchInput";
 import { TablePaginationActions } from "../../../utils/TableUtils";
-import {FETCH_ITEMS_GQL, IItem, IItems} from "../../../graphql/item.type";
+import {CHANGE_ITEM_STATUS, FETCH_ITEMS_GQL, IItem, IItems} from "../../../graphql/item.type";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton/IconButton";
+import {EntityStatus} from "../../../graphql/users.type";
+import {clearCache} from "../../../utils/globalUtil";
+import {grapqhQlClient} from "../../../index";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -46,22 +49,44 @@ export const ToolsResourceComp: React.FC = () => {
    const { path } = useRouteMatch();
    const classes = useStyles2();
    const [pageIndex, setPageIndex] = React.useState(0);
-   const [pageSize, setPageSize] = React.useState(5);
+   const [pageSize, setPageSize] = React.useState(10);
    const [selectedItems, setSelectedItems] = React.useState<number[]>([]);
+   const [searchString, setSearchString] = React.useState<string>('');
    const buttonClasses = useButtonStyles();
-   const [fetchPersons, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_ITEMS_GQL);
+   const [fetchItemTools, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_ITEMS_GQL);
+   const [changeItemStatus, changeStatusResponse] = useMutation<{items: IItems}, any>(CHANGE_ITEM_STATUS);
+   const defaultFilters = [{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType",operator: "=", value: "TOOLS"}];
+
    useEffect(() => {
-      fetchPersons({variables: { pageIndex: pageIndex, pageSize: pageSize, filters: [{field: "itemType",operator: "=", value: "TOOLS"}]}});
+      fetchItemTools({variables: { pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
    }, []);
 
    useEffect(() => {
-      fetchPersons({variables: { pageIndex: pageIndex, pageSize: pageSize}});
+      fetchItemTools({variables: { pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
    }, [pageIndex, pageSize]);
 
    if (loading || !data) return <div>Loading</div>;
 
    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
       setPageIndex(newPage);
+   };
+
+   const onDeleteItems = (event: React.MouseEvent<HTMLButtonElement>) => {
+      changeItemStatus({variables: {itemIds: selectedItems, status: EntityStatus.INACTIVE }
+         , update: (cache) => clearCache(cache, 'items.page')
+      }).then((changeStatusResponse) => {
+         if(changeStatusResponse.data && changeStatusResponse.data.items.changeItemStatus) {
+            fetchItemTools({variables: { pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
+            setSelectedItems([]);
+         }
+      });
+   };
+
+   const onSearch = (event: FormEvent) => {
+      event.preventDefault();
+      clearCache(grapqhQlClient.cache, 'items.page');
+      // fetchItemTools({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
+      fetchItemTools({variables: { searchString, filters: defaultFilters}});
    };
 
    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -118,6 +143,7 @@ export const ToolsResourceComp: React.FC = () => {
                   startIcon={<CancelIcon/>}
                   className={buttonClasses.button}
                   disabled={selectedItems.length === 0}
+                  onClick={onDeleteItems}
                >
                   Delete
                </Button>
@@ -132,7 +158,9 @@ export const ToolsResourceComp: React.FC = () => {
                </Button>
             </Grid>
             <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
-               <SearchInput placeholder="Search"/>
+               <form  noValidate autoComplete="off" onSubmit={onSearch}>
+                  <SearchInput placeholder="Search" value={searchString} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchString(event.target.value)}/>
+               </form>
             </Grid>
          </Grid>
 
