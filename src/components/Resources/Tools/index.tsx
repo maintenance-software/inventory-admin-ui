@@ -51,19 +51,20 @@ export const ToolsResourceComp: React.FC = () => {
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [selectedItems, setSelectedItems] = React.useState<number[]>([]);
+   const [searchInput, setSearchInput] = React.useState<string>('');
    const [searchString, setSearchString] = React.useState<string>('');
    const buttonClasses = useButtonStyles();
    const [fetchItemTools, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_ITEMS_GQL);
-   const [changeItemStatus, changeStatusResponse] = useMutation<{items: IItems}, any>(CHANGE_ITEM_STATUS);
+   const [changeItemStatus] = useMutation<{items: IItems}, any>(CHANGE_ITEM_STATUS);
    const defaultFilters = [{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType",operator: "=", value: "TOOLS"}];
 
    useEffect(() => {
-      fetchItemTools({variables: { pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
+      fetchItemTools({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
    }, []);
 
    useEffect(() => {
-      fetchItemTools({variables: { pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
-   }, [pageIndex, pageSize]);
+      fetchItemTools({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
+   }, [pageIndex, pageSize, searchString]);
 
    if (loading || !data) return <div>Loading</div>;
 
@@ -85,8 +86,10 @@ export const ToolsResourceComp: React.FC = () => {
    const onSearch = (event: FormEvent) => {
       event.preventDefault();
       clearCache(grapqhQlClient.cache, 'items.page');
-      // fetchItemTools({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: defaultFilters}});
-      fetchItemTools({variables: { searchString, filters: defaultFilters}});
+      // fetchItemTools({variables: { searchString, pageIndex: 0, pageSize: pageSize, filters: defaultFilters}});
+      setPageIndex(0);
+      setSearchString(searchInput);
+      // fetchItemTools({variables: { searchString, filters: defaultFilters}});
    };
 
    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -159,7 +162,7 @@ export const ToolsResourceComp: React.FC = () => {
             </Grid>
             <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
                <form  noValidate autoComplete="off" onSubmit={onSearch}>
-                  <SearchInput placeholder="Search" value={searchString} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchString(event.target.value)}/>
+                  <SearchInput placeholder="Search" value={searchInput} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchInput(event.target.value)}/>
                </form>
             </Grid>
          </Grid>
