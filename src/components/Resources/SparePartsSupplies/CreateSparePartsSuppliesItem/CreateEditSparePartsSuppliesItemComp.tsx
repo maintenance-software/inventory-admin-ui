@@ -153,7 +153,7 @@ export const CreateEditSparePartsSuppliesItemComp: React.FC =  () => {
             name: itemForm.name,
             notes: itemForm.notes,
             partNumber: itemForm.partNumber,
-            status: itemForm.status as EntityStatus,
+            status: item.itemId > 0 ? itemForm.status as EntityStatus : EntityStatus.ACTIVE,
             unitId: itemForm.unitId,
             categoryId: itemForm.categoryId
          };

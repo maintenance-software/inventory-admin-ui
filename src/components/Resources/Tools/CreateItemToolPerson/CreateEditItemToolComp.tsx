@@ -14,18 +14,17 @@ import {
    FETCH_CATEGORIES,
    FETCH_UNITS,
    GET_ITEM_TOOL_BY_ID,
-   FETCH_ITEMS_GQL,
    getItemDefaultInstance,
    ICategory,
    IItem,
    IItems,
-   ItemType, IUnit,
+   ItemType,
+   IUnit,
    SAVE_ITEM_TOOL
 } from "../../../../graphql/item.type";
 import {EditItemToolForm, IItemForm, IItemFormProps} from "./CreateEditItemToolForm";
 import {EntityStatus} from "../../../../graphql/users.type";
-import {buildPath, clearCache} from "../../../../utils/globalUtil";
-import {awaitExpression} from "@babel/types";
+import {clearCache} from "../../../../utils/globalUtil";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -154,7 +153,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
             name: itemForm.name,
             notes: itemForm.notes,
             partNumber: itemForm.partNumber,
-            status: itemForm.status as EntityStatus,
+            status: item.itemId > 0 ? itemForm.status as EntityStatus : EntityStatus.ACTIVE,
             unitId: itemForm.unitId,
             categoryId: itemForm.categoryId
          };
