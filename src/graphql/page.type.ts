@@ -7,6 +7,6 @@ export interface IPageInfo {
 
 export interface IPage<T> {
    totalCount: number;
-   content: T[]
+   content: T[];
    pageInfo: IPageInfo;
 }

@@ -29,6 +29,7 @@ import {Container, Grid} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Paper from "@material-ui/core/Paper/Paper";
 import ResourceRoutes from "./Resources/Routes";
+import {InventoryRoute} from "./Inventory/Route";
 
 const useStyles = makeStyles(theme => ({
    root: {
@@ -131,6 +132,7 @@ const App: React.FC = () => {
                          <Route path="/home" component={Home}/>
                          <Route path="/users" component={Users}/>
                          <Route path="/resources" component={ResourceRoutes}/>
+                         <Route path="/inventories" component={InventoryRoute}/>
                          <Route path="/items" component={ItemPage}/>
                          <Route path="/session/profile" component={UserProfile}/>
                          <Route path="/session/settings" component={UserSettings}/>
