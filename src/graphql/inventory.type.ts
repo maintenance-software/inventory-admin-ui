@@ -70,7 +70,7 @@ export const FETCH_INVENTORIES_GQL = gql`
 
 
 export const GET_INVENTORY_BY_ID = gql`
-   query getItemToolById($inventoryId: Int!) {
+   query getInventoryById($inventoryId: Int!) {
       inventories {
          inventory(entityId: $inventoryId) {
             inventoryId
@@ -78,6 +78,38 @@ export const GET_INVENTORY_BY_ID = gql`
             description
             allowNegativeStocks
             status
+         }
+      }
+   }
+`;
+
+export const FETCH_INVENTORY_ITEMS = gql`
+   query getInventoryItems($inventoryId: Int!) {
+      inventories {
+         inventory(entityId: $inventoryId) {
+            inventoryItems {
+               totalCount
+               content {
+               inventoryItemId
+                  level
+                  maxLevelAllowed
+                  minLevelAllowed
+                  price
+                  location
+                  dateExpiry
+                  item {
+                     itemId
+                     name
+                     itemType
+                  }
+               }
+               pageInfo {
+                  hasNext
+                  hasPreview
+                  pageSize
+                  pageIndex
+               }
+            }
          }
       }
    }

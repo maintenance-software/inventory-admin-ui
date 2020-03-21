@@ -20,6 +20,8 @@ import {
 import {EntityStatus} from "../../../graphql/users.type";
 import {EditInventoryForm, IInventoryForm, IInventoryFormProps} from "./CreateEditInventoryForm";
 import {clearCache} from "../../../utils/globalUtil";
+import {InventoryStockComp} from "./InventoryStockComp";
+import {ItemSelectableComp} from "../../items/ItemSelectable/ItemSelectableComp";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -149,7 +151,7 @@ export const CreateEditInventoryComp: React.FC =  () => {
             className={classes.tabs}
          >
             <Tab label="GENERAL" {...a11yProps(0)} />
-            <Tab label="ASSIGNMENT" {...a11yProps(1)} />
+            <Tab label="STOCKS" {...a11yProps(1)} />
             <Tab label="PERMISSION" {...a11yProps(2)} />
             <Tab label="SETTINGS" {...a11yProps(3)} />
          </Tabs>
@@ -157,10 +159,10 @@ export const CreateEditInventoryComp: React.FC =  () => {
             <EditInventoryForm {...itemFormProps}/>
          </TabPanel>
          <TabPanel value={value} index={1}>
-            {/*<UserRoleComp userRoles={user.roles} onSaveUserRoles = {onSaveUserRoles}/>*/}
+            <InventoryStockComp/>
          </TabPanel>
          <TabPanel value={value} index={2}>
-            In develop 1
+            <ItemSelectableComp/>
          </TabPanel>
          <TabPanel value={value} index={3}>
             In develop 2

@@ -18,7 +18,7 @@ const useStyles1 = makeStyles((theme: Theme) =>
    createStyles({
       root: {
          flexShrink: 0,
-         marginLeft: theme.spacing(2.5),
+         marginLeft: theme.spacing(1),
       },
    }),
 );
