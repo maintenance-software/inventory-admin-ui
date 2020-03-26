@@ -21,7 +21,7 @@ import {EntityStatus} from "../../../graphql/users.type";
 import {EditInventoryForm, IInventoryForm, IInventoryFormProps} from "./CreateEditInventoryForm";
 import {clearCache} from "../../../utils/globalUtil";
 import {InventoryStockComp} from "./InventoryStockComp";
-import {ItemSelectableComp} from "../../items/ItemSelectable/ItemSelectableComp";
+import {InventoryItemAvailableComp} from "../../items/ItemSelectable/InventoryItemAvailableComp";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -162,7 +162,7 @@ export const CreateEditInventoryComp: React.FC =  () => {
             <InventoryStockComp/>
          </TabPanel>
          <TabPanel value={value} index={2}>
-            <ItemSelectableComp/>
+            {/*<InventoryItemAvailableComp inventoryId={inventoryId}/>*/}
          </TabPanel>
          <TabPanel value={value} index={3}>
             In develop 2

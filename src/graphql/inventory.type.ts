@@ -115,6 +115,30 @@ export const FETCH_INVENTORY_ITEMS = gql`
    }
 `;
 
+export const FETCH_AVAILABLE_ITEMS = gql`
+   query fetchAvaillableItems($inventoryId: Int!, $searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!] ) {
+      inventories {
+         inventory(entityId: $inventoryId) {
+            availableItems(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+               totalCount
+               content {
+                  itemId
+                  code
+                  name
+               }
+               pageInfo {
+                  hasNext
+                  hasPreview
+                  pageSize
+                  pageIndex
+               }
+            }
+         }
+      }
+   }
+`;
+
+
 export const SAVE_INVENTORY = gql`
    mutation saveInventory(
       $inventoryId: Int!
@@ -137,13 +161,30 @@ export const SAVE_INVENTORY = gql`
    }
 `;
 
-export const CHANGE_ITEM_STATUS = gql`
-   mutation changeItemStatus(
-      $itemIds: [Int!]!,
-      $status: String!
+export const SAVE_INVENTORY_ITEMS = gql`
+   mutation saveInventoryItems(
+      $inventoryId: Int!
+      $itemIds: [Int!]!
+      $level: Int!
+      $maxLevelAllowed: Int!
+      $minLevelAllowed: Int!
+      $price: Float!
+      $location: String!
+      $dateExpiry: String!
    ) {
-      items {
-         changeItemStatus(entityIds: $itemIds, status: $status)
+      inventories {
+         saveInventoryItems(
+            inventoryId: $inventoryId
+            itemIds: $itemIds
+            level: $level
+            maxLevelAllowed: $maxLevelAllowed
+            minLevelAllowed: $minLevelAllowed
+            price: $price
+            location: $location
+            dateExpiry: $dateExpiry         
+         ) {
+            inventoryItemId
+         }
       }
    }
 `;

@@ -13,8 +13,9 @@ const buildShortName = (firstName: string, lastName: string) => {
 
 export {flattenObject, buildFullName, buildShortName};
 
-export const clearCache = (cache: any, path: string) => {
-   Object.keys(cache.data.data).forEach(key => key.indexOf(path) !== -1 && cache.data.delete(key));
+export const clearCache = (cache: any, patern: string) => {
+   Object.keys(cache.data.data).forEach(key => key.match(patern) && cache.data.delete(key));
+   // Object.keys(cache.data.data).forEach(key => key.indexOf(path) !== -1 && cache.data.delete(key));
 };
 
 export const buildPath = (baseUrl: string, path: string) => {
