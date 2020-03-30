@@ -8,6 +8,7 @@ import {ToolsResourceComp} from "./Tools";
 import {CreateEditItemToolComp} from "./Tools/CreateItemToolPerson/CreateEditItemToolComp";
 import {SparePartsSuppliesItemComp} from "./SparePartsSupplies";
 import {CreateEditSparePartsSuppliesItemComp} from "./SparePartsSupplies/CreateSparePartsSuppliesItem/CreateEditSparePartsSuppliesItemComp";
+import {EquipmentComp} from "./Equipment";
 
 
 const HumanResourceRoutes: React.FC =  () => {
@@ -31,12 +32,22 @@ const ToolsResourceRoutes: React.FC =  () => {
    );
 };
 
-const SparePartsSupplies: React.FC =  () => {
+const SparePartsSupplieRoutes: React.FC =  () => {
    const { path } = useRouteMatch();
    return (
       <Switch>
          <Route exact path={path} component={SparePartsSuppliesItemComp}/>
          <Route path={`${path}/:itemId`} component={CreateEditSparePartsSuppliesItemComp}/>
+      </Switch>
+   );
+};
+
+const EquipmentAssetRoutes: React.FC =  () => {
+   const { path } = useRouteMatch();
+   return (
+      <Switch>
+         <Route exact path={path} component={EquipmentComp}/>
+         <Route path={`${path}/:equipmentId`} component={EquipmentComp}/>
       </Switch>
    );
 };
@@ -50,7 +61,8 @@ const ResourceRoutes: React.FC =  () => {
      <Switch>
         <Route path={`${path}/human`} component={HumanResourceRoutes}/>
         <Route path={`${path}/tools`} component={ToolsResourceRoutes}/>
-        <Route path={`${path}/spare-parts`} component={SparePartsSupplies}/>
+        <Route path={`${path}/spare-parts`} component={SparePartsSupplieRoutes}/>
+        <Route path={`${path}/equipment`} component={EquipmentAssetRoutes}/>
         <Redirect exact from={`${path}/`} to="/invalidRoute" />
      </Switch>
   );
