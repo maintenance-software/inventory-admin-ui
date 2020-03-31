@@ -10,18 +10,15 @@ import {Theme} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
-import {
-   GET_INVENTORY_BY_ID,
-   getInventoryDefaultInstance,
-   IInventories,
-   IInventory,
-   SAVE_INVENTORY
-} from "../../../../graphql/inventory.type";
 import {EntityStatus} from "../../../../graphql/users.type";
-import {EditInventoryForm, IInventoryForm, IInventoryFormProps} from "./CreateEditInventoryForm";
+import {EditEquipmentForm, IEquipmentFormProps} from "./CreateEditEquipmentForm";
 import {clearCache} from "../../../../utils/globalUtil";
-import {InventoryStockComp} from "./InventoryStockComp";
-import {InventoryItemAvailableComp} from "../../../items/ItemSelectable/InventoryItemAvailableComp";
+import {
+   GET_EQUIPMENT_BY_ID,
+   getDefaultEquipmentInstance,
+   IEquipment,
+   IEquipments, SAVE_EQUIPMENT
+} from "../../../../graphql/equipment.type";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -69,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 
-interface InventoryMutationRequest {
+interface EquipmentMutationRequest {
    inventoryId: number;
    name: string;
    description: string;
@@ -77,7 +74,7 @@ interface InventoryMutationRequest {
    status: EntityStatus;
 }
 
-export const CreateEditInventoryComp: React.FC =  () => {
+export const CreateEditEquipmentComp: React.FC =  () => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
@@ -85,46 +82,55 @@ export const CreateEditInventoryComp: React.FC =  () => {
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [saveInventory] = useMutation<{ inventories: IInventories }, any>(SAVE_INVENTORY);
-   const [getInventoryById, { called, loading, data }] = useLazyQuery<{inventories: IInventories}, any>(GET_INVENTORY_BY_ID);
+   const [saveEquipment] = useMutation<{ equipments: IEquipments }, any>(SAVE_EQUIPMENT);
+   const [getEquipmentById, { called, loading, data }] = useLazyQuery<{equipments: IEquipments}, any>(GET_EQUIPMENT_BY_ID);
    const [hasError, setHasError] = useState(false);
-   const inventoryId = +params.inventoryId;
+   const equipmentId = +params.equipmentId;
    const toggle = (tab: string) => {
       if(activeTab !== tab)
          setActiveTab(tab);
    };
 
    useEffect(() => {
-     if(inventoryId && inventoryId > 0) {
-        getInventoryById({variables: { inventoryId }});
+     if(equipmentId && equipmentId > 0) {
+        getEquipmentById({variables: { equipmentId }});
      }
   }, []);
 
-   if (loading || (!data && inventoryId > 0))
+   if (loading || (!data && equipmentId > 0))
       return <div>Loading</div>;
 
-   let inventory: IInventory= getInventoryDefaultInstance();
+   let equipment: IEquipment= getDefaultEquipmentInstance();
 
    if(data) {
-      inventory = data.inventories.inventory;
+      equipment = data.equipments.equipment;
    }
 
-   const itemFormProps: IInventoryFormProps = {
-      inventoryForm: {
-         name: inventory.name,
-         description: inventory.description,
-         allowNegativeStocks: inventory.allowNegativeStocks,
-         status: inventory.status
+   const equipmentFormProps: IEquipmentFormProps = {
+      equipmentForm: {
+         name: equipment.name,
+         description: equipment.description,
+         code: equipment.code,
+         partNumber: equipment.partNumber,
+         manufacturer: equipment.manufacturer,
+         model: equipment.model,
+         notes: equipment.notes,
+         status: equipment.status,
+         images: equipment.images,
+         priority: equipment.priority,
+         hoursAverageDailyUse: equipment.hoursAverageDailyUse,
+         outOfService: equipment.outOfService,
+         purchaseDate: equipment.purchaseDate
       },
-      onSaveInventoryCallback: async (inventoryForm: IInventoryForm, resetForm: Function) => {
-         const mutationRequest: InventoryMutationRequest = {
-            inventoryId: inventory.inventoryId,
-            name: inventoryForm.name,
-            description: inventoryForm.description,
-            allowNegativeStocks: inventoryForm.allowNegativeStocks,
+      onSaveEquipmentCallback: async (equipmentForm: IEquipment, resetForm: Function) => {
+         const mutationRequest: EquipmentMutationRequest = {
+            inventoryId: 0,
+            name: '',
+            description: '',
+            allowNegativeStocks: true,
             status: EntityStatus.ACTIVE
          };
-         const response = await saveInventory({
+         const response = await saveEquipment({
             variables: mutationRequest
             , update: (cache) => {
                clearCache(cache, 'inventories.inventory');
@@ -132,8 +138,8 @@ export const CreateEditInventoryComp: React.FC =  () => {
             }
          });
          if(!response.data) return;
-         getInventoryById({variables: { inventoryId: response.data.inventories.saveInventory.inventoryId }});
-         history.push(response.data.inventories.saveInventory.inventoryId.toString());
+         getEquipmentById({variables: { equipmentId: response.data.equipments.saveEquipment.equipmentId }});
+         history.push(response.data.equipments.saveEquipment.equipmentId.toString());
       }
    };
 
@@ -156,13 +162,13 @@ export const CreateEditInventoryComp: React.FC =  () => {
             <Tab label="SETTINGS" {...a11yProps(3)} />
          </Tabs>
          <TabPanel value={value} index={0}>
-            <EditInventoryForm {...itemFormProps}/>
+            <EditEquipmentForm {...equipmentFormProps}/>
          </TabPanel>
          <TabPanel value={value} index={1}>
-            <InventoryStockComp/>
+            dev 1
          </TabPanel>
          <TabPanel value={value} index={2}>
-            {/*<InventoryItemAvailableComp inventoryId={inventoryId}/>*/}
+            dev 2
          </TabPanel>
          <TabPanel value={value} index={3}>
             In develop 2

@@ -9,6 +9,7 @@ import {CreateEditItemToolComp} from "./Tools/CreateItemToolPerson/CreateEditIte
 import {SparePartsSuppliesItemComp} from "./SparePartsSupplies";
 import {CreateEditSparePartsSuppliesItemComp} from "./SparePartsSupplies/CreateSparePartsSuppliesItem/CreateEditSparePartsSuppliesItemComp";
 import {EquipmentComp} from "./Equipment";
+import {CreateEditEquipmentComp} from "./Equipment/CreateEditEquipment/CreateEditEquipmentComp";
 
 
 const HumanResourceRoutes: React.FC =  () => {
@@ -47,7 +48,7 @@ const EquipmentAssetRoutes: React.FC =  () => {
    return (
       <Switch>
          <Route exact path={path} component={EquipmentComp}/>
-         <Route path={`${path}/:equipmentId`} component={EquipmentComp}/>
+         <Route path={`${path}/:equipmentId`} component={CreateEditEquipmentComp}/>
       </Switch>
    );
 };

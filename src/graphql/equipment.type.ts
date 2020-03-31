@@ -77,7 +77,7 @@ query fetchEquipmentPage($searchString: String, $pageIndex: Int, $pageSize: Int,
 export const GET_EQUIPMENT_BY_ID = gql`
    query getEquipmentById($equipmentId: Int!) {
       equipments {
-         equipments(entityId: equipmentId) {
+         equipment(entityId: $equipmentId) {
            equipmentId
            name
            description
@@ -91,14 +91,13 @@ export const GET_EQUIPMENT_BY_ID = gql`
            priority
            hoursAverageDailyUse
            outOfService
-           purchaseDate
-           parent 
+           purchaseDate 
          }
       }
    }
 `;
 
-export const SAVE_ITEM_TOOL = gql`
+export const SAVE_EQUIPMENT = gql`
 mutation saveEquipment(
      $equipmentId: Int!
    , $name: String!
