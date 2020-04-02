@@ -21,7 +21,7 @@ import {EntityStatus} from "../../../graphql/users.type";
 import {EditInventoryForm, IInventoryForm, IInventoryFormProps} from "./CreateEditInventoryForm";
 import {clearCache} from "../../../utils/globalUtil";
 import {InventoryStockComp} from "./InventoryStockComp";
-import {InventoryItemAvailableComp} from "../../items/ItemSelectable/InventoryItemAvailableComp";
+import {InventoryItemAvailableComp} from "../../Assets/Commons/AssetSelectable/InventoryItemAvailableComp";
 
 interface TabPanelProps {
    children?: React.ReactNode;

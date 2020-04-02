@@ -11,13 +11,14 @@ import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
 import {EntityStatus} from "../../../../graphql/users.type";
-import {EditEquipmentForm, IEquipmentFormProps} from "./CreateEditEquipmentForm";
+import {EditEquipmentForm, IEquipmentForm, IEquipmentFormProps} from "./CreateEditEquipmentForm";
 import {clearCache} from "../../../../utils/globalUtil";
 import {
    GET_EQUIPMENT_BY_ID,
    getDefaultEquipmentInstance,
    IEquipment,
-   IEquipments, SAVE_EQUIPMENT
+   IEquipments,
+   SAVE_EQUIPMENT
 } from "../../../../graphql/equipment.type";
 
 interface TabPanelProps {
@@ -67,11 +68,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 
 interface EquipmentMutationRequest {
-   inventoryId: number;
+   equipmentId: number;
    name: string;
    description: string;
-   allowNegativeStocks: boolean;
-   status: EntityStatus;
+   code: string;
+   partNumber: string;
+   manufacturer: string;
+   model: string;
+   notes: string;
+   status: string;
+   images: string[];
+   priority: number;
+   hoursAverageDailyUse: number;
+   outOfService: boolean;
+   purchaseDate: string | null;
+   parentId: number | null;
 }
 
 export const CreateEditEquipmentComp: React.FC =  () => {
@@ -107,39 +118,58 @@ export const CreateEditEquipmentComp: React.FC =  () => {
    }
 
    const equipmentFormProps: IEquipmentFormProps = {
+      equipmentId: equipmentId,
       equipmentForm: {
-         name: equipment.name,
-         description: equipment.description,
-         code: equipment.code,
-         partNumber: equipment.partNumber,
-         manufacturer: equipment.manufacturer,
-         model: equipment.model,
-         notes: equipment.notes,
-         status: equipment.status,
-         images: equipment.images,
-         priority: equipment.priority,
-         hoursAverageDailyUse: equipment.hoursAverageDailyUse,
-         outOfService: equipment.outOfService,
-         purchaseDate: equipment.purchaseDate
+         name: equipment.name || '',
+         description: equipment.description || '',
+         code: equipment.code || '',
+         partNumber: equipment.partNumber || '',
+         manufacturer: equipment.manufacturer || '',
+         model: equipment.model || '',
+         notes: equipment.notes || '',
+         status: equipment.status || EntityStatus.ACTIVE,
+         images: equipment.images || [],
+         priority: equipment.priority || 0,
+         hoursAverageDailyUse: equipment.hoursAverageDailyUse || 0,
+         outOfService: equipment.outOfService || false,
+         purchaseDate: equipment.purchaseDate || '',
+         parentId: !equipment.parent? null : equipment.parent.equipmentId,
+         parentName: !equipment.parent? '' : equipment.parent.name
       },
-      onSaveEquipmentCallback: async (equipmentForm: IEquipment, resetForm: Function) => {
+      onSaveEquipmentCallback: async (equipmentForm: IEquipmentForm, resetForm: Function) => {
          const mutationRequest: EquipmentMutationRequest = {
-            inventoryId: 0,
-            name: '',
-            description: '',
-            allowNegativeStocks: true,
-            status: EntityStatus.ACTIVE
+            equipmentId: equipmentId,
+            name: equipmentForm.name,
+            description: equipmentForm.description,
+            code: equipmentForm.code,
+            partNumber: equipmentForm.partNumber,
+            manufacturer: equipmentForm.manufacturer,
+            model: equipmentForm.model,
+            notes: equipmentForm.notes,
+            status: equipmentForm.status,
+            images: equipmentForm.images,
+            priority: +equipmentForm.priority,
+            hoursAverageDailyUse: +equipmentForm.hoursAverageDailyUse,
+            outOfService: equipmentForm.outOfService,
+            purchaseDate: equipmentForm.purchaseDate || null,
+            parentId: equipmentForm.parentId
          };
          const response = await saveEquipment({
             variables: mutationRequest
             , update: (cache) => {
-               clearCache(cache, 'inventories.inventory');
-               clearCache(cache, 'inventories.list');
+               // clearCache(cache, 'inventories.inventory');
+               // clearCache(cache, 'inventories.list');
             }
          });
-         if(!response.data) return;
-         getEquipmentById({variables: { equipmentId: response.data.equipments.saveEquipment.equipmentId }});
-         history.push(response.data.equipments.saveEquipment.equipmentId.toString());
+         if(!response.data)
+            return;
+         if(equipmentId > 0) {
+            resetForm({});
+         } else {
+            getEquipmentById({variables: { equipmentId: response.data.equipments.saveEquipment.equipmentId }});
+            console.log(history.action);
+            history.push(response.data.equipments.saveEquipment.equipmentId.toString());
+         }
       }
    };
 

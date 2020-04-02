@@ -91,7 +91,11 @@ export const GET_EQUIPMENT_BY_ID = gql`
            priority
            hoursAverageDailyUse
            outOfService
-           purchaseDate 
+           purchaseDate
+           parent {
+            equipmentId
+            name
+           } 
          }
       }
    }

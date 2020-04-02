@@ -2,7 +2,7 @@ import React, {useEffect, FormEvent} from 'react';
 import { useLazyQuery, useMutation } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
-import {_EquipmentComp} from './_EquipmentComp';
+import {EquipmentComp_} from './EquipmentComp_';
 import {FETCH_EQUIPMENTS_PAGE_GQL, IEquipment, IEquipments} from "../../../graphql/equipment.type";
 
 export const EquipmentComp: React.FC = () => {
@@ -66,7 +66,7 @@ export const EquipmentComp: React.FC = () => {
       }
    };
 
-   return <_EquipmentComp
+   return <EquipmentComp_
       equipments={data.equipments.page.content}
       totalCount={data.equipments.page.totalCount}
       pageIndex={data.equipments.page.pageInfo.pageIndex}
@@ -80,5 +80,7 @@ export const EquipmentComp: React.FC = () => {
       onChangeViewMode={handleChangeMViewMode}
       onExpand={handleExpand}
       onBreadcrumbs={handleBreadcrumbs}
+      onAddEquipment={() => history.push(path + '/' + 0)}
+      onEditEquipment={(equipment: IEquipment) => history.push(path + '/' + equipment.equipmentId)}
    />;
 };

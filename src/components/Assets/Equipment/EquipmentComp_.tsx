@@ -1,5 +1,4 @@
-import React, {useEffect, FormEvent, FC} from 'react';
-import { useTranslation } from 'react-i18next';
+import React, {FC, FormEvent} from 'react';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import TableContainer from "@material-ui/core/TableContainer/TableContainer";
 import Table from '@material-ui/core/Table';
@@ -10,12 +9,11 @@ import Paper from '@material-ui/core/Paper';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import Grid from "@material-ui/core/Grid/Grid";
-import CancelIcon from '@material-ui/icons/Cancel';
+import ListIcon from '@material-ui/icons/List';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import AddBoxIcon from '@material-ui/icons/AddBox';
-import { useHistory } from "react-router";
-import { useRouteMatch } from "react-router-dom";
+import {useHistory} from "react-router";
+import {useRouteMatch} from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import {IEquipment} from "../../../graphql/equipment.type";
 import {SearchInput} from '../../SearchInput/SearchInput';
@@ -24,6 +22,10 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import Switch from '@material-ui/core/Switch';
+import {EntityStatus} from "../../../graphql/users.type";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -57,9 +59,11 @@ interface EquipmentProps {
    onSearchEquipment?(searchString: string) : void;
    onExpand?(equipment: IEquipment): void;
    onBreadcrumbs?(index: number): void;
+   onAddEquipment?(): void;
+   onEditEquipment?(equipment: IEquipment): void;
 }
 
-export const _EquipmentComp: FC<EquipmentProps> = ({equipments, pageIndex, pageSize, totalCount, searchString, viewMode, treePath, onChangePage, onChangeRowsPerPage, onSearchEquipment, onChangeViewMode, onExpand, onBreadcrumbs}) => {
+export const EquipmentComp_: FC<EquipmentProps> = ({equipments, pageIndex, pageSize, totalCount, searchString, viewMode, treePath, onChangePage, onChangeRowsPerPage, onSearchEquipment, onChangeViewMode, onExpand, onBreadcrumbs, onAddEquipment, onEditEquipment}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
@@ -85,65 +89,63 @@ export const _EquipmentComp: FC<EquipmentProps> = ({equipments, pageIndex, pageS
                   size="small"
                   startIcon={<AddIcon/>}
                   className={buttonClasses.button}
+                  onClick={onAddEquipment}
                >
                   Add
                </Button>
                <Button
                   variant="contained"
                   color="default"
-                  size="small"
-                  startIcon={<EditIcon/>}
-                  className={buttonClasses.button}
-               >
-                  Edit
-               </Button>
-               <Button
-                  variant="contained"
-                  color="secondary"
                   size='small'
-                  startIcon={<CancelIcon/>}
+                  startIcon={<ListIcon/>}
                   className={buttonClasses.button}
                >
-                  Delete
+                  Options
                </Button>
+               <FormControlLabel style={{marginTop: 0, marginBottom: 0, padding: 0}}
+                                 control={
+                                    <Checkbox
+                                       checked={'TREE' === viewMode}
+                                       name="view-mode"
+                                       color="primary"
+                                       onChange={onChangeViewMode}
+                                    />
+                                 }
+                                 label="Tree Mode"
+               />
             </Grid>
             <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
-               <FormControlLabel style={{marginTop: 0, marginBottom: 0, padding: 0}}
-                  control={
-                     <Checkbox
-                        checked={'TREE' === viewMode}
-                        name="view-mode"
-                        color="primary"
-                        onChange={onChangeViewMode}
-                     />
-                  }
-                  label="Tree Mode"
-               />
                <form  noValidate autoComplete="off" onSubmit={onSearch}>
                   <SearchInput placeholder="Search" value={searchInput} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchInput(event.target.value)}/>
                </form>
             </Grid>
          </Grid>
          <TableContainer className={classes.container}>
-            <Table stickyHeader>
+            <Table stickyHeader size="small">
                <TableHead>
                   <TableRow>
-                     <TableCell>{''}</TableCell>
                      <TableCell>Code</TableCell>
                      <TableCell>Name</TableCell>
                      <TableCell>Description</TableCell>
+                     <TableCell align="center">Options</TableCell>
                   </TableRow>
                </TableHead>
                <TableBody>
                   {equipments.map((row: IEquipment, index) => (
-                     <TableRow key={row.equipmentId} hover
-                     >
-                        <TableCell>
-                           {viewMode === 'TREE'?<IconButton color="primary" style={{padding:'0'}} onClick={() => onExpand && onExpand(row)} aria-label="expand"><AddBoxIcon fontSize="small" /></IconButton>:''}
-                        </TableCell>
+                     <TableRow key={row.equipmentId} hover>
                         <TableCell>{row.code}</TableCell>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.description}</TableCell>
+                        <TableCell align="center">
+                           <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
+                              <IconButton onClick={() => onExpand && onExpand(row)} disabled={viewMode !== 'TREE'} aria-label="show item" component="span">
+                                 <VisibilityIcon/>
+                              </IconButton>
+                              <IconButton onClick={() => onEditEquipment && onEditEquipment(row)} aria-label="edit equipment" component="span">
+                                 <EditIcon/>
+                              </IconButton>
+                           </ButtonGroup>
+                        </TableCell>
                      </TableRow>
                   ))}
                </TableBody>

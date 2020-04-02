@@ -57,6 +57,7 @@ export enum ItemType {
    SPARE_PARTS = 'SPARE_PARTS',
    TOOLS = 'TOOLS',
    SUPPLIES = 'SUPPLIES',
+   EQUIPMENTS = 'EQUIPMENTS',
    NONE = 'NONE'
 }
 

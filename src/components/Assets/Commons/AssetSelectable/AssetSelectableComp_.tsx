@@ -11,11 +11,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import Grid from "@material-ui/core/Grid/Grid";
 import ListIcon from '@material-ui/icons/List';
-import { SearchInput } from "../../SearchInput/SearchInput";
-import { TablePaginationActions } from "../../../utils/TableUtils";
+import { SearchInput } from "../../../SearchInput/SearchInput";
+import { TablePaginationActions } from "../../../../utils/TableUtils";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
-import {IItem} from "../../../graphql/item.type";
+import {IItem, ItemType} from "../../../../graphql/item.type";
 import Button from '@material-ui/core/Button';
 import {Checkbox, Typography} from '@material-ui/core';
 
@@ -37,32 +37,39 @@ const useStyles2 = makeStyles({
    }
 });
 
+export interface ISimpleItem {
+   itemId: number;
+   code: string;
+   description: string;
+   name: string;
+}
+
 interface _ItemSelectableProps {
-   items: IItem[];
+   items: ISimpleItem[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
    searchString?: string;
    onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
    onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
-   onSelectItem?(item: IItem[]) : void;
+   onSelectItem?(item: ISimpleItem[]) : void;
    onSearchItem?(searchString: string) : void;
 }
 
-export const _ItemSelectableComp: FC<_ItemSelectableProps> = ({items, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSelectItem, onSearchItem}) => {
+export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSelectItem, onSearchItem}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
-   const [selected, setSelected] = React.useState<IItem[]>([]);
+   const [selected, setSelected] = React.useState<ISimpleItem[]>([]);
    const [searchInput, setSearchInput] = React.useState<string>(searchString || '');
    const onSearch = (event: FormEvent) => {
       event.preventDefault();
       onSearchItem && onSearchItem(searchInput);
    };
 
-   const handleClick = (event: React.MouseEvent<unknown>, item: IItem) => {
+   const handleClick = (event: React.MouseEvent<unknown>, item: ISimpleItem) => {
       const selectedIndex = selected.findIndex(e => e.itemId === item.itemId);
-      let newSelected: IItem[] = [];
+      let newSelected: ISimpleItem[] = [];
       if (selectedIndex === -1) {
          newSelected = selected.concat(item);
       } else {
@@ -125,14 +132,14 @@ export const _ItemSelectableComp: FC<_ItemSelectableProps> = ({items, pageIndex,
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {items.map((row: IItem, index) => (
+                  {items.map((row: ISimpleItem, index) => (
                      <TableRow
                         hover
                         onClick={event => handleClick(event, row)}
                         role="checkbox"
                         aria-checked={!!selected.find(item => item.itemId === row.itemId)}
                         tabIndex={-1}
-                        key={row.name}
+                        key={row.itemId}
                         selected={!!selected.find(item => item.itemId === row.itemId)}
                      >
                         <TableCell padding="checkbox">

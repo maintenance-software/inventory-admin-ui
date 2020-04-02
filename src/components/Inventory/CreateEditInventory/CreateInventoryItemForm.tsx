@@ -10,7 +10,7 @@ import Button from "@material-ui/core/Button/Button";
 import { useMutation } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {IItem} from "../../../graphql/item.type";
-import {InventoryItemAvailableComp} from "../../items/ItemSelectable/InventoryItemAvailableComp";
+import {InventoryItemAvailableComp} from "../../Assets/Commons/AssetSelectable/InventoryItemAvailableComp";
 import {IInventories, SAVE_INVENTORY, SAVE_INVENTORY_ITEMS} from "../../../graphql/inventory.type";
 import {clearCache} from "../../../utils/globalUtil";
 
