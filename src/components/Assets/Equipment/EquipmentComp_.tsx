@@ -51,11 +51,9 @@ interface EquipmentProps {
    pageSize: number;
    totalCount: number;
    searchString?: string;
-   viewMode: 'TREE' | 'GRID';
    treePath: IEquipment[];
    onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
    onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
-   onChangeViewMode?(event: React.ChangeEvent<HTMLInputElement>): void;
    onSearchEquipment?(searchString: string) : void;
    onExpand?(equipment: IEquipment): void;
    onBreadcrumbs?(index: number): void;
@@ -63,7 +61,7 @@ interface EquipmentProps {
    onEditEquipment?(equipment: IEquipment): void;
 }
 
-export const EquipmentComp_: FC<EquipmentProps> = ({equipments, pageIndex, pageSize, totalCount, searchString, viewMode, treePath, onChangePage, onChangeRowsPerPage, onSearchEquipment, onChangeViewMode, onExpand, onBreadcrumbs, onAddEquipment, onEditEquipment}) => {
+export const EquipmentComp_: FC<EquipmentProps> = ({equipments, pageIndex, pageSize, totalCount, searchString, treePath, onChangePage, onChangeRowsPerPage, onSearchEquipment, onExpand, onBreadcrumbs, onAddEquipment, onEditEquipment}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
@@ -102,17 +100,6 @@ export const EquipmentComp_: FC<EquipmentProps> = ({equipments, pageIndex, pageS
                >
                   Options
                </Button>
-               <FormControlLabel style={{marginTop: 0, marginBottom: 0, padding: 0}}
-                                 control={
-                                    <Checkbox
-                                       checked={'TREE' === viewMode}
-                                       name="view-mode"
-                                       color="primary"
-                                       onChange={onChangeViewMode}
-                                    />
-                                 }
-                                 label="Tree Mode"
-               />
             </Grid>
             <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
                <form  noValidate autoComplete="off" onSubmit={onSearch}>
@@ -138,7 +125,7 @@ export const EquipmentComp_: FC<EquipmentProps> = ({equipments, pageIndex, pageS
                         <TableCell>{row.description}</TableCell>
                         <TableCell align="center">
                            <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
-                              <IconButton onClick={() => onExpand && onExpand(row)} disabled={viewMode !== 'TREE'} aria-label="show item" component="span">
+                              <IconButton onClick={() => onExpand && onExpand(row)} aria-label="show item" component="span">
                                  <VisibilityIcon/>
                               </IconButton>
                               <IconButton onClick={() => onEditEquipment && onEditEquipment(row)} aria-label="edit equipment" component="span">

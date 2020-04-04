@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams, useRouteMatch} from 'react-router-dom';
 import {useLazyQuery, useMutation} from "@apollo/react-hooks";
@@ -20,6 +20,7 @@ import {
    IEquipments,
    SAVE_EQUIPMENT
 } from "../../../../graphql/equipment.type";
+import {EquipmentContext} from "../../Routes";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -29,7 +30,6 @@ interface TabPanelProps {
 
 const TabPanel = (props: TabPanelProps) => {
    const { children, value, index, ...other } = props;
-
    return (
       <Typography
          component="div"
@@ -96,6 +96,7 @@ export const CreateEditEquipmentComp: React.FC =  () => {
    const [saveEquipment] = useMutation<{ equipments: IEquipments }, any>(SAVE_EQUIPMENT);
    const [getEquipmentById, { called, loading, data }] = useLazyQuery<{equipments: IEquipments}, any>(GET_EQUIPMENT_BY_ID);
    const [hasError, setHasError] = useState(false);
+   const {pathTree, setPathTree} = useContext(EquipmentContext);
    const equipmentId = +params.equipmentId;
    const toggle = (tab: string) => {
       if(activeTab !== tab)
@@ -118,7 +119,6 @@ export const CreateEditEquipmentComp: React.FC =  () => {
    }
 
    const equipmentFormProps: IEquipmentFormProps = {
-      equipmentId: equipmentId,
       equipmentForm: {
          name: equipment.name || '',
          description: equipment.description || '',
@@ -133,8 +133,6 @@ export const CreateEditEquipmentComp: React.FC =  () => {
          hoursAverageDailyUse: equipment.hoursAverageDailyUse || 0,
          outOfService: equipment.outOfService || false,
          purchaseDate: equipment.purchaseDate || '',
-         parentId: !equipment.parent? null : equipment.parent.equipmentId,
-         parentName: !equipment.parent? '' : equipment.parent.name
       },
       onSaveEquipmentCallback: async (equipmentForm: IEquipmentForm, resetForm: Function) => {
          const mutationRequest: EquipmentMutationRequest = {
@@ -152,12 +150,12 @@ export const CreateEditEquipmentComp: React.FC =  () => {
             hoursAverageDailyUse: +equipmentForm.hoursAverageDailyUse,
             outOfService: equipmentForm.outOfService,
             purchaseDate: equipmentForm.purchaseDate || null,
-            parentId: equipmentForm.parentId
+            parentId: pathTree.length > 0 ? pathTree[pathTree.length - 1].equipmentId : null
          };
          const response = await saveEquipment({
             variables: mutationRequest
             , update: (cache) => {
-               // clearCache(cache, 'inventories.inventory');
+               clearCache(cache, 'equipments.page');
                // clearCache(cache, 'inventories.list');
             }
          });

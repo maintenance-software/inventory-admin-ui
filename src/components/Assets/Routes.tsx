@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {createContext} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import {Redirect} from "react-router";
@@ -10,6 +10,7 @@ import {SparePartsSuppliesItemComp} from "./SparePartsSupplies";
 import {CreateEditSparePartsSuppliesItemComp} from "./SparePartsSupplies/CreateSparePartsSuppliesItem/CreateEditSparePartsSuppliesItemComp";
 import {EquipmentComp} from "./Equipment";
 import {CreateEditEquipmentComp} from "./Equipment/CreateEditEquipment/CreateEditEquipmentComp";
+import {IEquipment} from "../../graphql/equipment.type";
 
 
 const HumanResourceRoutes: React.FC =  () => {
@@ -43,12 +44,21 @@ const SparePartsSupplieRoutes: React.FC =  () => {
    );
 };
 
+interface IEquipmentContext {
+   pathTree: IEquipment[];
+   setPathTree: Function;
+}
+
+export const EquipmentContext = createContext<IEquipmentContext>({pathTree: [], setPathTree: ()=>{}});
 const EquipmentAssetRoutes: React.FC =  () => {
+   const [pathTree, setPathTree] = React.useState<IEquipment[]>([]);
    const { path } = useRouteMatch();
    return (
       <Switch>
-         <Route exact path={path} component={EquipmentComp}/>
-         <Route path={`${path}/:equipmentId`} component={CreateEditEquipmentComp}/>
+         <EquipmentContext.Provider value={{pathTree, setPathTree}}>
+            <Route exact path={path} component={EquipmentComp}/>
+            <Route path={`${path}/:equipmentId`} component={CreateEditEquipmentComp}/>
+         </EquipmentContext.Provider>
       </Switch>
    );
 };

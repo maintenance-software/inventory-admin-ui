@@ -1,15 +1,16 @@
-import React, {useEffect, FormEvent} from 'react';
-import { useLazyQuery, useMutation } from "@apollo/react-hooks";
+import React, {useEffect, useContext} from 'react';
+import { useLazyQuery } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {EquipmentComp_} from './EquipmentComp_';
 import {FETCH_EQUIPMENTS_PAGE_GQL, IEquipment, IEquipments} from "../../../graphql/equipment.type";
+import {EquipmentContext} from "../Routes";
 
 export const EquipmentComp: React.FC = () => {
    const history = useHistory();
    const { path } = useRouteMatch();
-   const [viewMode, setViewMode] = React.useState<'GRID'|'TREE'>('GRID');
-   const [pathTree, setPathTree] = React.useState<IEquipment[]>([]);
+   // const [viewMode, setViewMode] = React.useState<'GRID'|'TREE'>('GRID');
+   const {pathTree, setPathTree} = useContext(EquipmentContext);
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
@@ -21,13 +22,13 @@ export const EquipmentComp: React.FC = () => {
 
    useEffect(() => {
       let filters = [];
-      if(viewMode === 'TREE' && pathTree.length === 0) {
+      if(pathTree.length === 0) {
          filters.push({field: "parentId", operator: "=", value: "null"});
-      } else if(viewMode === 'TREE' && pathTree.length > 0)  {
+      } else {
          filters.push({field: "parentId", operator: "=", value: pathTree[pathTree.length - 1].equipmentId.toString()});
       }
       fetchEquipments({variables: { searchString, pageIndex, pageSize, filters }});
-   }, [pageIndex, pageSize, searchString, viewMode, pathTree]);
+   }, [pageIndex, pageSize, searchString, pathTree]);
 
    if (loading || !data) return <div>Loading</div>;
 
@@ -49,14 +50,14 @@ export const EquipmentComp: React.FC = () => {
       setPathTree(pathTree.concat(equipment));
    };
 
-   const handleChangeMViewMode = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if(event.target.checked) {
-         setViewMode('TREE');
-      } else {
-         setPathTree([]);
-         setViewMode('GRID');
-      }
-   };
+   // const handleChangeMViewMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+   //    if(event.target.checked) {
+   //       setViewMode('TREE');
+   //    } else {
+   //       setPathTree([]);
+   //       setViewMode('GRID');
+   //    }
+   // };
 
    const handleBreadcrumbs = (index: number) => {
       if(index < 0) {
@@ -72,12 +73,10 @@ export const EquipmentComp: React.FC = () => {
       pageIndex={data.equipments.page.pageInfo.pageIndex}
       pageSize={data.equipments.page.pageInfo.pageSize}
       searchString={searchString}
-      viewMode={viewMode}
       treePath={pathTree}
       onChangePage={handleChangePage}
       onChangeRowsPerPage={handleChangeRowsPerPage}
       onSearchEquipment={handleSearch}
-      onChangeViewMode={handleChangeMViewMode}
       onExpand={handleExpand}
       onBreadcrumbs={handleBreadcrumbs}
       onAddEquipment={() => history.push(path + '/' + 0)}
