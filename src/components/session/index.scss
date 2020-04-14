@@ -1,0 +1,24 @@
+@import '../../../node_modules/bootstrap/scss/bootstrap';
+
+.sidebar-icon {
+   //font-size: 1.5em;
+   //width: 30px;
+   //height: 30px;
+   border-radius: 50%;
+   background-color: rgba(141, 146, 147, 0.15);
+   color: rgba(141, 146, 147, 0.45);
+   transition: .2s ease-in-out .2s;
+   @extend .my-0;
+   @extend .mx-auto;
+   @extend .d-flex;
+   @extend .justify-content-center;
+   @extend .align-items-center;
+}
+
+.active-bg {
+   background-color: rgba(41, 199, 95, 0.25);
+}
+
+.active-color {
+   color: rgba(41, 199, 95, 0.75);
+}

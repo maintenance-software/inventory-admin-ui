@@ -9,12 +9,12 @@ import './font-awesome'
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 
-const client = new ApolloClient({
+export const grapqhQlClient = new ApolloClient({
    uri: '/graphql'
 });
 
 ReactDOM.render(
-   <ApolloProvider client={client}>
+   <ApolloProvider client={grapqhQlClient}>
       <App />
    </ApolloProvider>,
    document.getElementById('root')

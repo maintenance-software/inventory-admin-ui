@@ -5,8 +5,7 @@ export interface IUsers {
    list: IUser[];
 }
 
-export interface IUser {
-   status: EntityStatus;
+export interface ISessionUser {
    language: string;
    expiration: boolean;
    userId: number;
@@ -18,6 +17,35 @@ export interface IUser {
    person: IPerson;
 }
 
+
+export interface IUser {
+   status: EntityStatus;
+   language: string;
+   expiration: boolean;
+   userId: number;
+   username: string;
+   password: string;
+   email: string;
+   person: IPerson;
+   privileges: IPrivilege[];
+   roles: IRole[];
+}
+
+
+export interface IRole {
+   roleId: number;
+   key: number;
+   name: string;
+   description: string;
+   privileges: IPrivilege[];
+}
+
+export interface IPrivilege{
+   privilegeId: number;
+   key: number;
+   name: string;
+   description: string;
+}
 
 export enum EntityStatus {
    ACTIVE = 'ACTIVE',
