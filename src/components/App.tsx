@@ -30,6 +30,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import Paper from "@material-ui/core/Paper/Paper";
 import ResourceRoutes from "./Assets/Routes";
 import {InventoryRoute} from "./Inventory/Route";
+import {MaintenanceResourceRoutes} from "./Maintenance/Routes";
 
 const useStyles = makeStyles(theme => ({
    root: {
@@ -132,6 +133,7 @@ const App: React.FC = () => {
                          <Route path="/home" component={Home}/>
                          <Route path="/users" component={Users}/>
                          <Route path="/assets" component={ResourceRoutes}/>
+                         <Route path="/maintenance" component={MaintenanceResourceRoutes}/>
                          <Route path="/inventories" component={InventoryRoute}/>
                          <Route path="/items" component={ItemPage}/>
                          <Route path="/session/profile" component={UserProfile}/>
