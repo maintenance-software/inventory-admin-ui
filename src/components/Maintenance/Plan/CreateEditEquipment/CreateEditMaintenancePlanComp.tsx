@@ -20,6 +20,7 @@ import {
    IMaintenancePlans,
    SAVE_MAINTENANCE_PLAN
 } from "../../../../graphql/Maintenance.type";
+import {Task} from "./Tasks/Task";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -150,7 +151,7 @@ export const CreateEditMaintenancePlanComp: React.FC =  () => {
             className={classes.tabs}
          >
             <Tab label="GENERAL" {...a11yProps(0)} />
-            <Tab label="STOCKS" {...a11yProps(1)} />
+            <Tab label="Tasks" {...a11yProps(1)} />
             <Tab label="PERMISSION" {...a11yProps(2)} />
             <Tab label="SETTINGS" {...a11yProps(3)} />
          </Tabs>
@@ -158,7 +159,7 @@ export const CreateEditMaintenancePlanComp: React.FC =  () => {
             <EditEquipmentForm {...equipmentFormProps}/>
          </TabPanel>
          <TabPanel value={value} index={1}>
-            dev 1
+            <Task tasks={maintenance.tasks}/>
          </TabPanel>
          <TabPanel value={value} index={2}>
             dev 2

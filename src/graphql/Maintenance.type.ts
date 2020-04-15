@@ -105,6 +105,23 @@ export const GET_MAINTENANCE_PLAN_BY_ID = gql`
             name
             description
             status
+            tasks {
+               taskId
+               name
+               description
+               priority
+               duration
+               downTimeDuration
+               attribute1
+               attribute2
+               createdDate
+               modifiedDate
+               taskCategory {
+                  taskCategoryId
+                  name
+                  description   
+               }
+            }
          }
       }
    }

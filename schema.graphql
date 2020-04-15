@@ -1,276 +1,410 @@
 # This file was generated based on ".graphqlconfig". Do not edit manually.
 
-schema {
-    query: Query
-    mutation: Mutation
+type Privileges {
+    privilege(entityId: Int!): Privilege!
+    list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [Privilege!]!
 }
 
-type Address {
-    addressId: Int!
-    city: String!
-    country: String!
-    createdDate: String!
-    modifiedDate: String
-    state: String!
-    street1: String!
-    street2: String!
-    street3: String!
-    zip: String!
-}
-
-type Category {
-    categoryId: Int!
-    createdDate: String!
-    description: String!
-    modifiedDate: String
-    name: String!
-}
-
-type ContactInfo {
-    contact: String!
-    contactId: Int!
-    contactType: String!
-    createdDate: String!
-    modifiedDate: String
+type InventoryItems {
+    inventoryItem(entityId: Int!): InventoryItem!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_InventoryItem!
+    saveInventoryItem(inventoryItemId: Int!, level: Int!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!, location: String!, inventoryId: Int!, dateExpiry: String, itemId: Int!): InventoryItem!
 }
 
 type Inventories {
     inventory(entityId: Int!): Inventory!
     list: [Inventory!]!
+    saveInventory(inventoryId: Int!, name: String!, description: String!, allowNegativeStocks: Boolean!, status: String!): Inventory!
+    saveInventoryItems(level: Int!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!, location: String!, dateExpiry: String, inventoryId: Int!, itemIds: [Int!]!): [InventoryItem!]!
 }
 
-type Inventory {
-    createdDate: String!
-    description: String!
-    inventoryId: Int!
-    inventoryItems(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_InventoryItem!
-    modifiedDate: String
+type Privilege {
+    privilegeId: Int!
+    key: String!
     name: String!
+    description: String
+    active: Boolean!
+    createdDate: String
+    modifiedDate: String
+}
+
+type Roles {
+    role(entityId: Int!): Role!
+    list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [Role!]!
 }
 
 type InventoryItem {
-    createdDate: String!
-    dateExpiry: String
-    inventory: Inventory!
     inventoryItemId: Int!
-    item: Item!
     level: Int!
-    location: String!
     maxLevelAllowed: Int!
     minLevelAllowed: Int!
-    modifiedDate: String
     price: Float!
-}
-
-type InventoryItems {
-    inventoryItem(entityId: Int!): InventoryItem!
-    page(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_InventoryItem!
-}
-
-type Item {
-    category: Category!
-    code: String!
+    location: String!
+    dateExpiry: String
+    inventory: Inventory!
+    item: Item!
     createdDate: String!
-    defaultPrice: Float!
-    description: String
-    images: [String!]!
-    inventoryItems(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_InventoryItem!
-    itemId: Int!
-    itemType: String!
-    manufacturer: String
-    model: String
     modifiedDate: String
+}
+
+input AddressArg {
+    addressId: Int!
+    street1: String!
+    street2: String!
+    street3: String!
+    zip: String!
+    city: String!
+    state: String!
+    country: String!
+}
+
+type Users {
+    user(entityId: Int!): User!
+    resetPassword(entityId: Int!): String!
+    changePassword(userId: Int!, password: String!, newPassword: String!): Boolean!
+    updatePassword(userId: Int!, password: String!): Boolean!
+    list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [User!]!
+}
+
+type Person {
+    personId: Int!
+    firstName: String!
+    lastName: String!
+    documentType: String!
+    documentId: String!
+    createdDate: String!
+    modifiedDate: String
+    address(address: AddressArg): Address
+    contactInfo(contactInfo: [ContactInfoArg!]): [ContactInfo!]!
+    account(user: UserArg): User
+}
+
+type Maintenance {
+    maintenanceId: Int!
     name: String!
-    notes: String
-    partNumber: String
+    description: String
     status: String!
-    unit: Unit!
+    createdDate: String!
+    modifiedDate: String
+    tasks: [Task!]!
+    equipments: [Equipment!]!
 }
 
-type Items {
-    item(entityId: Int!): Item!
-    page(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_Item!
-}
-
-type Mutation {
-    saveCategory(categoryId: Int!, description: String!, name: String!): Category!
-    saveInventory(active: Boolean!, description: String!, inventoryId: Int!, name: String!): Inventory!
-    saveInventoryItem(code: String!, dateExpiry: String, inventoryId: Int!, inventoryItemId: Int!, itemId: Int!, level: Int!, location: String!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!): InventoryItem!
-    saveItem(categoryId: Int!, code: String!, defaultPrice: Float!, description: String, images: [String!]!, itemId: Int!, itemType: String!, manufacturer: String, model: String, name: String!, notes: String, partNumber: String, status: String!, unitId: Int!): Item!
-    savePerson(documentId: String!, documentType: String!, firstName: String!, lastName: String!, personId: Int!): Person!
-    savePrivilege(active: Boolean!, description: String, key: String!, name: String!, privilegeId: Int!): Privilege!
-    saveRole(active: Boolean!, description: String, key: String!, name: String!, roleId: Int!): Role!
+input UserArg {
+    userId: Int!
+    username: String!
+    email: String!
+    status: String!
+    language: String!
+    expiration: Boolean!
 }
 
 type PageInfo {
     hasNext: Boolean!
     hasPreview: Boolean!
-    pageIndex: Int!
     pageSize: Int!
+    pageIndex: Int!
+}
+
+type Category {
+    categoryId: Int!
+    name: String!
+    description: String!
+    createdDate: String!
+    modifiedDate: String
 }
 
 type Page_InventoryItem {
+    totalCount: Int!
     content: [InventoryItem!]!
     pageInfo: PageInfo!
     sort: Sort!
-    totalCount: Int!
 }
 
-type Page_Item {
-    content: [Item!]!
-    pageInfo: PageInfo!
-    sort: Sort!
-    totalCount: Int!
-}
-
-type Page_Person {
-    content: [Person!]!
-    pageInfo: PageInfo!
-    sort: Sort!
-    totalCount: Int!
-}
-
-type Person {
-    account(user: UserArg): User
-    address(address: AddressArg): Address
-    contactInfo(contactInfo: [ContactInfoArg!]): [ContactInfo!]!
-    createdDate: String!
-    documentId: String!
-    documentType: String!
-    firstName: String!
-    lastName: String!
-    modifiedDate: String
-    personId: Int!
-}
-
-type Persons {
-    page(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): Page_Person!
-    person(entityId: Int!): Person!
-}
-
-type Privilege {
-    active: Boolean!
-    createdDate: String
-    description: String
-    key: String!
-    modifiedDate: String
-    name: String!
-    privilegeId: Int!
-}
-
-type Privileges {
-    list(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [Privilege!]!
-    privilege(entityId: Int!): Privilege!
-}
-
-type Query {
-    categories: [Category!]!
-    inventories: Inventories!
-    inventoryItems: InventoryItems!
-    items: Items!
-    persons: Persons!
-    privileges: Privileges!
-    roles: Roles!
-    session: Session!
-    units: [Unit!]!
-    users: Users!
-}
-
-type Role {
-    active: Boolean!
-    createdDate: String!
-    description: String
-    key: String!
-    modifiedDate: String
-    name: String!
-    privileges: [Privilege!]!
-    roleId: Int!
-}
-
-type Roles {
-    list(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [Role!]!
-    role(entityId: Int!): Role!
-}
-
-type Session {
-    authId: String!
-    email: String!
-    firstName: String!
-    language: String!
-    lastName: String!
-    permissions: [String!]!
-    username: String!
-}
-
-type Sort {
-    direction: String!
-    isSorted: Boolean!
-    isUnsorted: Boolean!
-}
-
-type Unit {
-    createdDate: String!
-    key: String!
-    label: String!
-    modifiedDate: String
-    unitId: Int!
-}
-
-type User {
-    createdDate: String!
-    email: String!
-    expiration: Boolean!
-    language: String!
-    modifiedDate: String
-    newPasswordRequired: Boolean!
-    person: Person!
-    privileges(privilegeIds: [Int!]): [Privilege!]!
-    roles(roleIds: [Int!]): [Role!]!
-    status: String!
-    userId: Int!
-    username: String!
-}
-
-type Users {
-    changePassword(newPassword: String!, password: String!, userId: Int!): Boolean!
-    list(filters: [Predicate!], pageIndex: Int, pageSize: Int, queryString: String): [User!]!
-    resetPassword(entityId: Int!): String!
-    updatePassword(password: String!, userId: Int!): Boolean!
-    user(entityId: Int!): User!
-}
-
-"The item that holds the address information"
-input AddressArg {
+type Address {
     addressId: Int!
-    city: String!
-    country: String!
-    state: String!
     street1: String!
     street2: String!
     street3: String!
     zip: String!
+    city: String!
+    state: String!
+    country: String!
+    createdDate: String!
+    modifiedDate: String
 }
 
-"The item that holds the contact Info information"
-input ContactInfoArg {
-    contact: String!
-    contactId: Int!
-    contactType: String!
+type Page_Equipment {
+    totalCount: Int!
+    content: [Equipment!]!
+    pageInfo: PageInfo!
+    sort: Sort!
 }
 
-"This field holds predicate information"
+type Items {
+    item(entityId: Int!): Item!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Item!
+    saveItem(itemId: Int!, code: String!, name: String!, defaultPrice: Float!, description: String, partNumber: String, manufacturer: String, model: String, itemType: String!, notes: String, status: String!, images: [String!]!, categoryId: Int, unitId: Int): Item!
+    changeItemStatus(entityIds: [Int!]!, status: String!): Boolean!
+}
+
+type Page_Person {
+    totalCount: Int!
+    content: [Person!]!
+    pageInfo: PageInfo!
+    sort: Sort!
+}
+
+type Equipments {
+    equipment(entityId: Int!): Equipment!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
+    saveEquipment(equipmentId: Int!, name: String!, description: String, code: String!, partNumber: String, manufacturer: String, model: String, notes: String, status: String!, images: [String!]!, priority: Int!, hoursAverageDailyUse: Int!, outOfService: Boolean!, purchaseDate: String, parentId: Int): Equipment!
+}
+
+type Page_Maintenance {
+    totalCount: Int!
+    content: [Maintenance!]!
+    pageInfo: PageInfo!
+    sort: Sort!
+}
+
+type User {
+    userId: Int!
+    username: String!
+    email: String!
+    status: String!
+    language: String!
+    expiration: Boolean!
+    newPasswordRequired: Boolean!
+    createdDate: String!
+    modifiedDate: String
+    person: Person!
+    privileges(privilegeIds: [Int!]): [Privilege!]!
+    roles(roleIds: [Int!]): [Role!]!
+}
+
 input Predicate {
     field: String!
     operator: String!
     value: String!
+    union: [Predicate!]
+    conjunction: [Predicate!]
 }
 
-"The item that holds the user information"
-input UserArg {
-    email: String!
-    expiration: Boolean!
-    language: String!
+type Mutation {
+    savePrivilege(privilegeId: Int!, key: String!, name: String!, description: String, active: Boolean!): Privilege!
+    saveRole(roleId: Int!, key: String!, name: String!, description: String, active: Boolean!): Role!
+    savePerson(personId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!): Person!
+    saveCategory(categoryId: Int!, name: String!, description: String!): Category!
+    saveUnit(unitId: Int!, key: String!, label: String!): Unit!
+    saveTaskCategory(taskCategoryId: Int!, name: String!, description: String): TaskCategory!
+    saveSubTaskKind(subTaskKindId: Int!, name: String!, description: String): SubTaskKind!
+    inventoryItems: InventoryItems!
+    items: Items!
+    equipments: Equipments!
+    inventories: Inventories!
+    maintenances: Maintenances!
+}
+
+type Role {
+    roleId: Int!
+    key: String!
+    name: String!
+    description: String
+    active: Boolean!
+    createdDate: String!
+    modifiedDate: String
+    privileges: [Privilege!]!
+}
+
+type Inventory {
+    inventoryId: Int!
+    name: String!
+    description: String!
+    allowNegativeStocks: Boolean!
     status: String!
-    userId: Int!
+    inventoryItems(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_InventoryItem!
+    availableItems(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Item!
+    createdDate: String!
+    modifiedDate: String
+}
+
+input ContactInfoArg {
+    contactId: Int!
+    contact: String!
+    contactType: String!
+}
+
+type Sort {
+    isUnsorted: Boolean!
+    isSorted: Boolean!
+    direction: String!
+}
+
+type Query {
+    session: Session!
+    privileges: Privileges!
+    roles: Roles!
+    persons: Persons!
+    users: Users!
+    categories: [Category!]!
+    units: [Unit!]!
+    taskCategories: [TaskCategory!]!
+    subTaskKinds: [SubTaskKind!]!
+    inventories: Inventories!
+    items: Items!
+    equipments: Equipments!
+    inventoryItems: InventoryItems!
+    maintenances: Maintenances!
+}
+
+type Equipment {
+    equipmentId: Int!
+    name: String!
+    description: String
+    code: String!
+    partNumber: String
+    manufacturer: String
+    model: String
+    notes: String
+    status: String!
+    images: [String!]!
+    priority: Int!
+    hoursAverageDailyUse: Int!
+    outOfService: Boolean!
+    purchaseDate: String
+    children(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
+    parent: Equipment
+    category: Category!
+    createdDate: String!
+    modifiedDate: String
+}
+
+type TaskCategory {
+    taskCategoryId: Int!
+    name: String!
+    description: String
+    createdDate: String!
+    modifiedDate: String
+}
+
+type Item {
+    itemId: Int!
+    code: String!
+    name: String!
+    defaultPrice: Float!
+    description: String
+    partNumber: String
+    manufacturer: String
+    model: String
+    itemType: String!
+    notes: String
+    status: String!
+    images: [String!]!
+    category: Category
+    unit: Unit
+    inventoryItems(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_InventoryItem!
+    createdDate: String!
+    modifiedDate: String
+}
+
+type Task {
+    taskId: Int!
+    name: String!
+    description: String
+    priority: Int!
+    duration: Int!
+    downTimeDuration: Int!
+    attribute1: String
+    attribute2: String
+    createdDate: String!
+    modifiedDate: String
+    taskCategory: TaskCategory
+    subTasks: [SubTask!]!
+}
+
+input SubTaskArg {
+    subTaskId: Int!
+    order: Int!
+    group: String!
+    description: String
+    mandatory: Boolean!
+    subTaskKindId: Int
+}
+
+type Maintenances {
+    maintenance(entityId: Int!): Maintenance!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Maintenance!
+    saveMaintenance(maintenanceId: Int!, name: String!, description: String, status: String!): Maintenance!
+    createUpdateTasks(maintenanceId: Int!, tasks: [TaskArg!]!): [Task!]!
+}
+
+type Persons {
+    person(entityId: Int!): Person!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Person!
+}
+
+type Unit {
+    unitId: Int!
+    key: String!
+    label: String!
+    createdDate: String!
+    modifiedDate: String
+}
+
+type ContactInfo {
+    contactId: Int!
+    contact: String!
+    contactType: String!
+    createdDate: String!
+    modifiedDate: String
+}
+
+type Session {
+    authId: String!
     username: String!
+    email: String!
+    firstName: String!
+    lastName: String!
+    language: String!
+    permissions: [String!]!
+}
+
+type SubTaskKind {
+    subTaskKindId: Int!
+    name: String!
+    description: String
+    createdDate: String!
+    modifiedDate: String
+}
+
+type Page_Item {
+    totalCount: Int!
+    content: [Item!]!
+    pageInfo: PageInfo!
+    sort: Sort!
+}
+
+input TaskArg {
+    taskId: Int!
+    name: String!
+    description: String
+    priority: Int!
+    duration: Int!
+    downTimeDuration: Int!
+    attribute1: String
+    attribute2: String
+    taskCategoryId: Int
+    subTasks: [SubTaskArg!]!
+}
+
+type SubTask {
+    subTaskId: Int!
+    order: Int!
+    group: String!
+    description: String
+    mandatory: Boolean!
+    createdDate: String!
+    modifiedDate: String
+    subTaskKind: SubTaskKind
 }
