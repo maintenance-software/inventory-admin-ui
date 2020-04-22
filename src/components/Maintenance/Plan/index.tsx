@@ -5,10 +5,11 @@ import {useRouteMatch} from "react-router-dom";
 import {MaintenancePlanComp_} from './MaintenancePlanComp_';
 import {MaintenancePlanContext} from "../Routes";
 import {FETCH_MAINTENANCE_PLAN_GQL, IMaintenancePlan, IMaintenancePlans} from "../../../graphql/Maintenance.type";
+import {appendToPath} from "../../../utils/globalUtil";
 
 export const MaintenancePlanComp: React.FC = () => {
    const history = useHistory();
-   const { path } = useRouteMatch();
+   const { path, url } = useRouteMatch();
    const {setMaintenanceId} = useContext(MaintenancePlanContext);
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
@@ -48,7 +49,7 @@ export const MaintenancePlanComp: React.FC = () => {
       onChangePage={handleChangePage}
       onChangeRowsPerPage={handleChangeRowsPerPage}
       onSearchMaintenancePlan={handleSearch}
-      onAddMaintenancePlan={() =>{setMaintenanceId(0); history.push(path + '/add')}}
-      onEditMaintenancePlan={(maintenance: IMaintenancePlan) => {setMaintenanceId(maintenance.maintenanceId); history.push(path + '/edit')}}
+      onAddMaintenancePlan={() => history.push(appendToPath(url, '0'))}
+      onEditMaintenancePlan={(maintenance: IMaintenancePlan) => history.push(appendToPath(url, maintenance.maintenanceId.toString()))}
    />;
 };

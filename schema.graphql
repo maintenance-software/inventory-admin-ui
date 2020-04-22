@@ -1,5 +1,3 @@
-# This file was generated based on ".graphqlconfig". Do not edit manually.
-
 type Privileges {
     privilege(entityId: Int!): Privilege!
     list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [Privilege!]!
@@ -206,6 +204,14 @@ type Mutation {
     maintenances: Maintenances!
 }
 
+type EventTrigger {
+    eventTriggerId: Int!
+    name: String!
+    description: String
+    createdDate: String!
+    modifiedDate: String
+}
+
 type Role {
     roleId: Int!
     key: String!
@@ -308,6 +314,23 @@ type Item {
     modifiedDate: String
 }
 
+type TaskTrigger {
+    taskTriggerId: Int!
+    kind: String!
+    description: String!
+    fixedSchedule: Boolean
+    frequency: Int
+    readType: String
+    limit: String
+    repeat: Boolean
+    operator: String
+    value: String
+    unit: Unit
+    eventTrigger: EventTrigger
+    createdDate: String!
+    modifiedDate: String
+}
+
 type Task {
     taskId: Int!
     name: String!
@@ -321,6 +344,7 @@ type Task {
     modifiedDate: String
     taskCategory: TaskCategory
     subTasks: [SubTask!]!
+    taskTriggers: [TaskTrigger!]!
 }
 
 input SubTaskArg {
@@ -337,6 +361,9 @@ type Maintenances {
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Maintenance!
     saveMaintenance(maintenanceId: Int!, name: String!, description: String, status: String!): Maintenance!
     createUpdateTasks(maintenanceId: Int!, tasks: [TaskArg!]!): [Task!]!
+    task(entityId: Int!): Task!
+    eventTriggers: [EventTrigger!]!
+    saveEventTrigger(eventTriggerId: Int!, name: String!, description: String): EventTrigger!
 }
 
 type Persons {
@@ -370,6 +397,21 @@ type Session {
     permissions: [String!]!
 }
 
+input TaskTriggerArg {
+    taskTriggerId: Int!
+    kind: String!
+    description: String!
+    fixedSchedule: Boolean
+    frequency: Int
+    readType: String
+    limit: String
+    repeat: Boolean
+    operator: String
+    value: String
+    unitId: Int
+    eventTriggerId: Int
+}
+
 type SubTaskKind {
     subTaskKindId: Int!
     name: String!
@@ -396,6 +438,7 @@ input TaskArg {
     attribute2: String
     taskCategoryId: Int
     subTasks: [SubTaskArg!]!
+    taskTriggers: [TaskTriggerArg!]!
 }
 
 type SubTask {

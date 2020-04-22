@@ -1,24 +1,28 @@
-import React, {FC, FormEvent} from 'react';
+import React, {FC, FormEvent, useState} from 'react';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import TableContainer from "@material-ui/core/TableContainer/TableContainer";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TablePagination from "@material-ui/core/TablePagination/TablePagination";
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
-import Grid from "@material-ui/core/Grid/Grid";
-import ListIcon from '@material-ui/icons/List';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import {useHistory} from "react-router";
-import {useRouteMatch} from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {TablePaginationActions} from "../../../../../utils/TableUtils";
-import {ITask} from "../../../../../graphql/Maintenance.type";
+import {getTaskDefaultInstance, ITask} from "../../../../../graphql/Maintenance.type";
+import TableFooter from '@material-ui/core/TableFooter';
+import {appendToPath} from "../../../../../utils/globalUtil";
+import { useRouteMatch } from 'react-router-dom';
+
+const useBottomNoneBorder = makeStyles({
+   root: {
+      borderBottom: "none"
+   }
+});
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -39,49 +43,62 @@ const useStyles2 = makeStyles({
 });
 
 interface TaskProps {
+   maintenanceId: number;
    tasks: ITask[];
-   // onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
-   // onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
-   // onSearchMaintenancePlan?(searchString: string) : void;
-   // onAddMaintenancePlan?(): void;
-   // onEditMaintenancePlan?(maintenance: IMaintenancePlan): void;
 }
 
-export const Task: FC<TaskProps> = ({tasks}) => {
+export const Task: FC<TaskProps> = ({maintenanceId, tasks}) => {
    const history = useHistory();
    const classes = useStyles2();
-   const buttonClasses = useButtonStyles();
-
+   const bottomNoneBoder = useBottomNoneBorder();
+   const { path, url } = useRouteMatch();
    return (
-      <Paper className={classes.root}>
-         <TableContainer className={classes.container}>
-            <Table stickyHeader size="small">
-               <TableHead>
-                  <TableRow>
-                     <TableCell>Name</TableCell>
-                     <TableCell>Description</TableCell>
-                     <TableCell>Status</TableCell>
-                     <TableCell align="center">Options</TableCell>
-                  </TableRow>
-               </TableHead>
-               <TableBody>
-                  {tasks.map((row: ITask, index) => (
-                     <TableRow key={row.taskId} hover>
-                        <TableCell>{row.name}</TableCell>
-                        <TableCell>{row.description}</TableCell>
-                        <TableCell>{row.attribute1}</TableCell>
-                        <TableCell align="center">
-                           <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
-                              <IconButton aria-label="edit equipment" component="span">
-                                 <EditIcon/>
-                              </IconButton>
-                           </ButtonGroup>
+      <>
+         <Paper className={classes.root}>
+            <TableContainer className={classes.container}>
+               <Table size="small">
+                  <TableHead>
+                     <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Category</TableCell>
+                        <TableCell>Priority</TableCell>
+                        <TableCell align="center">Options</TableCell>
+                     </TableRow>
+                  </TableHead>
+                  <TableBody>
+                     {tasks.sort((t1, t2) => t1.taskId - t2.taskId).map((row: ITask, index) => (
+                        <TableRow key={row.taskId} hover>
+                           <TableCell>{row.name}</TableCell>
+                           <TableCell>{row.taskCategory? row.taskCategory.name : ''}</TableCell>
+                           <TableCell>{row.priority}</TableCell>
+                           <TableCell align="center">
+                              <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
+                                 <IconButton aria-label="edit equipment" onClick={()=> history.push(appendToPath(url, row.taskId.toString()))}>
+                                    <EditIcon/>
+                                 </IconButton>
+                              </ButtonGroup>
+                           </TableCell>
+                        </TableRow>
+                     ))}
+                  </TableBody>
+                  <TableFooter>
+                     <TableRow>
+                        <TableCell  colSpan={4} className={bottomNoneBoder.root}>
+                           <Button
+                              variant="contained"
+                              color="default"
+                              size="small"
+                              startIcon={<AddIcon/>}
+                              onClick={() => history.push(appendToPath(url, '0'))}
+                           >
+                              Add
+                           </Button>
                         </TableCell>
                      </TableRow>
-                  ))}
-               </TableBody>
-            </Table>
-         </TableContainer>
-      </Paper>
+                  </TableFooter>
+               </Table>
+            </TableContainer>
+         </Paper>
+      </>
    );
 };

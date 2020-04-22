@@ -1,11 +1,12 @@
 import {gql} from 'apollo-boost';
 import {IPage, IPageInfo} from "./page.type";
 import {EntityStatus} from "./users.type";
-import {IItem} from "./item.type";
+import {IItem, IUnit} from "./item.type";
 import {IEquipment} from "./equipment.type";
 
 export interface IMaintenancePlans {
    maintenance: IMaintenancePlan;
+   task: ITask;
    page: IPage<IMaintenancePlan>;
    saveMaintenance: IMaintenancePlan;
 }
@@ -32,12 +33,39 @@ export interface ITask{
    attribute2: string;
    createdDate: string;
    modifiedDate: string;
-   taskCategoryArg: ITaskCategory;
+   taskCategory: ITaskCategory | null;
    subTasks: ISubTask[];
+   taskTriggers: ITaskTrigger[];
+}
+
+export interface ITaskTrigger {
+   taskTriggerId: number;
+   kind: string;
+   description: string;
+   fixedSchedule: boolean;
+   frequency: number;
+   readType: string;
+   limit: string;
+   repeat: boolean;
+   operator: string;
+   value: string;
+   unit?: IUnit;
+   eventTrigger?: IEventTrigger;
+   createdDate: string;
+   modifiedDate: string;
+
 }
 
 export interface ITaskCategory {
    taskCategoryId: number;
+   name: string;
+   description: string;
+   createdDate: string;
+   modifiedDate: string;
+}
+
+export interface IEventTrigger {
+   eventTriggerId: number;
    name: string;
    description: string;
    createdDate: string;
@@ -74,6 +102,37 @@ export const getMaintenancePlanDefaultInstance = ():IMaintenancePlan => ({
    equipments: [],
 });
 
+export const getTaskDefaultInstance = ():ITask => ({
+   taskId: 0,
+   name: '',
+   description: '',
+   priority: 5,
+   duration: 0,
+   downTimeDuration: 0,
+   attribute1: '',
+   attribute2: '',
+   createdDate: '',
+   modifiedDate: '',
+   taskCategory: null,
+   subTasks: [],
+   taskTriggers: []
+});
+
+export const getTaskTriggerDefaultInstance = ():ITaskTrigger => ({
+   taskTriggerId: 0,
+   kind: 'DATE',
+   description: '',
+   fixedSchedule: false,
+   frequency: 0,
+   readType: '',
+   limit: '',
+   repeat: false,
+   operator: '',
+   value: '',
+   createdDate: '',
+   modifiedDate: ''
+});
+
 export const FETCH_MAINTENANCE_PLAN_GQL = gql`
    query fetchMaintenancePlans {
       maintenances {
@@ -95,7 +154,6 @@ export const FETCH_MAINTENANCE_PLAN_GQL = gql`
       }
    }
 `;
-
 
 export const GET_MAINTENANCE_PLAN_BY_ID = gql`
    query getMaintenancePlanById($maintenanceId: Int!) {
@@ -122,10 +180,75 @@ export const GET_MAINTENANCE_PLAN_BY_ID = gql`
                   description   
                }
             }
+            
+            equipments {
+               equipmentId
+               code
+               name
+               description
+            }
          }
       }
    }
 `;
+
+export const GET_TASK_BY_ID = gql`
+   query getTaskById($taskId: Int!) {
+      maintenances {
+         task(entityId: $taskId) {
+            taskId
+            name
+            description
+            priority
+            duration
+            downTimeDuration
+            attribute1
+            attribute2
+            createdDate
+            modifiedDate
+            taskCategory {
+               taskCategoryId
+               name
+               description
+            }
+            taskTriggers {
+               taskTriggerId
+               kind
+               description
+               fixedSchedule
+               frequency
+               readType
+               limit
+               repeat
+               operator
+               value
+               unit {
+                  unitId
+                  key
+                  label
+               }
+               eventTrigger {
+                  eventTriggerId
+                  name
+               }
+            }
+            subTasks {
+               subTaskId
+               description
+               group
+               mandatory
+               order
+               subTaskKind {
+                  subTaskKindId
+                  name
+                  description
+               }
+            }
+         }
+      }
+   }
+`;
+
 
 export const FETCH_INVENTORY_ITEMS = gql`
    query getInventoryItems($inventoryId: Int!) {
@@ -203,30 +326,33 @@ export const SAVE_MAINTENANCE_PLAN = gql`
    }
 `;
 
-export const SAVE_INVENTORY_ITEMS = gql`
-   mutation saveInventoryItems(
-      $inventoryId: Int!
-      $itemIds: [Int!]!
-      $level: Int!
-      $maxLevelAllowed: Int!
-      $minLevelAllowed: Int!
-      $price: Float!
-      $location: String!
-      $dateExpiry: String!
+export const SAVE_MAINTENANCE_TASKS = gql`
+   mutation saveMaintenanceTasks(
+      $maintenanceId: Int!
+      $tasks: [TaskArg!]!
    ) {
-      inventories {
-         saveInventoryItems(
-            inventoryId: $inventoryId
-            itemIds: $itemIds
-            level: $level
-            maxLevelAllowed: $maxLevelAllowed
-            minLevelAllowed: $minLevelAllowed
-            price: $price
-            location: $location
-            dateExpiry: $dateExpiry         
-         ) {
-            inventoryItemId
+      maintenances {
+         createUpdateTasks(maintenanceId: $maintenanceId, tasks: $tasks) {
+            taskId
          }
+      }
+   }
+`;
+
+export const FETCH_TASK_CATEGORIES = gql`
+   query fetchTaskCategories{
+      taskCategories {
+         taskCategoryId
+         name
+      }
+   }
+`;
+
+export const FETCH_SUBTASK_KINDS = gql`
+   query fetchSubtaskKinds{
+      subTaskKinds {
+         subTaskKindId
+         name
       }
    }
 `;

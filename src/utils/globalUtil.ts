@@ -21,3 +21,7 @@ export const clearCache = (cache: any, patern: string) => {
 export const buildPath = (baseUrl: string, path: string) => {
    return baseUrl.endsWith('/') ? baseUrl + path : baseUrl + '/' + path;
 };
+
+export const appendToPath = (baseUrl: string, path: string) => {
+   return baseUrl.endsWith('/') ? baseUrl + path : baseUrl + '/' + path;
+};

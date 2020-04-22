@@ -5,7 +5,6 @@ import {Redirect} from "react-router";
 import {MaintenancePlanComp} from "./Plan";
 import {CreateEditMaintenancePlanComp} from "./Plan/CreateEditEquipment/CreateEditMaintenancePlanComp";
 
-
 interface IMaintenancePlanContext {
    maintenanceId: number;
    setMaintenanceId(a: number): void;
@@ -20,8 +19,7 @@ const MaintenancePlanRoutes: React.FC =  () => {
       <Switch>
          <MaintenancePlanContext.Provider value={{maintenanceId, setMaintenanceId}}>
             <Route exact path={path} component={MaintenancePlanComp}/>
-            <Route path={`${path}/add`} component={CreateEditMaintenancePlanComp}/>
-            <Route path={`${path}/edit`} component={CreateEditMaintenancePlanComp}/>
+            <Route path={`${path}/:maintenanceId`} component={CreateEditMaintenancePlanComp}/>
          </MaintenancePlanContext.Provider>
       </Switch>
    );
@@ -30,7 +28,6 @@ const MaintenancePlanRoutes: React.FC =  () => {
 export const MaintenanceResourceRoutes: React.FC =  () => {
   const [t, i18n] = useTranslation();
   const { path, url } = useRouteMatch();
-  // console.log(url);
   return (
      <Switch>
         <Route path={`${path}/plan`} component={MaintenancePlanRoutes}/>

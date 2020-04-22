@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {HashRouter as Router, Switch, Route, Redirect, useRouteMatch} from "react-router-dom";
 import './App.scss';
+import 'typeface-roboto';
 import {Leftsidebar} from "./leftsidebar/Leftsidebar";
 import { Home } from './home/home';
 import Users from './users';
