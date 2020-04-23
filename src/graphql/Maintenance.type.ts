@@ -133,6 +133,23 @@ export const getTaskTriggerDefaultInstance = ():ITaskTrigger => ({
    modifiedDate: ''
 });
 
+export const getSubTaskDefaultInstance = ():ISubTask => ({
+   subTaskId: 0,
+   order: 0,
+   group: '',
+   description: '',
+   mandatory: false,
+   createdDate: '',
+   modifiedDate: '',
+   subTaskKind: {
+      subTaskKindId: 0,
+      name: '',
+      description: '',
+      createdDate: '',
+      modifiedDate: ''
+   },
+});
+
 export const FETCH_MAINTENANCE_PLAN_GQL = gql`
    query fetchMaintenancePlans {
       maintenances {

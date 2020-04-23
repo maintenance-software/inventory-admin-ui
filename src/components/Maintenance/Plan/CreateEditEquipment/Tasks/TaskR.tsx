@@ -5,11 +5,11 @@ import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import {useHistory} from "react-router";
 import Typography from "@material-ui/core/Typography/Typography";
 import Box from "@material-ui/core/Box/Box";
-import {AppBar} from "@material-ui/core";
+import {AppBar, Button, Divider} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import {
-   GET_MAINTENANCE_PLAN_BY_ID,
+   GET_MAINTENANCE_PLAN_BY_ID, GET_TASK_BY_ID,
    IMaintenancePlans,
    ITask,
    ITaskCategory, SAVE_MAINTENANCE_TASKS
@@ -21,6 +21,7 @@ import {TaskDetailComp} from "./TaskDetail";
 import {TaskTrigger} from "./Trigger";
 import { useMutation } from '@apollo/react-hooks';
 import {appendToPath} from "../../../../../utils/globalUtil";
+import {SubTask} from "./SubTask";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -40,7 +41,7 @@ function TabPanel(props: TabPanelProps) {
          aria-labelledby={`wrapped-tab-${index}`}
          {...other}
       >
-         {value === index && <Box p={3}>{children}</Box>}
+         {value === index && <Box p={1}>{children}</Box>}
       </Typography>
    );
 }
@@ -136,10 +137,18 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
                attribute1: task.attribute1,
                attribute2: task.attribute2,
                taskCategoryId: taskDetailFormik.getFieldProps('taskCategoryId').value,
-               subTasks: []
+               subTasks: task.subTasks.map(s => ({
+                  subTaskId: s.subTaskId,
+                  order: s.order,
+                  group: s.group,
+                  description: s.description,
+                  mandatory: s.mandatory,
+                  subTaskKindId: s.subTaskKind.subTaskKindId
+               })),
+               taskTriggers: []
             }]
          }
-         , refetchQueries: [{query: GET_MAINTENANCE_PLAN_BY_ID, variables: {maintenanceId}}]
+         , refetchQueries: [{query: GET_TASK_BY_ID, variables: {taskId: task.taskId}}]
          // , update: (cache) => {
          //    clearCache(cache, 'maintenances.maintenance');
          // }
@@ -166,11 +175,18 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
             />
          </TabPanel>
          <TabPanel value={value} index="subtasks">
-            Item Two
+            <SubTask subtasks={task.subTasks || []}/>
          </TabPanel>
          <TabPanel value={value} index="triggers">
             <TaskTrigger triggers={task.taskTriggers || []}/>
          </TabPanel>
+         <Divider/>
+         <div>
+            <Button color="secondary">Cancel</Button>
+            <Button color="primary" onClick={handlerSaveTask}>
+               Save
+            </Button>
+         </div>
       </div>
   );
 };
