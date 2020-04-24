@@ -120,7 +120,7 @@ export const getTaskDefaultInstance = ():ITask => ({
 
 export const getTaskTriggerDefaultInstance = ():ITaskTrigger => ({
    taskTriggerId: 0,
-   kind: 'DATE',
+   kind: 'EVENT',
    description: '',
    fixedSchedule: false,
    frequency: 0,
@@ -370,6 +370,17 @@ export const FETCH_SUBTASK_KINDS = gql`
       subTaskKinds {
          subTaskKindId
          name
+      }
+   }
+`;
+
+export const FETCH_EVENT_TRIGGERS = gql`
+   query fetchEventTriggers{
+      maintenances {
+         eventTriggers {
+            eventTriggerId
+            name
+         }
       }
    }
 `;

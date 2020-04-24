@@ -12,8 +12,19 @@ import {useHistory} from "react-router";
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {ITaskTrigger} from "../../../../../graphql/Maintenance.type";
+import {
+   FETCH_EVENT_TRIGGERS,
+   FETCH_SUBTASK_KINDS,
+   getSubTaskDefaultInstance, getTaskTriggerDefaultInstance, IEventTrigger,
+   ISubTask,
+   ISubTaskKind,
+   ITaskTrigger
+} from "../../../../../graphql/Maintenance.type";
 import TableFooter from '@material-ui/core/TableFooter';
+import { useQuery } from '@apollo/react-hooks';
+import {SubTaskDialog} from "./SubTaskDialog";
+import {TriggerDialog} from "./TriggerDialog";
+import {FETCH_UNITS, IUnit} from "../../../../../graphql/item.type";
 
 const useBottomNoneBorder = makeStyles({
    root: {
@@ -43,6 +54,26 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
    const history = useHistory();
    const classes = useStyles2();
    const bottomNoneBoder = useBottomNoneBorder();
+   const [open, setOpen] = React.useState(false);
+   const [trigger, setTrigger] = useState<ITaskTrigger>(getTaskTriggerDefaultInstance());
+   const eventTriggersData = useQuery<{maintenances: {eventTriggers: IEventTrigger[]}}, any>(FETCH_EVENT_TRIGGERS);
+   const unitsData = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
+
+   const handleAddEditTrigger = (trigger: ITaskTrigger) => {
+      setOpen(true);
+      setTrigger(trigger);
+   };
+
+   const handleSaveTrigger = (t: ITaskTrigger) => {
+
+      if(t.taskTriggerId === 0) {
+         triggers.push(t);
+      } else {
+         const index = triggers.findIndex(k => k.taskTriggerId === t.taskTriggerId);
+         triggers[index] = t;
+      }
+      setOpen(false);
+   };
    return (
       <>
          <TableContainer className={classes.container}>
@@ -63,31 +94,13 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                         <TableCell>{row.fixedSchedule}</TableCell>
                         <TableCell align="center">
                            <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
-                              <IconButton aria-label="edit equipment" onClick={()=> {}}>
+                              <IconButton aria-label="edit equipment" onClick={() => handleAddEditTrigger(row)}>
                                  <EditIcon/>
                               </IconButton>
                            </ButtonGroup>
                         </TableCell>
                      </TableRow>
                   ))}
-                  <TableRow key={1111} hover>
-                     <TableCell>
-                        <select style={{width: '100%'}}>
-                           <option>DATE</option>
-                           <option>EVENT</option>
-                           <option>EVENT1</option>
-                        </select>
-                     </TableCell>
-                     <TableCell>spsps</TableCell>
-                     <TableCell>sasdsd</TableCell>
-                     <TableCell align="center">
-                        <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
-                           <IconButton aria-label="edit equipment" onClick={()=> {}}>
-                              <EditIcon/>
-                           </IconButton>
-                        </ButtonGroup>
-                     </TableCell>
-                  </TableRow>
                </TableBody>
                <TableFooter>
                   <TableRow>
@@ -97,7 +110,7 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                            color="default"
                            size="small"
                            startIcon={<AddIcon/>}
-                           onClick={() => {}}
+                           onClick={() => handleAddEditTrigger(getTaskTriggerDefaultInstance())}
                         >
                            Add
                         </Button>
@@ -106,6 +119,14 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                </TableFooter>
             </Table>
          </TableContainer>
+         <TriggerDialog
+            setOpen={setOpen}
+            open={open}
+            trigger={trigger}
+            triggerEvents={eventTriggersData.data? eventTriggersData.data.maintenances.eventTriggers : []}
+            units={unitsData.data? unitsData.data.units : []}
+            onSaveEventTrigger={handleSaveTrigger}
+         />
       </>
    );
 };

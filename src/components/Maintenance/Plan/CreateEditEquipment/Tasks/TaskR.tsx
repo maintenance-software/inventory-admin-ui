@@ -145,7 +145,20 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
                   mandatory: s.mandatory,
                   subTaskKindId: s.subTaskKind.subTaskKindId
                })),
-               taskTriggers: []
+               taskTriggers: task.taskTriggers.map(t => ({
+                  taskTriggerId: t.taskTriggerId,
+                  kind: t.kind,
+                  description: t.description,
+                  fixedSchedule: t.fixedSchedule,
+                  frequency: t.frequency,
+                  readType: t.readType,
+                  limit: t.limit,
+                  repeat: t.repeat,
+                  operator: t.operator,
+                  value: t.value,
+                  unitId: t.unit && t.unit.unitId !== 0? t.unit.unitId : null,
+                  eventTriggerId: t.eventTrigger && t.eventTrigger.eventTriggerId !== 0 ? t.eventTrigger.eventTriggerId : null
+               }))
             }]
          }
          , refetchQueries: [{query: GET_TASK_BY_ID, variables: {taskId: task.taskId}}]
