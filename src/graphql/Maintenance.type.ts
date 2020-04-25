@@ -266,39 +266,6 @@ export const GET_TASK_BY_ID = gql`
    }
 `;
 
-
-export const FETCH_INVENTORY_ITEMS = gql`
-   query getInventoryItems($inventoryId: Int!) {
-      inventories {
-         inventory(entityId: $inventoryId) {
-            inventoryItems {
-               totalCount
-               content {
-               inventoryItemId
-                  level
-                  maxLevelAllowed
-                  minLevelAllowed
-                  price
-                  location
-                  dateExpiry
-                  item {
-                     itemId
-                     name
-                     itemType
-                  }
-               }
-               pageInfo {
-                  hasNext
-                  hasPreview
-                  pageSize
-                  pageIndex
-               }
-            }
-         }
-      }
-   }
-`;
-
 export const FETCH_AVAILABLE_ITEMS = gql`
    query fetchAvaillableItems($inventoryId: Int!, $searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!] ) {
       inventories {

@@ -127,20 +127,20 @@ export const CreateEditMaintenancePlanComp: React.FC =  () => {
             className={classes.tabs}
          >
             <Tab value="home" label="GENERAL" {...a11yProps('home')} />
-            <Tab value="equipments" label="EQUIPMENT" {...a11yProps('equipments')} />
             <Tab value="tasks" label="TASKS" {...a11yProps('tasks')} />
+            <Tab value="equipments" label="EQUIPMENT" {...a11yProps('equipments')} />
          </Tabs>
             <TabPanel value={value} index="home">
                <PlanDetailsComp/>
-            </TabPanel>
-            <TabPanel value={value} index="equipments">
-               <PlanEquipmentComp/>
             </TabPanel>
             <TabPanel value={value} index="tasks">
                <Switch>
                   <Route exact path={`${path}/tasks`} component={TaskComp}/>
                   <Route path={`${path}/tasks/:taskId`} component={TaskRComp}/>
                </Switch>
+            </TabPanel>
+            <TabPanel value={value} index="equipments">
+               <PlanEquipmentComp/>
             </TabPanel>
       </Grid>
   );

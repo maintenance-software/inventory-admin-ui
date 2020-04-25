@@ -179,6 +179,7 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
                <Tab value="home" label="Details" {...a11yProps('home')}/>
                <Tab value="subtasks" label="Subtasks" {...a11yProps('subtasks')} />
                <Tab value="triggers" label="Triggers" {...a11yProps('triggers')} />
+               <Tab value="resources" label="Resources" {...a11yProps('resources')} />
             </Tabs>
          </AppBar>
          <TabPanel value={value} index="home">
@@ -192,6 +193,9 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
          </TabPanel>
          <TabPanel value={value} index="triggers">
             <TaskTrigger triggers={task.taskTriggers || []}/>
+         </TabPanel>
+         <TabPanel value={value} index="resources">
+            Resources
          </TabPanel>
          <Divider/>
          <div>
