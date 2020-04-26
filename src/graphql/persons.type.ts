@@ -1,3 +1,4 @@
+import {gql} from 'apollo-boost';
 
 export interface IPersons {
    person: IPerson;
@@ -37,3 +38,36 @@ export enum ContactType{
    CELL_PHONE = 'CELL_PHONE',
    WHATSAPP = 'WHATSAPP'
 }
+
+export interface IEmployee {
+   employeeId: number;
+   firstName: string;
+   lastName: string;
+   documentType: string;
+   documentId: string;
+   hireDate: string;
+   salary: number;
+   employeeJob: IEmployeeJob;
+   address: Address;
+   contactInfo: ContactInfo[];
+   createdDate: string;
+   modifiedDate: string;
+}
+
+export interface  IEmployeeJob {
+   employeeJobId: number;
+   tittle: string;
+   description: string;
+   createdDate: string;
+   modifiedDate: string;
+}
+
+
+export const FETCH_EMPLOYEE_JOBS = gql`
+   query fetchEmployeeJobs{
+      employeeJobs {
+         employeeJobId
+         tittle
+      }
+   }
+`;

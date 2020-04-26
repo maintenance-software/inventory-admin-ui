@@ -16,6 +16,19 @@ type Inventories {
     saveInventoryItems(level: Int!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!, location: String!, dateExpiry: String, inventoryId: Int!, itemIds: [Int!]!): [InventoryItem!]!
 }
 
+type TaskResource {
+    taskResourceId: Int!
+    order: Int!
+    amount: Int!
+    resourceType: String!
+    unit: Unit!
+    employeeJob: EmployeeJob
+    humanResource: Employee
+    inventoryResource: Item
+    createdDate: String!
+    modifiedDate: String
+}
+
 type Privilege {
     privilegeId: Int!
     key: String!
@@ -62,6 +75,21 @@ type Users {
     changePassword(userId: Int!, password: String!, newPassword: String!): Boolean!
     updatePassword(userId: Int!, password: String!): Boolean!
     list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [User!]!
+}
+
+type Employee {
+    employeeId: Int!
+    firstName: String!
+    lastName: String!
+    documentType: String!
+    documentId: String!
+    hireDate: String
+    salary: Float!
+    employeeJob: EmployeeJob!
+    address: Address
+    contactInfo: [ContactInfo!]!
+    createdDate: String!
+    modifiedDate: String
 }
 
 type Person {
@@ -117,6 +145,17 @@ type Page_InventoryItem {
     content: [InventoryItem!]!
     pageInfo: PageInfo!
     sort: Sort!
+}
+
+input TaskResourceArg {
+    taskResourceId: Int!
+    order: Int!
+    amount: Int!
+    resourceType: String!
+    unitId: Int!
+    employeeJobId: Int
+    humanResourceId: Int
+    inventoryResourceId: Int
 }
 
 type Address {
@@ -197,9 +236,11 @@ type Mutation {
     saveUnit(unitId: Int!, key: String!, label: String!): Unit!
     saveTaskCategory(taskCategoryId: Int!, name: String!, description: String): TaskCategory!
     saveSubTaskKind(subTaskKindId: Int!, name: String!, description: String): SubTaskKind!
+    saveEmployeeJob(employeeJobId: Int!, tittle: String!, description: String): EmployeeJob!
     inventoryItems: InventoryItems!
     items: Items!
     equipments: Equipments!
+    employees: Employees!
     inventories: Inventories!
     maintenances: Maintenances!
 }
@@ -257,9 +298,11 @@ type Query {
     units: [Unit!]!
     taskCategories: [TaskCategory!]!
     subTaskKinds: [SubTaskKind!]!
+    employeeJobs: [EmployeeJob!]!
     inventories: Inventories!
     items: Items!
     equipments: Equipments!
+    employees: Employees!
     inventoryItems: InventoryItems!
     maintenances: Maintenances!
 }
@@ -345,6 +388,7 @@ type Task {
     taskCategory: TaskCategory
     subTasks: [SubTask!]!
     taskTriggers: [TaskTrigger!]!
+    taskResources: [TaskResource!]!
 }
 
 input SubTaskArg {
@@ -356,6 +400,14 @@ input SubTaskArg {
     subTaskKindId: Int
 }
 
+type EmployeeJob {
+    employeeJobId: Int!
+    tittle: String!
+    description: String
+    createdDate: String!
+    modifiedDate: String
+}
+
 type Maintenances {
     maintenance(entityId: Int!): Maintenance!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Maintenance!
@@ -364,6 +416,13 @@ type Maintenances {
     task(entityId: Int!): Task!
     eventTriggers: [EventTrigger!]!
     saveEventTrigger(eventTriggerId: Int!, name: String!, description: String): EventTrigger!
+}
+
+type Page_Employee {
+    totalCount: Int!
+    content: [Employee!]!
+    pageInfo: PageInfo!
+    sort: Sort!
 }
 
 type Persons {
@@ -420,6 +479,12 @@ type SubTaskKind {
     modifiedDate: String
 }
 
+type Employees {
+    employee(entityId: Int!): Employee!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Employee!
+    saveEmployee(employeeId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!, hireDate: String, salary: Float!, employeeJobId: Int!, address: AddressArg, contactInfo: [ContactInfoArg!]!): Employee!
+}
+
 type Page_Item {
     totalCount: Int!
     content: [Item!]!
@@ -439,6 +504,7 @@ input TaskArg {
     taskCategoryId: Int
     subTasks: [SubTaskArg!]!
     taskTriggers: [TaskTriggerArg!]!
+    taskResources: [TaskResourceArg!]!
 }
 
 type SubTask {

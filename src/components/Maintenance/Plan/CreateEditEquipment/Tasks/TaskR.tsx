@@ -22,6 +22,7 @@ import {TaskTrigger} from "./Trigger";
 import { useMutation } from '@apollo/react-hooks';
 import {appendToPath} from "../../../../../utils/globalUtil";
 import {SubTask} from "./SubTask";
+import {TaskResource} from "./TaskResource";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -195,7 +196,7 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
             <TaskTrigger triggers={task.taskTriggers || []}/>
          </TabPanel>
          <TabPanel value={value} index="resources">
-            Resources
+            <TaskResource taskRecources={task.taskResources || []} />
          </TabPanel>
          <Divider/>
          <div>

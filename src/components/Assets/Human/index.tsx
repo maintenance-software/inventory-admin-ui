@@ -41,7 +41,7 @@ import {SearchInput} from "../../SearchInput/SearchInput";
 export const FETCH_PERSONS_GQL = gql`
   query fetchPersons($pageIndex: Int, $pageSize: Int){
     persons {
-      page(queryString: "", pageIndex: $pageIndex, pageSize: $pageSize) {
+      page(searchString: "", pageIndex: $pageIndex, pageSize: $pageSize) {
          totalCount
          content {
             personId

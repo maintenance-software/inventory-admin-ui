@@ -3,6 +3,7 @@ import {IPage, IPageInfo} from "./page.type";
 import {EntityStatus} from "./users.type";
 import {IItem, IUnit} from "./item.type";
 import {IEquipment} from "./equipment.type";
+import {IEmployee, IEmployeeJob} from "./persons.type";
 
 export interface IMaintenancePlans {
    maintenance: IMaintenancePlan;
@@ -36,6 +37,7 @@ export interface ITask{
    taskCategory: ITaskCategory | null;
    subTasks: ISubTask[];
    taskTriggers: ITaskTrigger[];
+   taskResources: ITaskResource[];
 }
 
 export interface ITaskTrigger {
@@ -68,6 +70,19 @@ export interface IEventTrigger {
    eventTriggerId: number;
    name: string;
    description: string;
+   createdDate: string;
+   modifiedDate: string;
+}
+
+export interface ITaskResource {
+   taskResourceId: number;
+   order: number;
+   amount: number;
+   resourceType: string;
+   unit: IUnit;
+   employeeJob?: IEmployeeJob;
+   humanResource?: IEmployee;
+   inventoryResource?: IItem;
    createdDate: string;
    modifiedDate: string;
 }
@@ -115,7 +130,22 @@ export const getTaskDefaultInstance = ():ITask => ({
    modifiedDate: '',
    taskCategory: null,
    subTasks: [],
-   taskTriggers: []
+   taskTriggers: [],
+   taskResources: []
+});
+
+export const getTaskResourceDefaultInstance = ():ITaskResource => ({
+   taskResourceId: 0,
+   order: 0,
+   amount: 0,
+   resourceType: 'INVENTORY',
+   unit: {
+      unitId: 0,
+      label: '',
+      key: ''
+   },
+   createdDate: '',
+   modifiedDate: ''
 });
 
 export const getTaskTriggerDefaultInstance = ():ITaskTrigger => ({
@@ -261,34 +291,36 @@ export const GET_TASK_BY_ID = gql`
                   description
                }
             }
-         }
-      }
-   }
-`;
 
-export const FETCH_AVAILABLE_ITEMS = gql`
-   query fetchAvaillableItems($inventoryId: Int!, $searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!] ) {
-      inventories {
-         inventory(entityId: $inventoryId) {
-            availableItems(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
-               totalCount
-               content {
+            taskResources {
+               taskResourceId
+               order
+               amount
+               resourceType
+               unit {
+                  unitId
+                  label
+               }
+               humanResource {
+                  employeeId
+                  firstName
+                  lastName
+               }
+               employeeJob {
+                  employeeJobId
+                  tittle
+               }
+               inventoryResource {
                   itemId
                   code
                   name
                }
-               pageInfo {
-                  hasNext
-                  hasPreview
-                  pageSize
-                  pageIndex
-               }
             }
+            
          }
       }
    }
 `;
-
 
 export const SAVE_MAINTENANCE_PLAN = gql`
    mutation saveMaintenancePlan(
