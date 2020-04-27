@@ -15,7 +15,7 @@ import { SearchInput } from "../../../SearchInput/SearchInput";
 import { TablePaginationActions } from "../../../../utils/TableUtils";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
-import {IItem, ItemType} from "../../../../graphql/item.type";
+import {getItemDefaultInstance, IItem, ItemType} from "../../../../graphql/item.type";
 import Button from '@material-ui/core/Button';
 import {Checkbox, Typography} from '@material-ui/core';
 
@@ -28,9 +28,10 @@ const useButtonStyles = makeStyles(theme => ({
 const useStyles2 = makeStyles({
    root: {
       width: '100%',
+      height: '100%'
    },
    container: {
-      height: '25rem',
+      // height: '100%',
    },
    title: {
       flex: '1 1 100%',
@@ -46,6 +47,9 @@ export interface ISimpleItem {
 
 interface _ItemSelectableProps {
    items: ISimpleItem[];
+   multiple: boolean;
+   disableItems: number[];
+   initialSelected?: ISimpleItem[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
@@ -56,19 +60,35 @@ interface _ItemSelectableProps {
    onSearchItem?(searchString: string) : void;
 }
 
-export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSelectItem, onSearchItem}) => {
+export const AssetChooser: FC<_ItemSelectableProps> = ({items, multiple, disableItems, initialSelected, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSelectItem, onSearchItem}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
-   const [selected, setSelected] = React.useState<ISimpleItem[]>([]);
+   const [selected, setSelected] = React.useState<ISimpleItem[]>(initialSelected || []);
    const [searchInput, setSearchInput] = React.useState<string>(searchString || '');
    const onSearch = (event: FormEvent) => {
       event.preventDefault();
       onSearchItem && onSearchItem(searchInput);
    };
 
+   useEffect(() => {
+      setSelected(initialSelected || []);
+   }, [initialSelected]);
+
    const handleClick = (event: React.MouseEvent<unknown>, item: ISimpleItem) => {
       const selectedIndex = selected.findIndex(e => e.itemId === item.itemId);
+
+      if(!multiple) {
+         if(selectedIndex === -1) {
+            setSelected([item]);
+            onSelectItem && onSelectItem([item]);
+         } else {
+            setSelected([]);
+            onSelectItem && onSelectItem([]);
+         }
+         return;
+      }
+
       let newSelected: ISimpleItem[] = [];
       if (selectedIndex === -1) {
          newSelected = selected.concat(item);
@@ -90,7 +110,7 @@ export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex
    };
 
    return (
-      <Paper className={classes.root}>
+      <div className={classes.root}>
          <Grid container direction="row" justify="flex-start" wrap='nowrap'>
             <Grid container wrap='nowrap'>
                <Button
@@ -103,11 +123,6 @@ export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex
                   Options
                </Button>
             </Grid>
-            {selected.length > 0 ? (
-               <Typography className={classes.title} color="inherit" variant="subtitle1">
-                  {selected.length} selected
-               </Typography>
-            ) : ''}
             <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
                <form  noValidate autoComplete="off" onSubmit={onSearch}>
                   <SearchInput placeholder="Search" value={searchInput} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchInput(event.target.value)}/>
@@ -120,6 +135,7 @@ export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex
                   <TableRow>
                      <TableCell padding="checkbox">
                         <Checkbox
+                           hidden={!multiple}
                            indeterminate={selected.length > 0 && selected.length < items.length}
                            checked={items.length > 0 && selected.length === items.length}
                            onChange={handleSelectAllClick}
@@ -135,7 +151,7 @@ export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex
                   {items.map((row: ISimpleItem, index) => (
                      <TableRow
                         hover
-                        onClick={event => handleClick(event, row)}
+                        onClick={event => (!disableItems.find(itemId => itemId === row.itemId)) && handleClick(event, row)}
                         role="checkbox"
                         aria-checked={!!selected.find(item => item.itemId === row.itemId)}
                         tabIndex={-1}
@@ -145,6 +161,7 @@ export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex
                         <TableCell padding="checkbox">
                            <Checkbox
                               color='default'
+                              disabled={!!disableItems.find(itemId => itemId === row.itemId)}
                               checked={!!selected.find(item => item.itemId === row.itemId)}
                               inputProps={{ 'aria-labelledby': row.itemId.toString() }}
                            />
@@ -171,6 +188,6 @@ export const AssetSelectableComp_: FC<_ItemSelectableProps> = ({items, pageIndex
             onChangeRowsPerPage={onChangeRowsPerPage}
             ActionsComponent={TablePaginationActions}
          />
-      </Paper>
+      </div>
    );
 };

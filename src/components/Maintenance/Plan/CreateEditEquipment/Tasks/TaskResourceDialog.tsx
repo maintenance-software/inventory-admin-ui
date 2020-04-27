@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next';
 import {useFormik} from 'formik';
 import * as Yup from "yup";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import {createStyles, Theme, Dialog, DialogContent, Stepper, StepLabel, Step, DialogTitle, DialogActions, FormLabel} from "@material-ui/core";
+import {createStyles, Theme, Dialog, DialogContent, Stepper, StepLabel, Step, DialogTitle, DialogActions, FormLabel, MenuItem} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField/TextField";
 import Radio from '@material-ui/core/Radio';
 import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
-import { useMutation } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
-import {IItem} from "../../../../../graphql/item.type";
+import {getItemDefaultInstance, IItem, IUnit} from "../../../../../graphql/item.type";
 import {ITaskResource} from "../../../../../graphql/Maintenance.type";
-import {AssetChooserComp} from "../../../../Assets/Commons/AssetSelectable/AssetChooserComp";
+import {AssetChooserComp} from "../../../../Assets/Commons/AssetChooser/AssetChooserComp";
+import {IEmployee, IEmployeeJob} from "../../../../../graphql/persons.type";
 
 const useFormStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -36,24 +36,34 @@ const useButtonStyles = makeStyles(theme => ({
 
 export interface IInventoryFormProps {
    taskResource: ITaskResource;
+   employeeJobs: IEmployeeJob[];
+   units: IUnit[];
    open: boolean;
    setOpen(open: boolean): void;
-   onAccept() : void;
+   onAccept(t: ITaskResource) : void;
 }
 
-export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource, open, setOpen, onAccept}) => {
+export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource, employeeJobs, units, open, setOpen, onAccept}) => {
    const steps = ['Resource Type', 'Resource', 'Details'];
    const history = useHistory();
-   const formClasses = useFormStyles();
    const buttonClasses = useButtonStyles();
-   const [selectedItems, setSelectedItems] = useState<IItem[]>([]);
    const [activeStep, setActiveStep] = useState(0);
    const [skipped, setSkipped] = React.useState(new Set<number>());
+
    const [resourceType, setResourceType] = React.useState(taskResource.resourceType);
+   const [amount, setAmount] = React.useState(taskResource.amount);
+   const [unitId, setUnitId] = React.useState(taskResource.unit.unitId);
+   const [employeeJobId, setEmployeeJobId] = React.useState(taskResource.employeeJob? taskResource.employeeJob.employeeJobId : 0);
+   const [inventoryResource, setInventoryResource] = React.useState(taskResource.inventoryResource? taskResource.inventoryResource : null);
+
 
    useEffect(() => {
       setActiveStep(0);
       setResourceType(taskResource.resourceType);
+      setAmount(taskResource.amount);
+      setUnitId(taskResource.unit.unitId);
+      setEmployeeJobId(taskResource.employeeJob? taskResource.employeeJob.employeeJobId : 0);
+      setInventoryResource(taskResource.inventoryResource? taskResource.inventoryResource : null);
    }, [taskResource]);
 
    const isStepSkipped = (step: number) => {
@@ -62,7 +72,19 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
 
    const handleNext = async () => {
       if(activeStep + 1 === 3) {
-         console.log('end step');
+         const r: ITaskResource = {
+            taskResourceId: taskResource.taskResourceId,
+            order: taskResource.order,
+            amount: amount,
+            resourceType: resourceType,
+            unit: units.find(u => u.unitId === unitId) || {unitId: 0, key: '', label: ''},
+            employeeJob: employeeJobs.find(e => e.employeeJobId === employeeJobId),
+            humanResource: taskResource.humanResource,
+            inventoryResource: inventoryResource? inventoryResource : undefined,
+            createdDate: taskResource.createdDate,
+            modifiedDate: taskResource.modifiedDate
+         };
+         onAccept(r);
       } else {
          setActiveStep(activeStep + 1);
       }
@@ -72,13 +94,38 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
       setActiveStep(prevActiveStep => prevActiveStep - 1);
    };
 
-   const handleSelectItem = (items: IItem[]) => {
-      setSelectedItems(items);
-   };
+   const TaskResourceSummary = (
+      <>
+         <Grid item xs={6}>
+            <TextField
+               style={{width: '100%'}}
+               id="amount-resource"
+               label="Amount"
+               value={amount}
+               onChange={(event => setAmount(+event.target.value))}
+            >
+            </TextField>
+         </Grid>
+         <Grid item xs={6}>
+            <TextField
+               style={{width: '100%'}}
+               id="human-resource-unit"
+               select
+               label="Unit"
+               value={unitId}
+               disabled={resourceType === 'INVENTORY'}
+               onChange={(event => setUnitId(+event.target.value))}
+            >
+               {units.map((option) => (
+                  <MenuItem key={option.unitId} value={option.unitId}>
+                     {option.label}
+                  </MenuItem>
+               ))}
+            </TextField>
+         </Grid>
+      </>
+   );
 
-   // const getItemSelectableComp = () => {
-   //    return <InventoryItemAvailableComp inventoryId={inventoryId} onSelectItem={handleSelectItem}/>
-   // };
    const InventoryTypeComp = (
       <>
          <Grid item xs={3}>
@@ -108,15 +155,47 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
          </>
    );
 
+   const HumanResourceJob = (
+      <>
+         <Grid item xs={12}>
+            <TextField
+               style={{width: '100%'}}
+               id="human-resource-job"
+               select
+               label="Human Resource"
+               value={employeeJobId}
+               onChange={(event => setEmployeeJobId(+event.target.value))}
+            >
+               {employeeJobs.map((option) => (
+                  <MenuItem key={option.employeeJobId} value={option.employeeJobId}>
+                     {option.tittle}
+                  </MenuItem>
+               ))}
+            </TextField>
+         </Grid>
+      </>
+   );
+
    const stepComp = (index: number) => {
       switch (index) {
          case 0: return InventoryTypeComp;
-         case 1: return <AssetChooserComp
-            disableItems={[]}
-            filters={[{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType", operator: "in", value: "SPARE_PARTS,TOOLS,SUPPLIES"}]}
-            multiple={false}
-            onSelectItem={() => {}}
-         />;
+         case 1: return (resourceType === 'INVENTORY')?
+            <AssetChooserComp
+               disableItems={[]}
+               filters={[{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType", operator: "in", value: "SPARE_PARTS,TOOLS,SUPPLIES"}]}
+               multiple={false}
+               initialSelected={inventoryResource? [inventoryResource] : []}
+               onSelectItems={(items: IItem[]) => {
+                  if(items.length === 1) {
+                     setInventoryResource(items[0]);
+                     setUnitId(items[0].unit.unitId)
+                  } else {
+                     setInventoryResource(null);
+                     setUnitId(0);
+                  }
+               }}
+         /> : HumanResourceJob;
+         case 2: return TaskResourceSummary;
       }
       return (<></>);
    };
@@ -125,12 +204,12 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
 
   return (
      <>
-        <Dialog maxWidth="md" onClose={()=>setOpen(false)} aria-labelledby="customized-dialog-title" open={open}>
+        <Dialog onClose={()=>setOpen(false)} aria-labelledby="customized-dialog-title" open={open}>
            <DialogTitle>
               Add / Edit Resource
            </DialogTitle>
-           <DialogContent dividers>
-              <Stepper activeStep={activeStep}>
+           <DialogContent dividers style={{height: '30rem', width: '35rem'}}>
+              <Stepper activeStep={activeStep} style={{padding: '.5rem'}}>
                  {steps.map((step, index) => {
                     const stepProps: { completed?: boolean } = {};
                     const labelProps: { optional?: React.ReactNode } = {};
@@ -144,33 +223,38 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
                     );
                  })}
               </Stepper>
-              <Grid container  spacing={2}>
+              <Grid container spacing={2} style={{marginTop: '1rem'}}>
                  { stepComp(activeStep) }
               </Grid>
            </DialogContent>
-           <DialogActions>
-              <div style={{padding: '.5rem', display: 'flex', justifyContent: 'space-between'}}>
-                 <Button variant="contained" color="secondary" onClick={()=> setOpen(false)}>
-                    Cancel
-                 </Button>
-                 <div>
-                    <Button disabled={activeStep === 0} onClick={handleBack}>
-                       Back
-                    </Button>
-                    <Button
-                       variant="contained"
-                       color="primary"
-                       onClick={handleNext}
-                    >
-                       {activeStep === 2 ? 'Save' : 'Next'}
-                    </Button>
-                 </div>
-              </div>
+           <DialogActions disableSpacing style={{justifyContent: 'center'}}>
+              <Button variant="outlined"
+                      color="secondary"
+                      size="small"
+                      className={buttonClasses.button}
+                      onClick={()=> setOpen(false)}
+              >
+                 Cancel
+              </Button>
+              <Button variant="outlined"
+                      color="primary"
+                      size="small"
+                      className={buttonClasses.button}
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+              >
+                 Back
+              </Button>
+              <Button variant="outlined"
+                      color="primary"
+                      size="small"
+                      className={buttonClasses.button}
+                      onClick={handleNext}
+              >
+                 {activeStep === 2 ? 'Accept' : 'Next'}
+              </Button>
            </DialogActions>
         </Dialog>
-
-
-
         </>
   );
 };

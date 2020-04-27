@@ -47,7 +47,8 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
    const bottomNoneBoder = useBottomNoneBorder();
    const [open, setOpen] = React.useState(false);
    const [resource, setResource] = useState<ITaskResource>(getTaskResourceDefaultInstance());
-   const employeeJobsData = useQuery<{maintenances: {employeeJobs: IEmployeeJob[]}}, any>(FETCH_EMPLOYEE_JOBS);
+   // const employeeJobsData = useQuery<{maintenances: {employeeJobs: IEmployeeJob[]}}, any>(FETCH_EMPLOYEE_JOBS);
+   const employeeJobsData = useQuery<{employeeJobs: IEmployeeJob[]}, any>(FETCH_EMPLOYEE_JOBS);
    const unitsData = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
 
    const handleAddEditResource = (trigger: ITaskResource) => {
@@ -56,7 +57,9 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
    };
 
    const handleSaveResource = (t: ITaskResource) => {
+      t.order = taskRecources.length;
       if(t.taskResourceId === 0) {
+         t.taskResourceId = -taskRecources.length;
          taskRecources.push(t);
       } else {
          const index = taskRecources.findIndex(k => k.taskResourceId === t.taskResourceId);
@@ -128,7 +131,14 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
             units={unitsData.data? unitsData.data.units : []}
             onSaveEventTrigger={handleSaveResource}
          />*/}
-         <TaskResourceDialog taskResource={resource} open={open} setOpen={setOpen} onAccept={()=> {}}/>
+         <TaskResourceDialog
+            taskResource={resource}
+            employeeJobs={employeeJobsData.data?employeeJobsData.data.employeeJobs : []}
+            units={unitsData.data?unitsData.data.units : []}
+            open={open}
+            setOpen={setOpen}
+            onAccept={handleSaveResource}
+         />
       </>
    );
 };

@@ -1,6 +1,6 @@
 const proxy = require('http-proxy-middleware');
 console.log('setting proxy test');
-var cookieValue = '_SESSION=QsaWHsSr+XEB+PbBWFS1vhH4cnX7hnR0U5m926PJlHiPOB2KLYcHx36Dq+orKa0gHpxs8+HqsRYLuP/hEGGBDJiGx4L9XJUlun2bf4qlRXrcWl9HyAW9iuF0yNDaZD6IQnbXEkDbkOlSWMj/ttpGC1gaXdDGMjle9QDMwrAfyAyqx63V7JhEL3vN9V1qrNi12jsxjlKFbb4h4FrXnjm7O/xKIOzuRBHF2m67v8k=; Path=/; Expires=Sun, 26-Apr-2020 20:52:20 GMT; HttpOnly';
+var cookieValue = '_SESSION=TmnBDzdfQ901jI51CN2OUnFysFwOgEibpu0dHQaOYEt8u7xrIxnfG6HZ8L0/l5Cqn2EFFkxaAeWNZi5irnRAWBeaIC8t8KQcVl/c0JHc4Aii4WM9DjPPoUxOZi5Gtwjw6/0n6wMwvyN/yd3YE0zYEj4Jl2V/uijf2o2xnGKEb1iiBMx8nInDRJNGcwNqAAn1E+4j2iC9hdiGvAz16mOqOVCohy/PNck0dlZkxw4=; Path=/; Expires=Mon, 27-Apr-2020 02:51:50 GMT; HttpOnly';
 module.exports = function(app) {
     app.use('/api', proxy({
         target: 'http://192.168.0.100:3000',

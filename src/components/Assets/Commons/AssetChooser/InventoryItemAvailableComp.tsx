@@ -3,7 +3,7 @@ import { useLazyQuery } from "@apollo/react-hooks";
 import { FETCH_ITEMS_GQL, IItem, IItems } from "../../../../graphql/item.type";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
-import {AssetSelectableComp_} from './AssetSelectableComp_';
+import {AssetChooser} from './AssetChooser';
 import {FETCH_AVAILABLE_ITEMS} from "../../../../graphql/inventory.type";
 import {IPage} from "../../../../graphql/page.type";
 
@@ -47,8 +47,10 @@ export const InventoryItemAvailableComp: FC<{inventoryId: number, onSelectItem?(
       console.log(items)
    };
 
-   return <AssetSelectableComp_
+   return <AssetChooser
       items = {data.inventories.inventory.availableItems.content}
+      multiple={false}
+      disableItems={[]}
       pageIndex = {data.inventories.inventory.availableItems.pageInfo.pageIndex}
       pageSize = {data.inventories.inventory.availableItems.pageInfo.pageSize}
       totalCount = {data.inventories.inventory.availableItems.totalCount}

@@ -1,4 +1,7 @@
 import {gql} from 'apollo-boost';
+import {IPage} from "./page.type";
+import {EntityStatus} from "./users.type";
+import {IItem, ItemType} from "./item.type";
 
 export interface IPersons {
    person: IPerson;
@@ -39,6 +42,12 @@ export enum ContactType{
    WHATSAPP = 'WHATSAPP'
 }
 
+export interface IEmployees {
+   employee: IEmployee;
+   page: IPage<IEmployee>;
+   saveEmployee: IEmployee;
+}
+
 export interface IEmployee {
    employeeId: number;
    firstName: string;
@@ -62,6 +71,37 @@ export interface  IEmployeeJob {
    modifiedDate: string;
 }
 
+export const getEmployeeJobDefaultInstance = ():IEmployeeJob => ({
+   employeeJobId: 0,
+   tittle: '',
+   description: '',
+   createdDate: '',
+   modifiedDate: ''
+});
+
+
+export const FETCH_EMPLOYEES = gql`
+   query fetchEmployees($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]){
+      employees {
+         page(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+            totalCount
+            content {
+               employeeId
+               firstName
+               lastName
+               documentId
+               documentType
+            }
+            pageInfo {
+               hasNext
+               hasPreview
+               pageSize
+               pageIndex
+            }
+         }
+      }
+   }
+`;
 
 export const FETCH_EMPLOYEE_JOBS = gql`
    query fetchEmployeeJobs{

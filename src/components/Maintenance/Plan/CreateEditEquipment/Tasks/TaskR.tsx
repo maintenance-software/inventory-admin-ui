@@ -159,6 +159,16 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
                   value: t.value,
                   unitId: t.unit && t.unit.unitId !== 0? t.unit.unitId : null,
                   eventTriggerId: t.eventTrigger && t.eventTrigger.eventTriggerId !== 0 ? t.eventTrigger.eventTriggerId : null
+               })),
+               taskResources: task.taskResources.map(t => ({
+                  taskResourceId: t.taskResourceId,
+                  order: t.order,
+                  amount: t.amount,
+                  resourceType: t.resourceType,
+                  unitId: t.unit.unitId,
+                  employeeJobId: t.employeeJob? t.employeeJob.employeeJobId : null,
+                  inventoryResourceId: t.inventoryResource? t.inventoryResource.itemId : null,
+                  humanResourceId: t.humanResource? t.humanResource.employeeId : null,
                }))
             }]
          }

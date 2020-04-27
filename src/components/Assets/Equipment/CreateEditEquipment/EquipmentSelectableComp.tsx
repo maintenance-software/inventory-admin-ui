@@ -1,7 +1,7 @@
 import React, {useEffect, FC} from 'react';
 import { useLazyQuery } from "@apollo/react-hooks";
 import {useRouteMatch} from "react-router-dom";
-import {AssetSelectableComp_, ISimpleItem} from '../../Commons/AssetSelectable/AssetSelectableComp_';
+import {AssetChooser, ISimpleItem} from '../../Commons/AssetChooser/AssetChooser';
 import {IPage} from "../../../../graphql/page.type";
 import {FETCH_EQUIPMENTS_PAGE_GQL, IEquipment} from "../../../../graphql/equipment.type";
 
@@ -44,13 +44,15 @@ export const EquipmentSelectableComp: FC<{itemId: number,onSelectItem?(items: IS
       console.log(items)
    };
 
-   return <AssetSelectableComp_
+   return <AssetChooser
       items = {data.equipments.page.content.map(e =>({
          itemId: e.equipmentId,
          code: e.code,
          description: e.description,
          name: e.name
       }))}
+      multiple={false}
+      disableItems={[]}
       pageIndex = {data.equipments.page.pageInfo.pageIndex}
       pageSize = {data.equipments.page.pageInfo.pageSize}
       totalCount = {data.equipments.page.totalCount}

@@ -137,7 +137,7 @@ export const getTaskDefaultInstance = ():ITask => ({
 export const getTaskResourceDefaultInstance = ():ITaskResource => ({
    taskResourceId: 0,
    order: 0,
-   amount: 0,
+   amount: 1,
    resourceType: 'INVENTORY',
    unit: {
       unitId: 0,

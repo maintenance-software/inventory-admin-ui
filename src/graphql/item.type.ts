@@ -105,6 +105,11 @@ export const FETCH_ITEMS_GQL = gql`
                   categoryId
                   name
                }
+               unit {
+                  unitId
+                  key
+                  label
+               }
             }
             pageInfo {
                hasNext
