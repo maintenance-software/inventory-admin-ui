@@ -1,4 +1,4 @@
-import React, {FC, FormEvent, useState} from 'react';
+import React, {FC, FormEvent, useState, useEffect} from 'react';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import TableContainer from "@material-ui/core/TableContainer/TableContainer";
 import Table from '@material-ui/core/Table';
@@ -66,6 +66,9 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
    const [subTask, setSubTask] = useState<ISubTask>(getSubTaskDefaultInstance());
    const subtaskKindsData = useQuery<{subTaskKinds: ISubTaskKind[]}, any>(FETCH_SUBTASK_KINDS);
 
+   // useEffect(() => {
+   // }, [subTask]);
+
    const handleAddEditSubTask = (subTask: ISubTask) => {
       setOpen(true);
       setSubTask(subTask);
@@ -105,7 +108,7 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
                </TableHead>
                <TableBody>
                   {subtasks.sort((t1, t2) => t1.order - t2.order).map((row: ISubTask, index) => (
-                     <TableRow key={row.subTaskId} hover>
+                     <TableRow key={index} hover>
                         <TableCell>{row.order}</TableCell>
                         <TableCell>{row.description}</TableCell>
                         <TableCell>{row.subTaskKind.name}</TableCell>

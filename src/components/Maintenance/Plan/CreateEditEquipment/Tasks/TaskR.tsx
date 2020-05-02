@@ -20,7 +20,7 @@ import {ICategory} from "../../../../../graphql/item.type";
 import {TaskDetailComp} from "./TaskDetail";
 import {TaskTrigger} from "./Trigger";
 import { useMutation } from '@apollo/react-hooks';
-import {appendToPath} from "../../../../../utils/globalUtil";
+import {appendToPath, clearCache} from "../../../../../utils/globalUtil";
 import {SubTask} from "./SubTask";
 import {TaskResource} from "./TaskResource";
 
@@ -61,7 +61,13 @@ const useStyles = makeStyles((theme: Theme) => ({
    }
 }));
 
-export interface ITaskDetail {
+interface ITaskProps {
+   task: ITask;
+   taskCategories: ITaskCategory[];
+   onSaveTask(task: ITask): void;
+}
+
+interface ITaskDetailForm {
    name: string;
    priority: number;
    durationDD: number;
@@ -75,7 +81,7 @@ export interface ITaskDetail {
    taskCategoryId: number;
 }
 
-export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories: ITaskCategory[]}> =  ({maintenanceId, task, taskCategories}) => {
+export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask}) => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
@@ -83,9 +89,7 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
    const { path, url } = useRouteMatch();
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
-   // const [value, setValue] = React.useState('task-details');
-   const [saveMaintenanceTasks] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_MAINTENANCE_TASKS);
-   const taskDetailFormik = useFormik<ITaskDetail>({
+   const taskDetailFormik = useFormik<ITaskDetailForm>({
       enableReinitialize: true,
       initialValues: {
          name: task.name,
@@ -125,62 +129,63 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
       const downTimeDurationDD = +taskDetailFormik.getFieldProps('downTimeDurationDD').value;
       const downTimeDurationHH = +taskDetailFormik.getFieldProps('downTimeDurationHH').value;
       const downTimeDurationMM = +taskDetailFormik.getFieldProps('downTimeDurationMM').value;
-      const response = await saveMaintenanceTasks({
-         variables: {
-            maintenanceId: maintenanceId,
-            tasks: [{
-               taskId: task.taskId,
-               name: taskDetailFormik.getFieldProps('name').value,
-               description: taskDetailFormik.getFieldProps('description').value,
-               priority: taskDetailFormik.getFieldProps('priority').value,
-               duration: durationMM + 60 * durationHH + 1440 * durationDD,
-               downTimeDuration: downTimeDurationMM + 60 * downTimeDurationHH + 1440 * downTimeDurationDD,
-               attribute1: task.attribute1,
-               attribute2: task.attribute2,
-               taskCategoryId: taskDetailFormik.getFieldProps('taskCategoryId').value,
-               subTasks: task.subTasks.map(s => ({
-                  subTaskId: s.subTaskId,
-                  order: s.order,
-                  group: s.group,
-                  description: s.description,
-                  mandatory: s.mandatory,
-                  subTaskKindId: s.subTaskKind.subTaskKindId
-               })),
-               taskTriggers: task.taskTriggers.map(t => ({
-                  taskTriggerId: t.taskTriggerId,
-                  kind: t.kind,
-                  description: t.description,
-                  fixedSchedule: t.fixedSchedule,
-                  frequency: t.frequency,
-                  readType: t.readType,
-                  limit: t.limit,
-                  repeat: t.repeat,
-                  operator: t.operator,
-                  value: t.value,
-                  unitId: t.unit && t.unit.unitId !== 0? t.unit.unitId : null,
-                  eventTriggerId: t.eventTrigger && t.eventTrigger.eventTriggerId !== 0 ? t.eventTrigger.eventTriggerId : null
-               })),
-               taskResources: task.taskResources.map(t => ({
-                  taskResourceId: t.taskResourceId,
-                  order: t.order,
-                  amount: t.amount,
-                  resourceType: t.resourceType,
-                  unitId: t.unit.unitId,
-                  employeeJobId: t.employeeJob? t.employeeJob.employeeJobId : null,
-                  inventoryResourceId: t.inventoryResource? t.inventoryResource.itemId : null,
-                  humanResourceId: t.humanResource? t.humanResource.employeeId : null,
-               }))
-            }]
-         }
-         , refetchQueries: [{query: GET_TASK_BY_ID, variables: {taskId: task.taskId}}]
-         // , update: (cache) => {
-         //    clearCache(cache, 'maintenances.maintenance');
-         // }
-      });
+      const categoryId = +taskDetailFormik.getFieldProps('taskCategoryId').value;
+
+      const newTask: ITask = {
+         taskId: task.taskId,
+         name: taskDetailFormik.getFieldProps('name').value,
+         description: taskDetailFormik.getFieldProps('description').value,
+         attribute1: task.attribute1,
+         attribute2: task.attribute2,
+         priority: taskDetailFormik.getFieldProps('priority').value,
+         duration: durationMM + 60 * durationHH + 1440 * durationDD,
+         downTimeDuration: downTimeDurationMM + 60 * downTimeDurationHH + 1440 * downTimeDurationDD,
+         taskCategory: taskCategories.find(c => c.taskCategoryId === categoryId),
+         subTasks: task.subTasks.map(s => ({
+            subTaskId: s.subTaskId,
+            order: s.order,
+            group: s.group,
+            description: s.description,
+            mandatory: s.mandatory,
+            modifiedDate: task.modifiedDate,
+            createdDate: task.createdDate,
+            subTaskKind: s.subTaskKind
+         })),
+         taskTriggers: task.taskTriggers.map(t => ({
+            taskTriggerId: t.taskTriggerId,
+            kind: t.kind,
+            description: t.description,
+            fixedSchedule: t.fixedSchedule,
+            frequency: t.frequency,
+            readType: t.readType,
+            limit: t.limit,
+            repeat: t.repeat,
+            operator: t.operator,
+            value: t.value,
+            unit: t.unit,
+            eventTrigger: t.eventTrigger,
+            modifiedDate: t.modifiedDate,
+            createdDate: t.createdDate
+         })),
+         taskResources: task.taskResources.map(t => ({
+            taskResourceId: t.taskResourceId,
+            order: t.order,
+            amount: t.amount,
+            resourceType: t.resourceType,
+            unit: t.unit,
+            employeeJob: t.employeeJob,
+            inventoryResource: t.inventoryResource,
+            humanResource: t.humanResource,
+            modifiedDate: t.modifiedDate,
+            createdDate: t.createdDate
+         })),
+         modifiedDate: task.modifiedDate,
+         createdDate: task.createdDate
+      };
+      onSaveTask(newTask);
       taskDetailFormik.resetForm({});
       // onSaveTask()
    };
-
    const option = history.location.pathname.substr(url.toString().length, history.location.pathname.length - 1).replace(/[\/]+/g, '');
    const value = !option? 'home' : option;
    return (
@@ -200,7 +205,7 @@ export const TaskR: React.FC<{maintenanceId: number, task: ITask, taskCategories
             />
          </TabPanel>
          <TabPanel value={value} index="subtasks">
-            <SubTask subtasks={task.subTasks || []}/>
+            <SubTask subtasks={task.subTasks}/>
          </TabPanel>
          <TabPanel value={value} index="triggers">
             <TaskTrigger triggers={task.taskTriggers || []}/>

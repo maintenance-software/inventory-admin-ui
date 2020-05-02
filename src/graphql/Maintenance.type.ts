@@ -10,6 +10,7 @@ export interface IMaintenancePlans {
    task: ITask;
    page: IPage<IMaintenancePlan>;
    saveMaintenance: IMaintenancePlan;
+   createUpdateTasks: ITask[]
 }
 
 export interface IMaintenancePlan{
@@ -34,7 +35,7 @@ export interface ITask{
    attribute2: string;
    createdDate: string;
    modifiedDate: string;
-   taskCategory: ITaskCategory | null;
+   taskCategory?: ITaskCategory | null;
    subTasks: ISubTask[];
    taskTriggers: ITaskTrigger[];
    taskResources: ITaskResource[];

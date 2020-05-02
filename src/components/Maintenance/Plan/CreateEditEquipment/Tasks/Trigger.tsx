@@ -88,7 +88,7 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                </TableHead>
                <TableBody>
                   {triggers.sort((t1, t2) => t1.taskTriggerId - t2.taskTriggerId).map((row: ITaskTrigger, index) => (
-                     <TableRow key={row.taskTriggerId} hover>
+                     <TableRow key={index} hover>
                         <TableCell>{row.kind}</TableCell>
                         <TableCell>{row.description}</TableCell>
                         <TableCell>{row.fixedSchedule}</TableCell>
