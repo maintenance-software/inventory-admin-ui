@@ -30,7 +30,7 @@ export const MaintenanceResourceRoutes: React.FC =  () => {
   const { path, url } = useRouteMatch();
   return (
      <Switch>
-        <Route path={`${path}/plan`} component={MaintenancePlanRoutes}/>
+        <Route path={`${path}/plans`} component={MaintenancePlanRoutes}/>
         <Redirect exact from={`${path}/`} to="/invalidRoute" />
      </Switch>
   );

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {FormikHelpers, useFormik} from 'formik';
 import { useParams } from 'react-router-dom';
 import * as Yup from "yup";
-import {Col, CustomInput, Form, FormFeedback, FormGroup, FormText, Input, Label, Row} from "reactstrap";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles, Theme} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField/TextField";

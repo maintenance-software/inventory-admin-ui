@@ -2,7 +2,6 @@ import React, { useEffect, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import {FormikHelpers, useFormik} from 'formik';
 import * as Yup from "yup";
-import {Col, CustomInput, Form, FormFeedback, FormGroup, FormText, Input, Label, Row} from "reactstrap";
 import { isNumber } from 'util';
 import {ITaskCategory} from "../../../../../graphql/Maintenance.type";
 import Grid from '@material-ui/core/Grid';

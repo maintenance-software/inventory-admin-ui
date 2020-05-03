@@ -1,116 +1,146 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, FormEvent } from 'react';
 import './Users.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import EditIcon from '@material-ui/icons/Edit';
 import { useTranslation } from 'react-i18next';
-import UserCard from './UserCard/UserCard';
-import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
-import {IUsers} from "../../../graphql/users.type";
-import {Pagination, PaginationItem, PaginationLink, Table} from "reactstrap";
+import ListIcon from '@material-ui/icons/List';
+import {IUser, IUsers, GET_USERS_GQL} from "../../../graphql/users.type";
 import {SearchInput} from "../../SearchInput/SearchInput";
 import {useHistory} from "react-router";
+import Container from '@material-ui/core/Container';
+import {IEquipment} from "../../../graphql/equipment.type";
+import {TablePaginationActions} from "../../../utils/TableUtils";
+import Grid from '@material-ui/core/Grid';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableCell from '@material-ui/core/TableCell';
+import TableBody from '@material-ui/core/TableBody';
+import TableRow from '@material-ui/core/TableRow';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import TablePagination from '@material-ui/core/TablePagination';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import AddIcon from '@material-ui/icons/Add';
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import Table from '@material-ui/core/Table';
 
 
-export const GET_USERS_GQL = gql`
-  query listUsers{
-    users {
-      list(queryString: "") {
-         userId
-         username
-         email
-         status
-         person {
-            personId
-            firstName
-            lastName
-         }
-      }
-    }
-  }
-`;
+const useButtonStyles = makeStyles(theme => ({
+   button: {
+      margin: theme.spacing(1),
+   }
+}));
+
+interface IUserProps {
+   users: IUser[];
+   pageIndex: number;
+   pageSize: number;
+   totalCount: number;
+   searchString?: string;
+   onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
+   onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
+   onSearchUser?(searchString: string) : void;
+   onAddUser?(): void;
+   onEditUser?(user: IUser): void;
+}
 
 
-const Users: React.FC =  () => {
-  const [t, i18n] = useTranslation();
+export const Users: React.FC<IUserProps> =  ({ users
+                                    , pageIndex
+                                    , pageSize
+                                    , totalCount
+                                    , searchString
+                                    , onChangePage
+                                    , onChangeRowsPerPage
+                                    , onSearchUser
+                                    , onAddUser
+                                    , onEditUser
+}) => {
+   const [t, i18n] = useTranslation();
    const history = useHistory();
-   const userQL = useQuery<{users: IUsers}, any>(GET_USERS_GQL);
-   if (userQL.loading || !userQL.data) return <div>Loading</div>;
-
-   const users = userQL.data.users.list;
+   const buttonClasses = useButtonStyles();
+   const [searchInput, setSearchInput] = React.useState<string>(searchString || '');
+   const onSearch = (event: FormEvent) => {
+      event.preventDefault();
+      onSearchUser && onSearchUser(searchInput);
+   };
 
   return (
     <>
-       <div className="row justify-content-between p-2 align-items-center">
-          <div>
-             <button className="btn btn-light" onClick={() => history.push('users/0')}>
-                <FontAwesomeIcon icon="user-plus"/>
-                {t('user.button.add')}
-             </button>
-          </div>
-          <SearchInput/>
-       </div>
+       <Container maxWidth="md">
+          <Grid container direction="row" justify="flex-start" wrap='nowrap'>
+             <Grid container wrap='nowrap'>
+                <Button
+                   variant="contained"
+                   color="primary"
+                   size="small"
+                   startIcon={<AddIcon/>}
+                   className={buttonClasses.button}
+                   onClick={onAddUser}
+                >
+                   Add
+                </Button>
+                <Button
+                   variant="contained"
+                   color="default"
+                   size='small'
+                   startIcon={<ListIcon/>}
+                   className={buttonClasses.button}
+                >
+                   Options
+                </Button>
+             </Grid>
+             <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
+                <form  noValidate autoComplete="off" onSubmit={onSearch}>
+                   <SearchInput placeholder="Search" value={searchInput} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchInput(event.target.value)}/>
+                </form>
+             </Grid>
+          </Grid>
+          <TableContainer>
+             <Table stickyHeader size="small">
+                <TableHead>
+                   <TableRow>
+                      <TableCell>User</TableCell>
+                      <TableCell>Roles</TableCell>
+                      <TableCell>Privilegios</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell align="center">Options</TableCell>
+                   </TableRow>
+                </TableHead>
+                <TableBody>
+                   {users.map((row: IUser, index) => (
+                      <TableRow key={row.userId} hover>
+                         <TableCell>{row.username}</TableCell>
+                         <TableCell>{row.roles}</TableCell>
+                         <TableCell>{row.roles}</TableCell>
+                         <TableCell>{row.status}</TableCell>
+                         <TableCell align="center">
+                            <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
+                               <IconButton onClick={() => onEditUser && onEditUser(row)} aria-label="edit equipment" component="span">
+                                  <EditIcon/>
+                               </IconButton>
+                            </ButtonGroup>
+                         </TableCell>
+                      </TableRow>
+                   ))}
+                </TableBody>
+             </Table>
+          </TableContainer>
+          <TablePagination
+             component="div"
+             rowsPerPageOptions={[5, 10, 25, 50, 100]}
+             count={totalCount}
+             rowsPerPage={pageSize}
+             page={pageIndex}
+             SelectProps={{
+                inputProps: { 'aria-label': 'rows per page' },
+                native: true,
+             }}
+             onChangePage={onChangePage || (() =>{})}
+             onChangeRowsPerPage={onChangeRowsPerPage}
+             ActionsComponent={TablePaginationActions}
+          />
 
-       <Table hover bordered>
-          <thead>
-             <tr>
-                <th>User</th>
-                <th>Roles</th>
-                <th>Privilegios</th>
-                <th>Status</th>
-             </tr>
-          </thead>
-          <tbody>
-          {users.map((u, i) => (
-             <tr key={u.userId} onClick={() => history.push('users/' + u.userId)} style={{cursor:'pointer'}}>
-                <td className="align-middle p-1"><UserCard key={i} user={u}/></td>
-                <td className="align-middle">Admin, Anonymous</td>
-                <td className="align-middle">Read, Write, Delete</td>
-                <td className="align-middle">{u.status}</td>
-             </tr>
-          ))}
-          </tbody>
-       </Table>
-
-       <Pagination aria-label="Page navigation example">
-          <PaginationItem disabled>
-             <PaginationLink first href="#" />
-          </PaginationItem>
-          <PaginationItem disabled>
-             <PaginationLink previous href="#" />
-          </PaginationItem>
-          <PaginationItem active>
-             <PaginationLink href="#">
-                1
-             </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-             <PaginationLink href="#">
-                2
-             </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-             <PaginationLink href="#">
-                3
-             </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-             <PaginationLink href="#">
-                4
-             </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-             <PaginationLink href="#">
-                5
-             </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-             <PaginationLink next href="#" />
-          </PaginationItem>
-          <PaginationItem>
-             <PaginationLink last href="#" />
-          </PaginationItem>
-       </Pagination>
+       </Container>
     </>
   );
 };
-export default Users;

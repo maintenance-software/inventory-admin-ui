@@ -1,4 +1,5 @@
 import {IPerson} from "./persons.type";
+import { gql } from "apollo-boost";
 
 export interface IUsers {
    user: IUser;
@@ -51,3 +52,22 @@ export enum EntityStatus {
    ACTIVE = 'ACTIVE',
    INACTIVE = 'INACTIVE'
 }
+
+
+export const GET_USERS_GQL = gql`
+   query listUsers{
+      users {
+         list(searchString: "") {
+            userId
+            username
+            email
+            status
+            person {
+               personId
+               firstName
+               lastName
+            }
+         }
+      }
+   }
+`;

@@ -70,10 +70,10 @@ const ResourceRoutes: React.FC =  () => {
   // console.log(url);
   return (
      <Switch>
-        <Route path={`${path}/human`} component={HumanResourceRoutes}/>
+        <Route path={`${path}/humans`} component={HumanResourceRoutes}/>
         <Route path={`${path}/tools`} component={ToolsResourceRoutes}/>
-        <Route path={`${path}/spare-parts`} component={SparePartsSupplieRoutes}/>
-        <Route path={`${path}/equipment`} component={EquipmentAssetRoutes}/>
+        <Route path={`${path}/supplies`} component={SparePartsSupplieRoutes}/>
+        <Route path={`${path}/equipments`} component={EquipmentAssetRoutes}/>
         <Redirect exact from={`${path}/`} to="/invalidRoute" />
      </Switch>
   );
