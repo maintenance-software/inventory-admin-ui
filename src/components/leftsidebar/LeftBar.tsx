@@ -221,7 +221,8 @@ export const Leftbar: React.FC<{session: ISession}> = ({session}) => {
                           <ListItemIcon style={{minWidth: '2rem'}}><HistoryIcon/></ListItemIcon>
                           <ListItemText primary="Activity Logs" />
                        </MenuItem>
-                       <MenuItem onClick={handleClose} component={Link} to="/logout">
+
+                       <MenuItem onClick={handleClose} component='a' href="/logout">
                           <ListItemIcon style={{minWidth: '2rem'}}><ExitToAppIcon/></ListItemIcon>
                           <ListItemText primary="Logout" />
                        </MenuItem>
