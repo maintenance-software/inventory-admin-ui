@@ -84,12 +84,12 @@ const MENUS = [
    {
       label: 'Home',
       icon: () => <HomeIcon/>,
-      path: '/home'
+      path: '/Home'
    },
    {
       label: 'Human Resources',
       icon: () => <PeopleIcon/>,
-      path: '/assets/humans'
+      path: '/humans'
    },
    {
       label: 'Assets',

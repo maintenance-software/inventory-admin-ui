@@ -22,7 +22,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
 import SaveIcon from '@material-ui/icons/Save';
-import {IRole} from "../../../../graphql/users.type";
+import {IRole} from "../../../graphql/users.type";
 
 export const GET_ROLES = gql`
   query fetchRoles{

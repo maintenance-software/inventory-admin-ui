@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useParams, useRouteMatch, Switch, Route} from 'react-router-dom';
-import {useLazyQuery, useMutation} from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import Typography from "@material-ui/core/Typography/Typography";
 import Box from "@material-ui/core/Box/Box";
@@ -11,12 +10,6 @@ import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
 import {appendToPath, clearCache} from "../../../../utils/globalUtil";
-import {
-   GET_MAINTENANCE_PLAN_BY_ID, getMaintenancePlanDefaultInstance,
-   IMaintenancePlan,
-   IMaintenancePlans,
-   SAVE_MAINTENANCE_PLAN
-} from "../../../../graphql/Maintenance.type";
 import {PlanDetailsComp} from "./PlanDetailsComp";
 import {PlanEquipmentComp} from "./Equipment/EquipmentComp";
 import {TaskComp} from "./Tasks/TaskComp";
@@ -66,45 +59,12 @@ const useStyles = makeStyles((theme: Theme) => ({
    },
 }));
 
-
-interface MaintenancePlanMutationRequest {
-   maintenanceId: number;
-   name: string;
-   description: string;
-   status: string;
-}
-
 export const CreateEditMaintenancePlanComp: React.FC =  () => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
    const { path, url } = useRouteMatch();
-   // const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
-   const [saveMaintenance] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_MAINTENANCE_PLAN);
-   const [getMaintenancePlanById, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(GET_MAINTENANCE_PLAN_BY_ID);
-   const [hasError, setHasError] = useState(false);
-   // const {maintenanceId, setMaintenanceId} = useContext(MaintenancePlanContext);
-   const maintenanceId = +params.maintenanceId;
-   // const toggle = (tab: string) => {
-   //    if(activeTab !== tab)
-   //       setActiveTab(tab);
-   // };
-
-   useEffect(() => {
-     if(maintenanceId && maintenanceId > 0) {
-        getMaintenancePlanById({variables: { maintenanceId }});
-     }
-  }, []);
-
-   if (loading || (!data && maintenanceId > 0))
-      return <div>Loading</div>;
-
-   let maintenance: IMaintenancePlan = getMaintenancePlanDefaultInstance();
-
-   if(data) {
-      maintenance = data.maintenances.maintenance;
-   }
 
    const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
       history.push(appendToPath(url, newValue === 'home'? '' : newValue));

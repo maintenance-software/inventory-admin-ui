@@ -9,17 +9,13 @@ import {AppBar, Button, Divider} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import {
-   GET_MAINTENANCE_PLAN_BY_ID, GET_TASK_BY_ID,
-   IMaintenancePlans,
    ITask,
-   ITaskCategory, SAVE_MAINTENANCE_TASKS
+   ITaskCategory
 } from "../../../../../graphql/Maintenance.type";
 import { useFormik } from 'formik';
 import * as Yup from "yup";
-import {ICategory} from "../../../../../graphql/item.type";
 import {TaskDetailComp} from "./TaskDetail";
 import {TaskTrigger} from "./Trigger";
-import { useMutation } from '@apollo/react-hooks';
 import {appendToPath, clearCache} from "../../../../../utils/globalUtil";
 import {SubTask} from "./SubTask";
 import {TaskResource} from "./TaskResource";
@@ -190,7 +186,7 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
    const value = !option? 'home' : option;
    return (
       <div className={classes.root}>
-         <AppBar position="static">
+         <AppBar position="static" color="default">
             <Tabs value={value} onChange={handleChange} aria-label="task tabs">
                <Tab value="home" label="Details" {...a11yProps('home')}/>
                <Tab value="subtasks" label="Subtasks" {...a11yProps('subtasks')} />

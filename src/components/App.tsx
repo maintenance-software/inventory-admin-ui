@@ -2,11 +2,7 @@ import React, {useState} from 'react';
 import {HashRouter as Router, Switch, Route, Redirect, useRouteMatch, useHistory} from "react-router-dom";
 import './App.scss';
 import 'typeface-roboto';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ReplyIcon from '@material-ui/icons/Reply';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import { Home } from './home/home';
+import { Home } from './Home/home';
 import Users from './users';
 import {useTranslation} from "react-i18next";
 import {fetchLocalizations} from "../api/localization.api";
@@ -22,8 +18,9 @@ import ResourceRoutes from "./Assets/Routes";
 import {InventoryRoute} from "./Inventory/Route";
 import {MaintenanceResourceRoutes} from "./Maintenance/Routes";
 import {CustomizedInputBase} from "./CustomizedInputBase";
-import {Leftbar} from "./leftsidebar/LeftBar";
-import {RouterBreadcrumbs} from "./RouterBreadcrumbs";
+import {Leftbar} from "./Leftsidebar/LeftBar";
+import {NavigationBar} from "./NavigationBar";
+import {HumanResourceRoutes} from "./Human/Routes";
 
 const useStyles = makeStyles(theme => ({
    root: {
@@ -92,23 +89,14 @@ const App: React.FC = () => {
                 <Grid item container style={{flexGrow: 1}}>
                    <Paper className={classes.paper}>
                       <Box display="flex" className={classes.breadcrumbsContainer} justifyContent="space-between">
-                         <Box>
-                            <IconButton aria-label="reload" size="small" className={classes.margin}>
-                               <ReplyIcon/>
-                            </IconButton>
-                            <IconButton aria-label="go-up" size="small" className={classes.margin}>
-                               <ArrowUpwardIcon/>
-                            </IconButton>
-                         </Box>
-                         <Box>
-                            <RouterBreadcrumbs/>
-                         </Box>
+                        <NavigationBar/>
                       </Box>
                       {/*<Divider/>*/}
                       <Switch>
                          <Redirect exact from="/" to="/home"/>
                          <Route path="/home" component={Home}/>
                          <Route path="/users" component={Users}/>
+                         <Route path="/humans" component={HumanResourceRoutes}/>
                          <Route path="/assets" component={ResourceRoutes}/>
                          <Route path="/maintenances" component={MaintenanceResourceRoutes}/>
                          <Route path="/inventories" component={InventoryRoute}/>
@@ -119,7 +107,6 @@ const App: React.FC = () => {
                       </Switch>
                    </Paper>
                 </Grid>
-
              </Grid>
           </Grid>
        </div>

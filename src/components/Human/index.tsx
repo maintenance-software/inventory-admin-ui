@@ -19,9 +19,9 @@ import TableFooter from "@material-ui/core/TableFooter/TableFooter";
 import TableHead from "@material-ui/core/TableHead/TableHead";
 import {gql} from 'apollo-boost';
 import {useLazyQuery} from "@apollo/react-hooks";
-import {IUsers} from "../../../graphql/users.type";
-import {IPerson} from "../../../graphql/persons.type";
-import {IPage} from "../../../graphql/page.type";
+import {IUsers} from "../../graphql/users.type";
+import {IPerson} from "../../graphql/persons.type";
+import {IPage} from "../../graphql/page.type";
 import Grid from "@material-ui/core/Grid/Grid";
 import Checkbox from "@material-ui/core/Checkbox/Checkbox";
 import Button from "@material-ui/core/Button/Button";
@@ -33,7 +33,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import InputBase from "@material-ui/core/InputBase/InputBase";
 import SearchIcon from '@material-ui/icons/Search';
 import Divider from "@material-ui/core/Divider/Divider";
-import {SearchInput} from "../../SearchInput/SearchInput";
+import {SearchInput} from "../SearchInput/SearchInput";
 
 
 

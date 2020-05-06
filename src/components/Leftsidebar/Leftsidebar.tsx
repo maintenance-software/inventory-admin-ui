@@ -8,9 +8,9 @@ import {useTranslation} from "react-i18next";
 
 const OPTIONS: {path: string, localKey: string, icon:IconProp}[] = [
     {
-      localKey: 'menu.home',
+      localKey: 'menu.Home',
       icon: 'home',
-      path: '/home'
+      path: '/Home'
     },
     {
       localKey: 'menu.users',

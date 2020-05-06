@@ -12,10 +12,10 @@ import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
 import {EntityStatus} from "../../../../graphql/users.type";
 import {EditEquipmentForm, IMaintenancePlanForm, IMaintenancePlanFormProps} from "./CreateEditMaintenancePlanForm";
-import {clearCache} from "../../../../utils/globalUtil";
+import {buildPath, clearCache} from "../../../../utils/globalUtil";
 import {MaintenancePlanContext} from "../../Routes";
 import {
-   GET_MAINTENANCE_PLAN_BY_ID, getMaintenancePlanDefaultInstance,
+   GET_MAINTENANCE_PLAN_BY_ID, getMaintenancePlanDefaultInstance, getTaskDefaultInstance,
    IMaintenancePlan,
    IMaintenancePlans,
    SAVE_MAINTENANCE_PLAN
@@ -51,33 +51,24 @@ export const PlanDetailsComp: React.FC =  () => {
    const params = useParams();
    const history = useHistory();
    const { path, url } = useRouteMatch();
-   const [activeTab, setActiveTab] = useState('1');
-   const classes = useStyles();
-   const [value, setValue] = React.useState(0);
-   const [saveMaintenance] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_MAINTENANCE_PLAN);
+   const [maintenance, setMaintenance] = useState(getMaintenancePlanDefaultInstance());
+   const [saveMaintenance, saveStatus] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_MAINTENANCE_PLAN);
    const [getMaintenancePlanById, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(GET_MAINTENANCE_PLAN_BY_ID);
-   const [hasError, setHasError] = useState(false);
-   // const {maintenanceId, setMaintenanceId} = useContext(MaintenancePlanContext);
-   const maintenanceId = +params.maintenanceId;
-   const toggle = (tab: string) => {
-      if(activeTab !== tab)
-         setActiveTab(tab);
-   };
-
    useEffect(() => {
+     const maintenanceId = +params.maintenanceId;
      if(maintenanceId && maintenanceId > 0) {
         getMaintenancePlanById({variables: { maintenanceId }});
      }
   }, []);
 
-   if (loading || (!data && maintenanceId > 0))
-      return <div>Loading</div>;
+   useEffect(() => {
+      if(!loading && called && data) {
+         setMaintenance(data.maintenances.maintenance);
+      }
+   }, [called, loading, data]);
 
-   let maintenance: IMaintenancePlan = getMaintenancePlanDefaultInstance();
-
-   if(data) {
-      maintenance = data.maintenances.maintenance;
-   }
+   // if (loading || saveStatus.loading || !data)
+   //    return <div>Loading</div>;
 
    const equipmentFormProps: IMaintenancePlanFormProps = {
       maintenanceForm: {
@@ -87,7 +78,7 @@ export const PlanDetailsComp: React.FC =  () => {
       },
       onSaveMaintenancePlanCallback: async (maintenanceForm: IMaintenancePlanForm, resetForm: Function) => {
          const mutationRequest: MaintenancePlanMutationRequest = {
-            maintenanceId: maintenanceId,
+            maintenanceId: maintenance.maintenanceId,
             name: maintenanceForm.name,
             description: maintenanceForm.description,
             status: maintenanceForm.status
@@ -96,17 +87,21 @@ export const PlanDetailsComp: React.FC =  () => {
             variables: mutationRequest
             , update: (cache) => {
                clearCache(cache, 'maintenances.page');
+               clearCache(cache, 'maintenances.maintenance');
                // clearCache(cache, 'inventories.list');
             }
          });
          if(!response.data)
             return;
-         if(maintenanceId > 0) {
+         const newMaintenanceId = response.data.maintenances.saveMaintenance.maintenanceId;
+         if(maintenance.maintenanceId > 0) {
             resetForm({});
          } else {
-            getMaintenancePlanById({variables: { maintenanceId: response.data.maintenances.saveMaintenance.maintenanceId }});
-            //setMaintenanceId(response.data.maintenances.saveMaintenance.maintenanceId);
+            const baseUrl = url.replace(/\/$/, "");
+            const basePath = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+            history.replace({ pathname: buildPath(basePath, newMaintenanceId.toString())});
          }
+         getMaintenancePlanById({variables: { maintenanceId: newMaintenanceId }});
       }
    };
 

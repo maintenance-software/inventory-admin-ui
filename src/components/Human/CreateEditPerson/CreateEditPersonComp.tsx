@@ -12,7 +12,7 @@ import {Theme} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
-import {ContactType, IPerson} from "../../../../graphql/persons.type";
+import {ContactType, IPerson} from "../../../graphql/persons.type";
 import {FETCH_PERSONS_GQL} from "../index";
 
 export const GET_PERSON_BY_ID = gql`

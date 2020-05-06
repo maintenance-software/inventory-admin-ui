@@ -165,7 +165,6 @@ export const CreateEditEquipmentComp: React.FC =  () => {
             resetForm({});
          } else {
             getEquipmentById({variables: { equipmentId: response.data.equipments.saveEquipment.equipmentId }});
-            console.log(history.action);
             history.push(response.data.equipments.saveEquipment.equipmentId.toString());
          }
       }

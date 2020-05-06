@@ -60,6 +60,7 @@ export const EditEquipmentForm: React.FC<IMaintenancePlanFormProps> =  ({mainten
    const formClasses = useFormStyles();
    const buttonClasses = useButtonStyles();
    const { values, setFieldValue, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IMaintenancePlanForm>({
+    enableReinitialize: true,
     initialValues: maintenanceForm,
     validationSchema: Yup.object().shape({
        name: Yup.string().required('This filed is required'),
