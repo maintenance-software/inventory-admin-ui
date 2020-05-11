@@ -184,7 +184,7 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
                disableItems={[]}
                filters={[{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType", operator: "in", value: "SPARE_PARTS,TOOLS,SUPPLIES"}]}
                multiple={false}
-               initialSelected={inventoryResource? [inventoryResource] : []}
+               initialSelected={inventoryResource? [inventoryResource.itemId] : []}
                onSelectItems={(items: IItem[]) => {
                   if(items.length === 1) {
                      setInventoryResource(items[0]);

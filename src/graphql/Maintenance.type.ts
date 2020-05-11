@@ -9,7 +9,9 @@ export interface IMaintenancePlans {
    maintenance: IMaintenancePlan;
    task: ITask;
    page: IPage<IMaintenancePlan>;
+   availableEquipments: IPage<IEquipment>;
    saveMaintenance: IMaintenancePlan;
+   addTaskActivityDate: boolean;
    createUpdateTasks: ITask[]
 }
 
@@ -203,6 +205,29 @@ export const FETCH_MAINTENANCE_PLAN_GQL = gql`
    }
 `;
 
+export const FETCH_EQUIPMENTS_AVAILABLE_GQL = gql`
+   query fetchEquipmentsAvailable($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]) {
+      maintenances {
+         availableEquipments(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+            totalCount
+            content {
+               equipmentId
+               code
+               name
+               description
+               status
+            }
+            pageInfo {
+               hasNext
+               hasPreview
+               pageSize
+               pageIndex
+            }
+         }
+      }
+   }
+`;
+
 export const GET_MAINTENANCE_PLAN_BY_ID = gql`
    query getMaintenancePlanById($maintenanceId: Int!) {
       maintenances {
@@ -234,6 +259,7 @@ export const GET_MAINTENANCE_PLAN_BY_ID = gql`
                code
                name
                description
+               createdDate
             }
          }
       }
@@ -339,6 +365,18 @@ export const SAVE_MAINTENANCE_PLAN = gql`
          ) {
             maintenanceId
          }
+      }
+   }
+`;
+
+export const SAVE_TASK_ACTIVITY = gql`
+   mutation saveTaskActivity(
+   $lastMaintenanceDate: String!
+   $assetId: Int!
+   $maintenanceId: Int!
+   ) {
+      maintenances {
+         addTaskActivityDate(lastMaintenanceDate: $lastMaintenanceDate, assetId: $assetId, maintenanceId: $maintenanceId)
       }
    }
 `;

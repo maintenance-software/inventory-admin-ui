@@ -10,13 +10,13 @@ export const useFetch = (promise: Promise<any>, lang: string) => {
       setData(localizations);
       setLoading(false);
     });    
-  }
+  };
 
   useEffect(() => {
     fetchLocalizations();
   }, [lang]);
   return [data, loading];
-}
+};
 
 
 

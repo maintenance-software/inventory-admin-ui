@@ -16,6 +16,13 @@ type Inventories {
     saveInventoryItems(level: Int!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!, location: String!, dateExpiry: String, inventoryId: Int!, itemIds: [Int!]!): [InventoryItem!]!
 }
 
+type Page_TaskActivity {
+    totalCount: Int!
+    content: [TaskActivity!]!
+    pageInfo: PageInfo!
+    sort: Sort!
+}
+
 type TaskResource {
     taskResourceId: Int!
     order: Int!
@@ -138,6 +145,23 @@ type Category {
     description: String!
     createdDate: String!
     modifiedDate: String
+}
+
+type TaskActivity {
+    taskActivityId: Int!
+    scheduledDate: String
+    calculatedDate: String!
+    rescheduled: Boolean!
+    status: String!
+    assetId: Int!
+    assetName: String!
+    maintenanceId: Int!
+    maintenanceName: String!
+    taskId: Int!
+    taskName: String!
+    taskPriority: Int!
+    taskTriggerId: Int!
+    triggerDescription: String!
 }
 
 type Page_InventoryItem {
@@ -368,6 +392,7 @@ type TaskTrigger {
     repeat: Boolean
     operator: String
     value: String
+    timeFrequency: String
     unit: Unit
     eventTrigger: EventTrigger
     createdDate: String!
@@ -411,6 +436,9 @@ type EmployeeJob {
 type Maintenances {
     maintenance(entityId: Int!): Maintenance!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Maintenance!
+    availableEquipments(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
+    taskActivities(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_TaskActivity!
+    addTaskActivityDate(lastMaintenanceDate: String!, assetId: Int!, maintenanceId: Int!): Boolean!
     saveMaintenance(maintenanceId: Int!, name: String!, description: String, status: String!): Maintenance!
     createUpdateTasks(maintenanceId: Int!, tasks: [TaskArg!]!): [Task!]!
     task(entityId: Int!): Task!
@@ -467,6 +495,7 @@ input TaskTriggerArg {
     repeat: Boolean
     operator: String
     value: String
+    timeFrequency: String
     unitId: Int
     eventTriggerId: Int
 }

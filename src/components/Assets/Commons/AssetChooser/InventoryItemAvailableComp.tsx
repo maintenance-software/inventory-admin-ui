@@ -51,6 +51,7 @@ export const InventoryItemAvailableComp: FC<{inventoryId: number, onSelectItem?(
       items = {data.inventories.inventory.availableItems.content}
       multiple={false}
       disableItems={[]}
+      initialSelected={[]}
       pageIndex = {data.inventories.inventory.availableItems.pageInfo.pageIndex}
       pageSize = {data.inventories.inventory.availableItems.pageInfo.pageSize}
       totalCount = {data.inventories.inventory.availableItems.totalCount}

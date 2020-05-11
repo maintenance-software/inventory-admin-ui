@@ -1,33 +1,32 @@
 import React, {useEffect, FC} from 'react';
 import { useLazyQuery } from "@apollo/react-hooks";
-import { FETCH_ITEMS_GQL, IItem, IItems } from "../../../../graphql/item.type";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
-import {AssetChooser, ISimpleItem} from './AssetChooser';
-import {FETCH_AVAILABLE_ITEMS} from "../../../../graphql/inventory.type";
-import {IPage} from "../../../../graphql/page.type";
+import {AssetChooser, ISimpleItem} from "../../../../Assets/Commons/AssetChooser/AssetChooser";
+import {FETCH_EQUIPMENTS_AVAILABLE_GQL, IMaintenancePlans} from "../../../../../graphql/Maintenance.type";
 
 interface IAssetChooserProps {
    multiple: boolean;
    filters: any[];
    disableItems: number[];
    initialSelected: number[];
-   onSelectItems(item: IItem[]) : void
+   onSelectItems(items: ISimpleItem[]) : void
 }
-export const AssetChooserComp: FC<IAssetChooserProps> = ({disableItems, multiple, initialSelected, filters, onSelectItems}) => {
+
+export const EquipmentChooserComp: FC<IAssetChooserProps> = ({disableItems, multiple, initialSelected, filters, onSelectItems}) => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchItems, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_ITEMS_GQL);
+   const [fetchEquipmentsAvailable, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(FETCH_EQUIPMENTS_AVAILABLE_GQL);
 
    useEffect(() => {
-      fetchItems({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
+      fetchEquipmentsAvailable({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
    }, []);
 
    useEffect(() => {
-      fetchItems({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
+      fetchEquipmentsAvailable({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
    }, [pageIndex, pageSize, searchString]);
 
    if (loading || !data) return <div>Loading</div>;
@@ -46,20 +45,25 @@ export const AssetChooserComp: FC<IAssetChooserProps> = ({disableItems, multiple
       setPageIndex(0);
    };
 
-   const handleSelectItem = (items: IItem[]) => {
+   const handleSelectEquipments = (items: ISimpleItem[]) => {
       onSelectItems && onSelectItems(items);
    };
 
    return <AssetChooser
-      items = {data.items.page.content}
+      items = {data.maintenances.availableEquipments.content.map(e => ({
+         itemId: e.equipmentId,
+         code: e.code,
+         name: e.name,
+         description: e .description
+      }))}
       multiple={multiple}
       disableItems={disableItems}
       initialSelected={initialSelected}
-      pageIndex = {data.items.page.pageInfo.pageIndex}
-      pageSize = {data.items.page.pageInfo.pageSize}
-      totalCount = {data.items.page.totalCount}
+      pageIndex = {data.maintenances.availableEquipments.pageInfo.pageIndex}
+      pageSize = {data.maintenances.availableEquipments.pageInfo.pageSize}
+      totalCount = {data.maintenances.availableEquipments.totalCount}
       searchString = {searchString}
-      onSelectItem = {onSelectItems || handleSelectItem}
+      onSelectItem = {onSelectItems || handleSelectEquipments}
       onChangePage = {handleChangePage}
       onChangeRowsPerPage = {handleChangeRowsPerPage}
       onSearchItem = {handleSearchItems}

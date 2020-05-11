@@ -53,6 +53,7 @@ export const EquipmentSelectableComp: FC<{itemId: number,onSelectItem?(items: IS
       }))}
       multiple={false}
       disableItems={[]}
+      initialSelected={[]}
       pageIndex = {data.equipments.page.pageInfo.pageIndex}
       pageSize = {data.equipments.page.pageInfo.pageSize}
       totalCount = {data.equipments.page.totalCount}

@@ -49,7 +49,7 @@ interface _ItemSelectableProps {
    items: ISimpleItem[];
    multiple: boolean;
    disableItems: number[];
-   initialSelected?: ISimpleItem[];
+   initialSelected: number[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
@@ -64,7 +64,7 @@ export const AssetChooser: FC<_ItemSelectableProps> = ({items, multiple, disable
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
-   const [selected, setSelected] = React.useState<ISimpleItem[]>(initialSelected || []);
+   const [selected, setSelected] = React.useState<ISimpleItem[]>(items.filter(item => !!initialSelected.find(id => id === item.itemId)));
    const [searchInput, setSearchInput] = React.useState<string>(searchString || '');
    const onSearch = (event: FormEvent) => {
       event.preventDefault();
@@ -72,7 +72,7 @@ export const AssetChooser: FC<_ItemSelectableProps> = ({items, multiple, disable
    };
 
    useEffect(() => {
-      setSelected(initialSelected || []);
+      setSelected(items.filter(item => !!initialSelected.find(id => id === item.itemId)));
    }, [initialSelected]);
 
    const handleClick = (event: React.MouseEvent<unknown>, item: ISimpleItem) => {

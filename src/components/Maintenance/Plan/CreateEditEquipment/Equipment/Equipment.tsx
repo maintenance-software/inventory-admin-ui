@@ -48,6 +48,7 @@ const useStyles2 = makeStyles({
 
 interface EquipmentProps {
    equipments: IEquipment[];
+   onAddEquipment(): void;
    // onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
    // onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
    // onSearchMaintenancePlan?(searchString: string) : void;
@@ -55,7 +56,7 @@ interface EquipmentProps {
    // onEditMaintenancePlan?(maintenance: IMaintenancePlan): void;
 }
 
-export const Equipment: FC<EquipmentProps> = ({equipments}) => {
+export const Equipment: FC<EquipmentProps> = ({equipments, onAddEquipment }) => {
    const history = useHistory();
    const classes = useStyles2();
    const bottomNoneBoder = useBottomNoneBorder();
@@ -89,6 +90,7 @@ export const Equipment: FC<EquipmentProps> = ({equipments}) => {
                            color="default"
                            size="small"
                            startIcon={<AddIcon/>}
+                           onClick={()=> onAddEquipment()}
                         >
                            Add
                         </Button>
