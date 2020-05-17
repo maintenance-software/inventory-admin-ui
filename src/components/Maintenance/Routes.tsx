@@ -4,6 +4,7 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import {Redirect} from "react-router";
 import {MaintenancePlanComp} from "./Plan";
 import {CreateEditMaintenancePlanComp} from "./Plan/CreateEditEquipment/CreateEditMaintenancePlanComp";
+import {TaskActivityListContainer} from "./TaskActivity/TaskActivityListContainer";
 
 interface IMaintenancePlanContext {
    maintenanceId: number;
@@ -25,6 +26,15 @@ const MaintenancePlanRoutes: React.FC =  () => {
    );
 };
 
+const TaskActivityRoutes: React.FC =  () => {
+   const { path } = useRouteMatch();
+   return (
+      <Switch>
+         <Route exact path={path} component={TaskActivityListContainer}/>
+      </Switch>
+   );
+};
+
 export const MaintenanceResourceRoutes: React.FC =  () => {
   const [t, i18n] = useTranslation();
   const { path, url } = useRouteMatch();
@@ -32,6 +42,7 @@ export const MaintenanceResourceRoutes: React.FC =  () => {
      <Switch>
         <Redirect exact from={path} to={`${path}/plans`}/>
         <Route path={`${path}/plans`} component={MaintenancePlanRoutes}/>
+        <Route path={`${path}/taskActivities`} component={TaskActivityRoutes}/>
         <Redirect exact from={`${path}/`} to="/invalidRoute" />
      </Switch>
   );

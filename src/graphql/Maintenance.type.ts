@@ -11,8 +11,26 @@ export interface IMaintenancePlans {
    page: IPage<IMaintenancePlan>;
    availableEquipments: IPage<IEquipment>;
    saveMaintenance: IMaintenancePlan;
+   taskActivities: IPage<ITaskActivity>;
    addTaskActivityDate: boolean;
    createUpdateTasks: ITask[]
+}
+
+export interface ITaskActivity{
+   taskActivityId: number;
+   scheduledDate: string;
+   calculatedDate: string;
+   rescheduled: boolean;
+   status: EntityStatus;
+   assetId: number;
+   assetName: string;
+   maintenanceId: number;
+   maintenanceName: string;
+   taskId: number;
+   taskName: string;
+   taskPriority: number;
+   taskTriggerId: number;
+   triggerDescription: string;
 }
 
 export interface IMaintenancePlan{
@@ -216,6 +234,38 @@ export const FETCH_EQUIPMENTS_AVAILABLE_GQL = gql`
                name
                description
                status
+            }
+            pageInfo {
+               hasNext
+               hasPreview
+               pageSize
+               pageIndex
+            }
+         }
+      }
+   }
+`;
+
+export const FETCH_TASK_ACTIVITIES_GQL = gql`
+   query fetchTaskActivities($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]) {
+      maintenances {
+         taskActivities(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+            totalCount
+            content {
+               taskActivityId
+               scheduledDate
+               calculatedDate
+               rescheduled
+               status
+               assetId
+               assetName
+               maintenanceId
+               maintenanceName
+               taskId
+               taskName
+               taskPriority
+               taskTriggerId
+               triggerDescription
             }
             pageInfo {
                hasNext

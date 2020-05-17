@@ -131,7 +131,7 @@ const MENUS = [
          {
             label: 'Pending Work',
             icon: () => <WatchLaterIcon/>,
-            path: '/pending-work'
+            path: '/taskActivities'
          },
          {
             label: 'Work Orders',
