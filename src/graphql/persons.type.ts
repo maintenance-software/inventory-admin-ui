@@ -103,11 +103,11 @@ export const FETCH_EMPLOYEES = gql`
    }
 `;
 
-export const FETCH_EMPLOYEE_JOBS = gql`
-   query fetchEmployeeJobs{
-      employeeJobs {
-         employeeJobId
-         tittle
-      }
-   }
-`;
+// export const FETCH_EMPLOYEE_JOBS = gql`
+//    query fetchEmployeeJobs{
+//       employeeJobs {
+//          employeeJobId
+//          tittle
+//       }
+//    }
+// `;

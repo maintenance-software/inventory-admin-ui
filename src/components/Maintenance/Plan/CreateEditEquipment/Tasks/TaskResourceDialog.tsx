@@ -9,7 +9,7 @@ import Radio from '@material-ui/core/Radio';
 import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
 import {useHistory} from "react-router";
-import {getItemDefaultInstance, IItem, IUnit} from "../../../../../graphql/item.type";
+import {getItemDefaultInstance, ICategory, IItem, IUnit} from "../../../../../graphql/item.type";
 import {ITaskResource} from "../../../../../graphql/Maintenance.type";
 import {AssetChooserComp} from "../../../../Assets/Commons/AssetChooser/AssetChooserComp";
 import {IEmployee, IEmployeeJob} from "../../../../../graphql/persons.type";
@@ -36,14 +36,14 @@ const useButtonStyles = makeStyles(theme => ({
 
 export interface IInventoryFormProps {
    taskResource: ITaskResource;
-   employeeJobs: IEmployeeJob[];
+   employeeCategories: ICategory[];
    units: IUnit[];
    open: boolean;
    setOpen(open: boolean): void;
    onAccept(t: ITaskResource) : void;
 }
 
-export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource, employeeJobs, units, open, setOpen, onAccept}) => {
+export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource, employeeCategories, units, open, setOpen, onAccept}) => {
    const steps = ['Resource Type', 'Resource', 'Details'];
    const history = useHistory();
    const buttonClasses = useButtonStyles();
@@ -53,7 +53,7 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
    const [resourceType, setResourceType] = React.useState(taskResource.resourceType);
    const [amount, setAmount] = React.useState(taskResource.amount);
    const [unitId, setUnitId] = React.useState(taskResource.unit.unitId);
-   const [employeeJobId, setEmployeeJobId] = React.useState(taskResource.employeeJob? taskResource.employeeJob.employeeJobId : 0);
+   const [employeeJobId, setEmployeeJobId] = React.useState(taskResource.employeeCategory? taskResource.employeeCategory.categoryId : 0);
    const [inventoryResource, setInventoryResource] = React.useState(taskResource.inventoryResource? taskResource.inventoryResource : null);
 
 
@@ -62,7 +62,7 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
       setResourceType(taskResource.resourceType);
       setAmount(taskResource.amount);
       setUnitId(taskResource.unit.unitId);
-      setEmployeeJobId(taskResource.employeeJob? taskResource.employeeJob.employeeJobId : 0);
+      setEmployeeJobId(taskResource.employeeCategory? taskResource.employeeCategory.categoryId : 0);
       setInventoryResource(taskResource.inventoryResource? taskResource.inventoryResource : null);
    }, [taskResource]);
 
@@ -78,8 +78,7 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
             amount: amount,
             resourceType: resourceType,
             unit: units.find(u => u.unitId === unitId) || {unitId: 0, key: '', label: ''},
-            employeeJob: employeeJobs.find(e => e.employeeJobId === employeeJobId),
-            humanResource: taskResource.humanResource,
+            employeeCategory: employeeCategories.find(e => e.categoryId === employeeJobId),
             inventoryResource: inventoryResource? inventoryResource : undefined,
             createdDate: taskResource.createdDate,
             modifiedDate: taskResource.modifiedDate
@@ -166,9 +165,9 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
                value={employeeJobId}
                onChange={(event => setEmployeeJobId(+event.target.value))}
             >
-               {employeeJobs.map((option) => (
-                  <MenuItem key={option.employeeJobId} value={option.employeeJobId}>
-                     {option.tittle}
+               {employeeCategories.map((option) => (
+                  <MenuItem key={option.categoryId} value={option.categoryId}>
+                     {option.name}
                   </MenuItem>
                ))}
             </TextField>
@@ -249,6 +248,7 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
                       color="primary"
                       size="small"
                       className={buttonClasses.button}
+                      disabled={activeStep === 2 && !unitId}
                       onClick={handleNext}
               >
                  {activeStep === 2 ? 'Accept' : 'Next'}

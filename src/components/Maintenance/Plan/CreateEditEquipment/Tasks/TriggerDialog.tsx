@@ -1,10 +1,7 @@
 import React, {FC, useState, useEffect} from 'react';
 import Button from '@material-ui/core/Button';
 import Radio from '@material-ui/core/Radio';
-import {
-   IEventTrigger,
-   ISubTask, ISubTaskKind, ITaskTrigger
-} from "../../../../../graphql/Maintenance.type";
+import { ITaskTrigger } from "../../../../../graphql/Maintenance.type";
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -14,21 +11,22 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import {IUnit} from "../../../../../graphql/item.type";
+import {ICategory, IUnit} from "../../../../../graphql/item.type";
 import FormLabel from '@material-ui/core/FormLabel';
 
 interface ITriggerDialogProps {
    open: boolean;
    setOpen(open: boolean): void;
+   triggerTypes: string[],
    trigger: ITaskTrigger;
-   triggerEvents: IEventTrigger[];
+   triggerEvents: ICategory[];
    units: IUnit[];
-   onSaveEventTrigger(trigger: ITaskTrigger): void;
+   onSaveTrigger(trigger: ITaskTrigger): void;
 }
 
-export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, trigger, triggerEvents, units, onSaveEventTrigger}) => {
-   const [triggerEventId, setTriggerEventId] = useState(trigger.eventTrigger? trigger.eventTrigger.eventTriggerId : 0);
-   const [triggerType, setTriggerType] = useState(trigger.kind);
+export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, triggerTypes, trigger, triggerEvents, units, onSaveTrigger}) => {
+   const [triggerEventId, setTriggerEventId] = useState(trigger.eventTriggerCategory? trigger.eventTriggerCategory.categoryId : 0);
+   const [triggerType, setTriggerType] = useState(trigger.triggerType);
    const [frequency, setFrequency] = useState(trigger.frequency);
    const [frequencyUnitId, setFrequencyUnitId] = useState(trigger.unit? trigger.unit.unitId : 0);
    const [repeat, setRepeat] = useState(trigger.repeat);
@@ -38,8 +36,8 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, trigger, 
    const [value, setValue] = useState(trigger.value);
 
    useEffect(() => {
-      setTriggerEventId(trigger.eventTrigger? trigger.eventTrigger.eventTriggerId : 0);
-      setTriggerType(trigger.kind);
+      setTriggerEventId(trigger.eventTriggerCategory? trigger.eventTriggerCategory.categoryId : 0);
+      setTriggerType(trigger.triggerType);
       setFrequency(trigger.frequency);
       setFrequencyUnitId(trigger.unit? trigger.unit.unitId : 0);
       setRepeat(trigger.repeat);
@@ -50,7 +48,7 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, trigger, 
    }, [trigger]);
 
    const handleSave = () => {
-      const eventTrigger = triggerEvents.find(k => k.eventTriggerId === triggerEventId) || {
+      const eventTrigger = triggerEvents.find(k => k.categoryId === triggerEventId) || {
          eventTriggerId: 0,
          name: '',
          description: '',
@@ -64,8 +62,8 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, trigger, 
          createdDate: '',
          modifiedDate: '',
       };
-      onSaveEventTrigger(Object.assign({}, trigger, {
-         kind: triggerType,
+      onSaveTrigger(Object.assign({}, trigger, {
+         triggerType: triggerType,
          frequency: frequency,
          readType: readType,
          limit: limit,
@@ -88,7 +86,7 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, trigger, 
             onChange={(event => setTriggerEventId(+event.target.value))}
          >
             {triggerEvents.map((option) => (
-               <MenuItem key={option.eventTriggerId} value={option.eventTriggerId}>
+               <MenuItem key={option.categoryId} value={option.categoryId}>
                   {option.name}
                </MenuItem>
             ))}
@@ -258,7 +256,6 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, trigger, 
       </>
    );
 
-
    return (
       <>
          <Dialog maxWidth="xs" onClose={()=>setOpen(false)} aria-labelledby="customized-dialog-title" open={open}>
@@ -276,9 +273,11 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, trigger, 
                         value={triggerType}
                         onChange={(event => setTriggerType(event.target.value))}
                      >
-                        <MenuItem key="event" value="EVENT">EVENT</MenuItem>
-                        <MenuItem key="measuring" value="MEASURING">MEASURING</MenuItem>
-                        <MenuItem key="date" value="DATE">DATE</MenuItem>
+                        {
+                           ['EVENT', 'MEASURING', 'DATE'].filter(k => k === triggerType || !triggerTypes.find(t => t === k)).map(k => (
+                              <MenuItem key={k} value={k}>{k}</MenuItem>
+                           ))
+                        }
                      </TextField>
                   </Grid>
                   {triggerType === 'EVENT'? eventSelector : ''}

@@ -1,7 +1,7 @@
 import {gql} from 'apollo-boost';
 import {IPage, IPageInfo} from "./page.type";
 import {EntityStatus} from "./users.type";
-import {IItem, IUnit} from "./item.type";
+import {ICategory, IItem, IUnit} from "./item.type";
 import {IEquipment} from "./equipment.type";
 import {IEmployee, IEmployeeJob} from "./persons.type";
 
@@ -55,7 +55,7 @@ export interface ITask{
    attribute2: string;
    createdDate: string;
    modifiedDate: string;
-   taskCategory?: ITaskCategory | null;
+   taskCategory?: ICategory | null;
    subTasks: ISubTask[];
    taskTriggers: ITaskTrigger[];
    taskResources: ITaskResource[];
@@ -63,7 +63,7 @@ export interface ITask{
 
 export interface ITaskTrigger {
    taskTriggerId: number;
-   kind: string;
+   triggerType: string;
    description: string;
    fixedSchedule: boolean;
    frequency: number;
@@ -73,7 +73,7 @@ export interface ITaskTrigger {
    operator: string;
    value: string;
    unit?: IUnit;
-   eventTrigger?: IEventTrigger;
+   eventTriggerCategory?: ICategory;
    createdDate: string;
    modifiedDate: string;
 
@@ -87,13 +87,13 @@ export interface ITaskCategory {
    modifiedDate: string;
 }
 
-export interface IEventTrigger {
-   eventTriggerId: number;
-   name: string;
-   description: string;
-   createdDate: string;
-   modifiedDate: string;
-}
+// export interface IEventTrigger {
+//    eventTriggerId: number;
+//    name: string;
+//    description: string;
+//    createdDate: string;
+//    modifiedDate: string;
+// }
 
 export interface ITaskResource {
    taskResourceId: number;
@@ -101,8 +101,7 @@ export interface ITaskResource {
    amount: number;
    resourceType: string;
    unit: IUnit;
-   employeeJob?: IEmployeeJob;
-   humanResource?: IEmployee;
+   employeeCategory?: ICategory;
    inventoryResource?: IItem;
    createdDate: string;
    modifiedDate: string;
@@ -116,16 +115,16 @@ export interface ISubTask {
    mandatory: boolean;
    createdDate: string;
    modifiedDate: string;
-   subTaskKind: ISubTaskKind;
+   subTaskCategory: ICategory;
 }
 
-export interface ISubTaskKind {
-   subTaskKindId: number;
-   name: string;
-   description: string;
-   createdDate: string;
-   modifiedDate: string;
-}
+// export interface ISubTaskKind {
+//    subTaskKindId: number;
+//    name: string;
+//    description: string;
+//    createdDate: string;
+//    modifiedDate: string;
+// }
 
 export const getMaintenancePlanDefaultInstance = ():IMaintenancePlan => ({
    maintenanceId: 0,
@@ -171,7 +170,7 @@ export const getTaskResourceDefaultInstance = ():ITaskResource => ({
 
 export const getTaskTriggerDefaultInstance = ():ITaskTrigger => ({
    taskTriggerId: 0,
-   kind: 'EVENT',
+   triggerType: '',
    description: '',
    fixedSchedule: false,
    frequency: 0,
@@ -192,12 +191,10 @@ export const getSubTaskDefaultInstance = ():ISubTask => ({
    mandatory: false,
    createdDate: '',
    modifiedDate: '',
-   subTaskKind: {
-      subTaskKindId: 0,
+   subTaskCategory: {
+      categoryId: 0,
       name: '',
-      description: '',
-      createdDate: '',
-      modifiedDate: ''
+      description: ''
    },
 });
 
@@ -298,7 +295,7 @@ export const GET_MAINTENANCE_PLAN_BY_ID = gql`
                createdDate
                modifiedDate
                taskCategory {
-                  taskCategoryId
+                  categoryId
                   name
                   description   
                }
@@ -331,13 +328,13 @@ export const GET_TASK_BY_ID = gql`
             createdDate
             modifiedDate
             taskCategory {
-               taskCategoryId
+               categoryId
                name
                description
             }
             taskTriggers {
                taskTriggerId
-               kind
+               triggerType
                description
                fixedSchedule
                frequency
@@ -351,8 +348,8 @@ export const GET_TASK_BY_ID = gql`
                   key
                   label
                }
-               eventTrigger {
-                  eventTriggerId
+               eventTriggerCategory {
+                  categoryId
                   name
                }
             }
@@ -362,8 +359,8 @@ export const GET_TASK_BY_ID = gql`
                group
                mandatory
                order
-               subTaskKind {
-                  subTaskKindId
+               subTaskCategory {
+                  categoryId
                   name
                   description
                }
@@ -378,14 +375,10 @@ export const GET_TASK_BY_ID = gql`
                   unitId
                   label
                }
-               humanResource {
-                  employeeId
-                  firstName
-                  lastName
-               }
-               employeeJob {
-                  employeeJobId
-                  tittle
+               employeeCategory {
+                  categoryId
+                  name
+                  description
                }
                inventoryResource {
                   itemId
@@ -444,31 +437,31 @@ export const SAVE_MAINTENANCE_TASKS = gql`
    }
 `;
 
-export const FETCH_TASK_CATEGORIES = gql`
-   query fetchTaskCategories{
-      taskCategories {
-         taskCategoryId
-         name
-      }
-   }
-`;
+// export const FETCH_TASK_CATEGORIES = gql`
+//    query fetchTaskCategories{
+//       taskCategories {
+//          taskCategoryId
+//          name
+//       }
+//    }
+// `;
 
-export const FETCH_SUBTASK_KINDS = gql`
-   query fetchSubtaskKinds{
-      subTaskKinds {
-         subTaskKindId
-         name
-      }
-   }
-`;
+// export const FETCH_SUBTASK_KINDS = gql`
+//    query fetchSubtaskKinds{
+//       subTaskKinds {
+//          subTaskKindId
+//          name
+//       }
+//    }
+// `;
 
-export const FETCH_EVENT_TRIGGERS = gql`
-   query fetchEventTriggers{
-      maintenances {
-         eventTriggers {
-            eventTriggerId
-            name
-         }
-      }
-   }
-`;
+// export const FETCH_EVENT_TRIGGERS = gql`
+//    query fetchEventTriggers{
+//       maintenances {
+//          eventTriggers {
+//             eventTriggerId
+//             name
+//          }
+//       }
+//    }
+// `;

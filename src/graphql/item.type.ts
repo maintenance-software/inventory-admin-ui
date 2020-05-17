@@ -31,6 +31,7 @@ export interface IItem {
 export interface ICategory {
    categoryId: number;
    name: string;
+   description: string;
 }
 
 export interface IUnit {
@@ -81,7 +82,8 @@ export const getItemDefaultInstance = ():IItem => ({
    },
    category: {
       categoryId: 0,
-      name: ''
+      name: '',
+      description: ''
    },
    createdDate: '',
    modifiedDate: ''
@@ -207,8 +209,8 @@ export const CHANGE_ITEM_STATUS = gql`
 `;
 
 export const FETCH_CATEGORIES = gql`
-   query fetchCategories {
-      categories {
+   query fetchCategories($scope: String!) {
+      categories(scope: $scope) {
          categoryId
          name
       }

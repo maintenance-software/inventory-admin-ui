@@ -19,6 +19,7 @@ import {TaskTrigger} from "./Trigger";
 import {appendToPath, clearCache} from "../../../../../utils/globalUtil";
 import {SubTask} from "./SubTask";
 import {TaskResource} from "./TaskResource";
+import {ICategory} from "../../../../../graphql/item.type";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -59,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface ITaskProps {
    task: ITask;
-   taskCategories: ITaskCategory[];
+   taskCategories: ICategory[];
    onSaveTask(task: ITask): void;
 }
 
@@ -98,7 +99,7 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
          downTimeDurationMM: Math.round(task.downTimeDuration % 60),
          attribute1: task.attribute1,
          attribute2: task.attribute2,
-         taskCategoryId: task.taskCategory? task.taskCategory.taskCategoryId: -1
+         taskCategoryId: task.taskCategory? task.taskCategory.categoryId: -1
       },
       validationSchema: Yup.object().shape({
          name: Yup.string().required('Name is required'),
@@ -136,7 +137,7 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
          priority: taskDetailFormik.getFieldProps('priority').value,
          duration: durationMM + 60 * durationHH + 1440 * durationDD,
          downTimeDuration: downTimeDurationMM + 60 * downTimeDurationHH + 1440 * downTimeDurationDD,
-         taskCategory: taskCategories.find(c => c.taskCategoryId === categoryId),
+         taskCategory: taskCategories.find(c => c.categoryId === categoryId),
          subTasks: task.subTasks.map(s => ({
             subTaskId: s.subTaskId,
             order: s.order,
@@ -145,11 +146,11 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
             mandatory: s.mandatory,
             modifiedDate: task.modifiedDate,
             createdDate: task.createdDate,
-            subTaskKind: s.subTaskKind
+            subTaskCategory: s.subTaskCategory
          })),
          taskTriggers: task.taskTriggers.map(t => ({
             taskTriggerId: t.taskTriggerId,
-            kind: t.kind,
+            triggerType: t.triggerType,
             description: t.description,
             fixedSchedule: t.fixedSchedule,
             frequency: t.frequency,
@@ -159,7 +160,7 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
             operator: t.operator,
             value: t.value,
             unit: t.unit,
-            eventTrigger: t.eventTrigger,
+            eventTriggerCategory: t.eventTriggerCategory,
             modifiedDate: t.modifiedDate,
             createdDate: t.createdDate
          })),
@@ -169,9 +170,8 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
             amount: t.amount,
             resourceType: t.resourceType,
             unit: t.unit,
-            employeeJob: t.employeeJob,
+            employeeCategory: t.employeeCategory,
             inventoryResource: t.inventoryResource,
-            humanResource: t.humanResource,
             modifiedDate: t.modifiedDate,
             createdDate: t.createdDate
          })),

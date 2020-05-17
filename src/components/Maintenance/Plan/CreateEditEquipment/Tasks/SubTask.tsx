@@ -12,13 +12,7 @@ import {useHistory} from "react-router";
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {
-   FETCH_SUBTASK_KINDS,
-   FETCH_TASK_CATEGORIES, getSubTaskDefaultInstance,
-   ISubTask, ISubTaskKind,
-   ITaskCategory,
-   ITaskTrigger
-} from "../../../../../graphql/Maintenance.type";
+import { getSubTaskDefaultInstance, ISubTask } from "../../../../../graphql/Maintenance.type";
 import TableFooter from '@material-ui/core/TableFooter';
 import Modal from '@material-ui/core/Modal';
 import Dialog from '@material-ui/core/Dialog';
@@ -33,6 +27,7 @@ import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import {SubTaskDialog} from "./SubTaskDialog";
+import {FETCH_CATEGORIES, ICategory} from "../../../../../graphql/item.type";
 
 const useBottomNoneBorder = makeStyles({
    root: {
@@ -64,7 +59,7 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
    const bottomNoneBoder = useBottomNoneBorder();
    const [open, setOpen] = React.useState(false);
    const [subTask, setSubTask] = useState<ISubTask>(getSubTaskDefaultInstance());
-   const subtaskKindsData = useQuery<{subTaskKinds: ISubTaskKind[]}, any>(FETCH_SUBTASK_KINDS);
+   const subtaskKindsData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'SUBTASK_CATEGORY'}});
 
    // useEffect(() => {
    // }, [subTask]);
@@ -74,12 +69,12 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
       setSubTask(subTask);
    };
 
-   const handleSaveSubTask = (kind: ISubTaskKind, description: string, mandatory: boolean) => {
+   const handleSaveSubTask = (kind: ICategory, description: string, mandatory: boolean) => {
       if(subTask.subTaskId === 0) {
          subTask.order = subtasks.length + 1;
          subTask.description = description;
          subTask.mandatory = mandatory;
-         subTask.subTaskKind = Object.assign({}, kind);
+         subTask.subTaskCategory = Object.assign({}, kind);
          subTask.subTaskId = -1 * subTask.order;
          subtasks.push(subTask);
       } else {
@@ -87,7 +82,7 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
             if(s.subTaskId === subTask.subTaskId) {
                s.description = description;
                s.mandatory = mandatory;
-               s.subTaskKind = Object.assign({}, kind);
+               s.subTaskCategory = Object.assign({}, kind);
             }
          });
       }
@@ -111,7 +106,7 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
                      <TableRow key={index} hover>
                         <TableCell>{row.order}</TableCell>
                         <TableCell>{row.description}</TableCell>
-                        <TableCell>{row.subTaskKind.name}</TableCell>
+                        <TableCell>{row.subTaskCategory.name}</TableCell>
                         <TableCell align="center">
                            <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">
                               <IconButton
@@ -145,7 +140,7 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
          <SubTaskDialog
             setOpen={setOpen}
             open={open}
-            subTaskKinds={subtaskKindsData.data?subtaskKindsData.data.subTaskKinds:[]}
+            subTaskCategories={subtaskKindsData.data?subtaskKindsData.data.categories:[]}
             subTask={subTask}
             onSaveSubTask={handleSaveSubTask}
          />

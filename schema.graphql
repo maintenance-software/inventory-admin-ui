@@ -29,8 +29,7 @@ type TaskResource {
     amount: Int!
     resourceType: String!
     unit: Unit!
-    employeeJob: EmployeeJob
-    humanResource: Employee
+    employeeCategory: Category
     inventoryResource: Item
     createdDate: String!
     modifiedDate: String
@@ -92,7 +91,7 @@ type Employee {
     documentId: String!
     hireDate: String
     salary: Float!
-    employeeJob: EmployeeJob!
+    employeeCategory: Category!
     address: Address
     contactInfo: [ContactInfo!]!
     createdDate: String!
@@ -142,6 +141,7 @@ type PageInfo {
 type Category {
     categoryId: Int!
     name: String!
+    scope: String!
     description: String!
     createdDate: String!
     modifiedDate: String
@@ -151,17 +151,21 @@ type TaskActivity {
     taskActivityId: Int!
     scheduledDate: String
     calculatedDate: String!
+    incidentDate: String
     rescheduled: Boolean!
     status: String!
     assetId: Int!
+    assetCode: String!
     assetName: String!
-    maintenanceId: Int!
-    maintenanceName: String!
+    maintenanceId: Int
+    maintenanceName: String
     taskId: Int!
     taskName: String!
     taskPriority: Int!
     taskTriggerId: Int!
     triggerDescription: String!
+    taskType: String!
+    createdDate: String!
 }
 
 type Page_InventoryItem {
@@ -177,8 +181,7 @@ input TaskResourceArg {
     amount: Int!
     resourceType: String!
     unitId: Int!
-    employeeJobId: Int
-    humanResourceId: Int
+    employeeCategoryId: Int
     inventoryResourceId: Int
 }
 
@@ -256,25 +259,14 @@ type Mutation {
     savePrivilege(privilegeId: Int!, key: String!, name: String!, description: String, active: Boolean!): Privilege!
     saveRole(roleId: Int!, key: String!, name: String!, description: String, active: Boolean!): Role!
     savePerson(personId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!): Person!
-    saveCategory(categoryId: Int!, name: String!, description: String!): Category!
+    saveCategory(categoryId: Int!, name: String!, scope: String!, description: String!): Category!
     saveUnit(unitId: Int!, key: String!, label: String!): Unit!
-    saveTaskCategory(taskCategoryId: Int!, name: String!, description: String): TaskCategory!
-    saveSubTaskKind(subTaskKindId: Int!, name: String!, description: String): SubTaskKind!
-    saveEmployeeJob(employeeJobId: Int!, tittle: String!, description: String): EmployeeJob!
     inventoryItems: InventoryItems!
     items: Items!
     equipments: Equipments!
     employees: Employees!
     inventories: Inventories!
     maintenances: Maintenances!
-}
-
-type EventTrigger {
-    eventTriggerId: Int!
-    name: String!
-    description: String
-    createdDate: String!
-    modifiedDate: String
 }
 
 type Role {
@@ -318,11 +310,8 @@ type Query {
     roles: Roles!
     persons: Persons!
     users: Users!
-    categories: [Category!]!
+    categories(scope: String!): [Category!]!
     units: [Unit!]!
-    taskCategories: [TaskCategory!]!
-    subTaskKinds: [SubTaskKind!]!
-    employeeJobs: [EmployeeJob!]!
     inventories: Inventories!
     items: Items!
     equipments: Equipments!
@@ -353,14 +342,6 @@ type Equipment {
     modifiedDate: String
 }
 
-type TaskCategory {
-    taskCategoryId: Int!
-    name: String!
-    description: String
-    createdDate: String!
-    modifiedDate: String
-}
-
 type Item {
     itemId: Int!
     code: String!
@@ -383,7 +364,7 @@ type Item {
 
 type TaskTrigger {
     taskTriggerId: Int!
-    kind: String!
+    triggerType: String!
     description: String!
     fixedSchedule: Boolean
     frequency: Int
@@ -394,7 +375,7 @@ type TaskTrigger {
     value: String
     timeFrequency: String
     unit: Unit
-    eventTrigger: EventTrigger
+    eventTriggerCategory: Category
     createdDate: String!
     modifiedDate: String
 }
@@ -410,7 +391,7 @@ type Task {
     attribute2: String
     createdDate: String!
     modifiedDate: String
-    taskCategory: TaskCategory
+    taskCategory: Category
     subTasks: [SubTask!]!
     taskTriggers: [TaskTrigger!]!
     taskResources: [TaskResource!]!
@@ -422,15 +403,7 @@ input SubTaskArg {
     group: String!
     description: String
     mandatory: Boolean!
-    subTaskKindId: Int
-}
-
-type EmployeeJob {
-    employeeJobId: Int!
-    tittle: String!
-    description: String
-    createdDate: String!
-    modifiedDate: String
+    subTaskCategoryId: Int
 }
 
 type Maintenances {
@@ -439,11 +412,11 @@ type Maintenances {
     availableEquipments(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
     taskActivities(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_TaskActivity!
     addTaskActivityDate(lastMaintenanceDate: String!, assetId: Int!, maintenanceId: Int!): Boolean!
+    addTaskActivityEvent(assetId: Int!, taskId: Int!, taskTriggerId: Int!, maintenanceId: Int, reportedById: Int!, hasAssetFailure: Boolean!, incidentDate: String): Boolean!
     saveMaintenance(maintenanceId: Int!, name: String!, description: String, status: String!): Maintenance!
-    createUpdateTasks(maintenanceId: Int!, tasks: [TaskArg!]!): [Task!]!
+    createUpdateTasks(maintenanceId: Int, tasks: [TaskArg!]!): [Task!]!
     task(entityId: Int!): Task!
-    eventTriggers: [EventTrigger!]!
-    saveEventTrigger(eventTriggerId: Int!, name: String!, description: String): EventTrigger!
+    equipmentTasks(entityId: Int!): [Task!]!
 }
 
 type Page_Employee {
@@ -486,7 +459,7 @@ type Session {
 
 input TaskTriggerArg {
     taskTriggerId: Int!
-    kind: String!
+    triggerType: String!
     description: String!
     fixedSchedule: Boolean
     frequency: Int
@@ -497,21 +470,13 @@ input TaskTriggerArg {
     value: String
     timeFrequency: String
     unitId: Int
-    eventTriggerId: Int
-}
-
-type SubTaskKind {
-    subTaskKindId: Int!
-    name: String!
-    description: String
-    createdDate: String!
-    modifiedDate: String
+    eventTriggerCategoryId: Int
 }
 
 type Employees {
     employee(entityId: Int!): Employee!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Employee!
-    saveEmployee(employeeId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!, hireDate: String, salary: Float!, employeeJobId: Int!, address: AddressArg, contactInfo: [ContactInfoArg!]!): Employee!
+    saveEmployee(employeeId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!, hireDate: String, salary: Float!, employeeCategoryId: Int!, address: AddressArg, contactInfo: [ContactInfoArg!]!): Employee!
 }
 
 type Page_Item {
@@ -544,5 +509,5 @@ type SubTask {
     mandatory: Boolean!
     createdDate: String!
     modifiedDate: String
-    subTaskKind: SubTaskKind
+    subTaskCategory: Category
 }

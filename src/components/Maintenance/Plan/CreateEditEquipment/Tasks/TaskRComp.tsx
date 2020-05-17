@@ -8,10 +8,11 @@ import {
    IMaintenancePlans,
    GET_TASK_BY_ID,
    ITask,
-   getTaskDefaultInstance, ITaskCategory, FETCH_TASK_CATEGORIES, SAVE_MAINTENANCE_TASKS
+   getTaskDefaultInstance, ITaskCategory, SAVE_MAINTENANCE_TASKS
 } from "../../../../../graphql/Maintenance.type";
 import {TaskR} from "./TaskR";
 import {appendToPath, clearCache} from "../../../../../utils/globalUtil";
+import {FETCH_CATEGORIES, ICategory} from "../../../../../graphql/item.type";
 
 export const TaskRComp: React.FC =  () => {
    const params = useParams();
@@ -19,7 +20,7 @@ export const TaskRComp: React.FC =  () => {
    const { path, url } = useRouteMatch();
    const [task, setTask] = useState(getTaskDefaultInstance());
    const [getTaskById, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(GET_TASK_BY_ID);
-   const categoryData = useQuery<{taskCategories: ITaskCategory[]}, any>(FETCH_TASK_CATEGORIES);
+   const categoryData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'TASK_CATEGORY'}});
    const [saveMaintenanceTasks, saveStatus] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_MAINTENANCE_TASKS);
    const taskId = +params.taskId;
    const maintenanceId = +params.maintenanceId;
@@ -52,18 +53,18 @@ export const TaskRComp: React.FC =  () => {
                downTimeDuration: task.downTimeDuration,
                attribute1: task.attribute1,
                attribute2: task.attribute2,
-               taskCategoryId: task.taskCategory? task.taskCategory.taskCategoryId : null,
+               taskCategoryId: task.taskCategory? task.taskCategory.categoryId : null,
                subTasks: task.subTasks.map(s => ({
                   subTaskId: s.subTaskId,
                   order: s.order,
                   group: s.group,
                   description: s.description,
                   mandatory: s.mandatory,
-                  subTaskKindId: s.subTaskKind.subTaskKindId
+                  subTaskCategoryId: s.subTaskCategory.categoryId
                })),
                taskTriggers: task.taskTriggers.map(t => ({
                   taskTriggerId: t.taskTriggerId,
-                  kind: t.kind,
+                  triggerType: t.triggerType,
                   description: t.description,
                   fixedSchedule: t.fixedSchedule,
                   frequency: t.frequency,
@@ -73,7 +74,7 @@ export const TaskRComp: React.FC =  () => {
                   operator: t.operator,
                   value: t.value,
                   unitId: t.unit && t.unit.unitId !== 0? t.unit.unitId : null,
-                  eventTriggerId: t.eventTrigger && t.eventTrigger.eventTriggerId !== 0 ? t.eventTrigger.eventTriggerId : null
+                  eventTriggerCategoryId: t.eventTriggerCategory && t.eventTriggerCategory.categoryId !== 0 ? t.eventTriggerCategory.categoryId : null
                })),
                taskResources: task.taskResources.map(t => ({
                   taskResourceId: t.taskResourceId,
@@ -81,9 +82,8 @@ export const TaskRComp: React.FC =  () => {
                   amount: t.amount,
                   resourceType: t.resourceType,
                   unitId: t.unit.unitId,
-                  employeeJobId: t.employeeJob? t.employeeJob.employeeJobId : null,
-                  inventoryResourceId: t.inventoryResource? t.inventoryResource.itemId : null,
-                  humanResourceId: t.humanResource? t.humanResource.employeeId : null,
+                  employeeCategoryId: t.employeeCategory? t.employeeCategory.categoryId : null,
+                  inventoryResourceId: t.inventoryResource? t.inventoryResource.itemId : null
                }))
             }]
          }
@@ -105,7 +105,7 @@ export const TaskRComp: React.FC =  () => {
 
    return (
       <TaskR task={task}
-             taskCategories={!categoryData.data? [] : categoryData.data.taskCategories}
+             taskCategories={!categoryData.data? [] : categoryData.data.categories}
              onSaveTask={onSaveTask}
       />
   );

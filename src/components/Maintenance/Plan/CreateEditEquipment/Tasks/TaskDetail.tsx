@@ -10,6 +10,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import MenuItem from '@material-ui/core/MenuItem';
+import {ICategory} from "../../../../../graphql/item.type";
 
 const useSliderStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -22,7 +23,7 @@ const useSliderStyles = makeStyles((theme: Theme) =>
    }),
 );
 
-export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: ITaskCategory[]}> =  ({taskDetailForm, taskCategories}) => {
+export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: ICategory[]}> =  ({taskDetailForm, taskCategories}) => {
    const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid, setFieldValue } = taskDetailForm;
    const classes = useSliderStyles();
   //  const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid, setFieldValue } = useFormik<ITaskDetail>({
@@ -64,7 +65,7 @@ export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: ITaskCateg
                 <TextField  id="taskCategory" label="Task Category" select  style={{width: '100%'}} {...taskCategoryId}>
                    <MenuItem key={-1} value="-1">--Select--</MenuItem>
                    {taskCategories.map(c => (
-                      <MenuItem key={c.taskCategoryId} value={c.taskCategoryId}>{c.name}</MenuItem>
+                      <MenuItem key={c.categoryId} value={c.categoryId}>{c.name}</MenuItem>
                    ))}
                 </TextField>
              </Grid>

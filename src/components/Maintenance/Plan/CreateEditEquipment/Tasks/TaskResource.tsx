@@ -18,8 +18,7 @@ import {
 } from "../../../../../graphql/Maintenance.type";
 import TableFooter from '@material-ui/core/TableFooter';
 import { useQuery } from '@apollo/react-hooks';
-import {FETCH_UNITS, IUnit} from "../../../../../graphql/item.type";
-import {FETCH_EMPLOYEE_JOBS, IEmployeeJob} from "../../../../../graphql/persons.type";
+import {FETCH_CATEGORIES, FETCH_UNITS, ICategory, IUnit} from "../../../../../graphql/item.type";
 import {buildFullName} from "../../../../../utils/globalUtil";
 import {TaskResourceDialog} from "./TaskResourceDialog";
 
@@ -48,7 +47,7 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
    const [open, setOpen] = React.useState(false);
    const [resource, setResource] = useState<ITaskResource>(getTaskResourceDefaultInstance());
    // const employeeJobsData = useQuery<{maintenances: {employeeJobs: IEmployeeJob[]}}, any>(FETCH_EMPLOYEE_JOBS);
-   const employeeJobsData = useQuery<{employeeJobs: IEmployeeJob[]}, any>(FETCH_EMPLOYEE_JOBS);
+   const employeeJobsData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope:'EMPLOYEE_JOB_CATEGORY'}});
    const unitsData = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
 
    const handleAddEditResource = (trigger: ITaskResource) => {
@@ -71,7 +70,7 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
    const getDescription = (r: ITaskResource) => {
       switch (r.resourceType) {
          case 'INVENTORY': return r.inventoryResource? r.inventoryResource.name : '';
-         case 'HUMAN': return r.employeeJob? r.employeeJob.tittle : '';
+         case 'HUMAN': return r.employeeCategory? r.employeeCategory.name : '';
       }
       return '';
    };
@@ -133,7 +132,7 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
          />*/}
          <TaskResourceDialog
             taskResource={resource}
-            employeeJobs={employeeJobsData.data?employeeJobsData.data.employeeJobs : []}
+            employeeCategories={employeeJobsData.data?employeeJobsData.data.categories : []}
             units={unitsData.data?unitsData.data.units : []}
             open={open}
             setOpen={setOpen}

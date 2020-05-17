@@ -13,18 +13,13 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {
-   FETCH_EVENT_TRIGGERS,
-   FETCH_SUBTASK_KINDS,
-   getSubTaskDefaultInstance, getTaskTriggerDefaultInstance, IEventTrigger,
-   ISubTask,
-   ISubTaskKind,
+   getTaskTriggerDefaultInstance,
    ITaskTrigger
 } from "../../../../../graphql/Maintenance.type";
 import TableFooter from '@material-ui/core/TableFooter';
 import { useQuery } from '@apollo/react-hooks';
-import {SubTaskDialog} from "./SubTaskDialog";
 import {TriggerDialog} from "./TriggerDialog";
-import {FETCH_UNITS, IUnit} from "../../../../../graphql/item.type";
+import {FETCH_CATEGORIES, FETCH_UNITS, ICategory, IUnit} from "../../../../../graphql/item.type";
 
 const useBottomNoneBorder = makeStyles({
    root: {
@@ -56,7 +51,7 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
    const bottomNoneBoder = useBottomNoneBorder();
    const [open, setOpen] = React.useState(false);
    const [trigger, setTrigger] = useState<ITaskTrigger>(getTaskTriggerDefaultInstance());
-   const eventTriggersData = useQuery<{maintenances: {eventTriggers: IEventTrigger[]}}, any>(FETCH_EVENT_TRIGGERS);
+   const eventTriggersData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'EVENT_CATEGORY'}});
    const unitsData = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
 
    const handleAddEditTrigger = (trigger: ITaskTrigger) => {
@@ -89,7 +84,7 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                <TableBody>
                   {triggers.sort((t1, t2) => t1.taskTriggerId - t2.taskTriggerId).map((row: ITaskTrigger, index) => (
                      <TableRow key={index} hover>
-                        <TableCell>{row.kind}</TableCell>
+                        <TableCell>{row.triggerType}</TableCell>
                         <TableCell>{row.description}</TableCell>
                         <TableCell>{row.fixedSchedule}</TableCell>
                         <TableCell align="center">
@@ -109,6 +104,7 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                            variant="contained"
                            color="default"
                            size="small"
+                           disabled={triggers.length === 3}
                            startIcon={<AddIcon/>}
                            onClick={() => handleAddEditTrigger(getTaskTriggerDefaultInstance())}
                         >
@@ -122,10 +118,11 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
          <TriggerDialog
             setOpen={setOpen}
             open={open}
+            triggerTypes={triggers.map(t => t.triggerType)}
             trigger={trigger}
-            triggerEvents={eventTriggersData.data? eventTriggersData.data.maintenances.eventTriggers : []}
+            triggerEvents={eventTriggersData.data? eventTriggersData.data.categories : []}
             units={unitsData.data? unitsData.data.units : []}
-            onSaveEventTrigger={handleSaveTrigger}
+            onSaveTrigger={handleSaveTrigger}
          />
       </>
    );

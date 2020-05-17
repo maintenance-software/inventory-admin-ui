@@ -1,8 +1,6 @@
 import React, {FC, useState, useEffect} from 'react';
 import Button from '@material-ui/core/Button';
-import {
-   ISubTask, ISubTaskKind
-} from "../../../../../graphql/Maintenance.type";
+import { ISubTask } from "../../../../../graphql/Maintenance.type";
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -12,33 +10,32 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import {ICategory} from "../../../../../graphql/item.type";
 
 interface ISubTaskDialogProps {
    open: boolean;
    setOpen(open: boolean): void;
    subTask: ISubTask;
-   subTaskKinds: ISubTaskKind[];
-   onSaveSubTask(taskKind: ISubTaskKind, description: string, mandatory: boolean): void;
+   subTaskCategories: ICategory[];
+   onSaveSubTask(taskKind: ICategory, description: string, mandatory: boolean): void;
 }
 
-export const SubTaskDialog: FC<ISubTaskDialogProps> = ({open, setOpen, subTask, subTaskKinds, onSaveSubTask}) => {
+export const SubTaskDialog: FC<ISubTaskDialogProps> = ({open, setOpen, subTask, subTaskCategories, onSaveSubTask}) => {
    const [mandatory, setMandatory] = useState(subTask.mandatory);
    const [description, setDescription] = useState(subTask.description);
-   const [kind, setKind] = useState(subTask.subTaskKind.subTaskKindId);
+   const [kind, setKind] = useState(subTask.subTaskCategory.categoryId);
 
    useEffect(() => {
       setDescription(subTask.description);
-      setKind(subTask.subTaskKind.subTaskKindId);
+      setKind(subTask.subTaskCategory.categoryId);
       setMandatory(subTask.mandatory);
    }, [subTask]);
 
    const handleSave = () => {
-      onSaveSubTask(subTaskKinds.find(k => k.subTaskKindId === kind) || {
-         subTaskKindId: 0,
+      onSaveSubTask(subTaskCategories.find(k => k.categoryId === kind) || {
+         categoryId: 0,
          name: '',
-         description: '',
-         modifiedDate: '',
-         createdDate: ''
+         description: ''
       }, description, mandatory);
    };
    return (
@@ -58,8 +55,8 @@ export const SubTaskDialog: FC<ISubTaskDialogProps> = ({open, setOpen, subTask, 
                         value={kind}
                         onChange={(event => setKind(+event.target.value))}
                      >
-                        {subTaskKinds.map((option) => (
-                           <MenuItem key={option.subTaskKindId} value={option.subTaskKindId}>
+                        {subTaskCategories.map((option) => (
+                           <MenuItem key={option.categoryId} value={option.categoryId}>
                               {option.name}
                            </MenuItem>
                         ))}
