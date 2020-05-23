@@ -85,7 +85,7 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                   {triggers.sort((t1, t2) => t1.taskTriggerId - t2.taskTriggerId).map((row: ITaskTrigger, index) => (
                      <TableRow key={index} hover>
                         <TableCell>{row.triggerType}</TableCell>
-                        <TableCell>{row.description}</TableCell>
+                        <TableCell>{row.triggerType === 'EVENT' && row.eventTriggerCategory?row.eventTriggerCategory.name : row.description }</TableCell>
                         <TableCell>{row.fixedSchedule}</TableCell>
                         <TableCell align="center">
                            <ButtonGroup variant="text" size="small" color="primary" aria-label="text primary button group">

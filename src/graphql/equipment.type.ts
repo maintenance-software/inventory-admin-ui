@@ -142,3 +142,17 @@ mutation saveEquipment(
   }
 }
 `;
+
+export const SET_MAINTENANCE_GQL = gql`
+   mutation setMaintenance(
+      $equipmentId: Int!,
+      $maintenanceId: Int!
+   ){
+      equipments {
+         setMaintenance(
+            equipmentId: $equipmentId,
+            maintenanceId: $maintenanceId
+         )
+      }
+   }
+`;

@@ -24,6 +24,7 @@ export interface ITaskActivity{
    status: EntityStatus;
    assetId: number;
    assetName: string;
+   assetCode: string;
    maintenanceId: number;
    maintenanceName: string;
    taskId: number;
@@ -55,6 +56,7 @@ export interface ITask{
    attribute2: string;
    createdDate: string;
    modifiedDate: string;
+   maintenanceId: number;
    taskCategory?: ICategory | null;
    subTasks: ISubTask[];
    taskTriggers: ITaskTrigger[];
@@ -149,6 +151,7 @@ export const getTaskDefaultInstance = ():ITask => ({
    createdDate: '',
    modifiedDate: '',
    taskCategory: null,
+   maintenanceId: 0,
    subTasks: [],
    taskTriggers: [],
    taskResources: []
@@ -243,6 +246,26 @@ export const FETCH_EQUIPMENTS_AVAILABLE_GQL = gql`
    }
 `;
 
+export const FETCH_TASKS_FOR_EQUIPMENT_QL = gql`
+   query fetchTasksForEquipment($equipmentId: Int!) {
+      maintenances {
+         equipmentTasks(entityId: $equipmentId) {
+            taskId
+            name
+            maintenanceId
+            taskTriggers {
+               taskTriggerId
+               triggerType
+               eventTriggerCategory {
+                  categoryId
+                  name
+               }
+            }
+         }
+      }
+   }
+`;
+
 export const FETCH_TASK_ACTIVITIES_GQL = gql`
    query fetchTaskActivities($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]) {
       maintenances {
@@ -256,6 +279,7 @@ export const FETCH_TASK_ACTIVITIES_GQL = gql`
                status
                assetId
                assetName
+               assetCode
                maintenanceId
                maintenanceName
                taskId
@@ -412,14 +436,38 @@ export const SAVE_MAINTENANCE_PLAN = gql`
    }
 `;
 
-export const SAVE_TASK_ACTIVITY = gql`
-   mutation saveTaskActivity(
+export const SAVE_TASK_ACTIVITY_DATE_GQL = gql`
+   mutation saveTaskActivityDate(
    $lastMaintenanceDate: String!
    $assetId: Int!
    $maintenanceId: Int!
    ) {
       maintenances {
          addTaskActivityDate(lastMaintenanceDate: $lastMaintenanceDate, assetId: $assetId, maintenanceId: $maintenanceId)
+      }
+   }
+`;
+
+export const SAVE_TASK_ACTIVITY_EVENT_GQL = gql`
+   mutation saveTaskActivityEvent(
+    $taskTriggerId: Int!
+    $taskId: Int!
+    $maintenanceId: Int
+    $assetId: Int!
+    $hasAssetFailure: Boolean!
+    $incidentDate: String
+    $reportedById: Int!
+   ) {
+      maintenances {
+         addTaskActivityEvent(
+            taskTriggerId: $taskTriggerId,
+            taskId: $taskId,
+            maintenanceId: $maintenanceId,
+            assetId: $assetId,
+            hasAssetFailure: $hasAssetFailure,
+            incidentDate: $incidentDate,
+            reportedById: $reportedById 
+         )
       }
    }
 `;

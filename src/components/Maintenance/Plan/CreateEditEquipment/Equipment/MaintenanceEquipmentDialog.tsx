@@ -8,7 +8,7 @@ import TextField from "@material-ui/core/TextField/TextField";
 import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
 import {useHistory} from "react-router";
-import {EquipmentChooserComp} from "./EquipmentChooserComp";
+import {EquipmentAvailableChooserComp} from "./EquipmentAvailableChooserComp";
 import {ISimpleItem} from "../../../../Assets/Commons/AssetChooser/AssetChooser";
 
 
@@ -36,10 +36,10 @@ export interface IInventoryFormProps {
    maintenanceIds: number[];
    open: boolean;
    setOpen(open: boolean): void;
-   onAccept(equipmentId: number, date: String) : void;
+   onSaveTaskActivity(equipmentId: number, date: String) : void;
 }
 
-export const MaintenanceEquipmentDialog: React.FC<IInventoryFormProps> =  ({maintenanceIds, open, setOpen, onAccept}) => {
+export const MaintenanceEquipmentDialog: React.FC<IInventoryFormProps> =  ({maintenanceIds, open, setOpen, onSaveTaskActivity}) => {
    const steps = ['Equipments', 'Details'];
    const buttonClasses = useButtonStyles();
    const dateStyle = useDateStyles();
@@ -58,7 +58,7 @@ export const MaintenanceEquipmentDialog: React.FC<IInventoryFormProps> =  ({main
 
    const handleNext = async () => {
       if(activeStep + 1 === 2) {
-         onAccept(equipmentId, selectedDate);
+         onSaveTaskActivity(equipmentId, selectedDate);
       } else {
          setActiveStep(activeStep + 1);
       }
@@ -90,7 +90,7 @@ export const MaintenanceEquipmentDialog: React.FC<IInventoryFormProps> =  ({main
 
    const stepComp = (index: number) => {
       switch (index) {
-         case 0: return (<EquipmentChooserComp
+         case 0: return (<EquipmentAvailableChooserComp
                disableItems={[]}
                initialSelected={equipmentId? [equipmentId] : []}
                filters={[]}

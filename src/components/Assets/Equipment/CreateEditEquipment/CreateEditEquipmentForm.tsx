@@ -70,18 +70,19 @@ export const EditEquipmentForm: React.FC<IEquipmentFormProps> =  ({equipmentForm
    const formClasses = useFormStyles();
    const buttonClasses = useButtonStyles();
    const { values, setFieldValue, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IEquipmentForm>({
-    initialValues: equipmentForm,
-    validationSchema: Yup.object().shape({
-       name: Yup.string().required('This filed is required'),
-       code: Yup.string().required('code requiresd'),
-       priority: Yup.number(),
-       hoursAverageDailyUse: Yup.number()
-    }),
+      enableReinitialize: true,
+      initialValues: equipmentForm,
+       validationSchema: Yup.object().shape({
+          name: Yup.string().required('This filed is required'),
+          code: Yup.string().required('code requiresd'),
+          priority: Yup.number(),
+          hoursAverageDailyUse: Yup.number()
+       }),
 
-    onSubmit: (values, bag) => {
-       onSaveEquipmentCallback(values, bag.resetForm);
-    }
-  });
+       onSubmit: (values, bag) => {
+          onSaveEquipmentCallback(values, bag.resetForm);
+       }
+   });
 
    const name = getFieldProps("name");
    const nameField = getFieldMeta('name');
@@ -149,9 +150,13 @@ export const EditEquipmentForm: React.FC<IEquipmentFormProps> =  ({equipmentForm
             </Grid>
 
             <Grid container spacing={2}>
-               <Grid item xs={3}><TextField  id="priority" label="Priority" {...priority}/></Grid>
-               <Grid item xs={3}><TextField  id="hoursAverageDailyUse" label="Average daily use" {...hoursAverageDailyUse}/></Grid>
-               <Grid item xs={3}>
+               <Grid item xs={4}>
+                  <FormControlLabel
+                     control={<Checkbox color="primary" checked={outOfService.value} name="outOfService" {...outOfService}/>}
+                     label="Out of service"
+                  />
+               </Grid>
+               <Grid item xs={4}>
                   <TextField
                      id="date"
                      label="Purchase Date"
@@ -162,12 +167,8 @@ export const EditEquipmentForm: React.FC<IEquipmentFormProps> =  ({equipmentForm
                      {...purchaseDate}
                   />
                </Grid>
-               <Grid item xs={3}>
-                  <FormControlLabel
-                     control={<Checkbox color="primary" checked={outOfService.value} name="outOfService" {...outOfService}/>}
-                     label="Out of service"
-                  />
-               </Grid>
+               <Grid item xs={2}><TextField  id="priority" label="Priority" {...priority}/></Grid>
+               <Grid item xs={2}><TextField  id="hoursAverageDailyUse" label="Average daily use" {...hoursAverageDailyUse}/></Grid>
             </Grid>
          </form>
       </Grid>

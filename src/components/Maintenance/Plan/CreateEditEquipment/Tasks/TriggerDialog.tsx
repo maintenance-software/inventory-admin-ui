@@ -56,11 +56,9 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, triggerTy
          modifiedDate: '',
       };
       const unit = units.find(k => k.unitId === frequencyUnitId) || {
-         eventTriggerId: 0,
-         name: '',
-         description: '',
-         createdDate: '',
-         modifiedDate: '',
+         unitId: 0,
+         key: '',
+         label: ''
       };
       onSaveTrigger(Object.assign({}, trigger, {
          triggerType: triggerType,
@@ -71,7 +69,7 @@ export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, triggerTy
          operator: operator,
          value: value,
          unit: unit,
-         eventTrigger: eventTrigger
+         eventTriggerCategory: eventTrigger
       }));
    };
 

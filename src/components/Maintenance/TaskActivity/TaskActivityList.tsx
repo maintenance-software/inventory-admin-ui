@@ -97,6 +97,7 @@ interface TaskActivityProps {
    onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
    onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
    onSearchTaskActivity?(searchString: string) : void;
+   onCreateActivityByEvent?() : void;
 }
 
 const CustomRow: FC<TaskActivity> = (props) => {
@@ -110,6 +111,7 @@ const CustomRow: FC<TaskActivity> = (props) => {
                   {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                </IconButton>
                      {props.assetName}
+                     ({props.assetCode})
             </TableCell>
          </TableRow>
          {open && props.activities.map((historyRow, index) => (
@@ -159,7 +161,7 @@ export const  CollapsibleTable: FC<{taskActivities: TaskActivity[]}> = ({taskAct
    );
 };
 
-export const TaskActivityList: FC<TaskActivityProps> = ({taskActivities, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSearchTaskActivity}) => {
+export const TaskActivityList: FC<TaskActivityProps> = ({taskActivities, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSearchTaskActivity, onCreateActivityByEvent}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
@@ -187,6 +189,7 @@ export const TaskActivityList: FC<TaskActivityProps> = ({taskActivities, pageInd
                   color="default"
                   size="small"
                   startIcon={<WorkIcon/>}
+                  onClick={()=> onCreateActivityByEvent && onCreateActivityByEvent() }
                   className={buttonClasses.button}
                >
                   Tarea no planificada

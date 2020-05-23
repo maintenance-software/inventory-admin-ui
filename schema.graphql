@@ -223,6 +223,7 @@ type Equipments {
     equipment(entityId: Int!): Equipment!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
     saveEquipment(equipmentId: Int!, name: String!, description: String, code: String!, partNumber: String, manufacturer: String, model: String, notes: String, status: String!, images: [String!]!, priority: Int!, hoursAverageDailyUse: Int!, outOfService: Boolean!, purchaseDate: String, parentId: Int): Equipment!
+    setMaintenance(equipmentId: Int!, maintenanceId: Int!): Boolean!
 }
 
 type Page_Maintenance {
@@ -389,6 +390,7 @@ type Task {
     downTimeDuration: Int!
     attribute1: String
     attribute2: String
+    maintenanceId: Int
     createdDate: String!
     modifiedDate: String
     taskCategory: Category

@@ -2,8 +2,9 @@ import React, {useEffect, FC} from 'react';
 import { useLazyQuery } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
-import {AssetChooser, ISimpleItem} from "../../../../Assets/Commons/AssetChooser/AssetChooser";
-import {FETCH_EQUIPMENTS_AVAILABLE_GQL, IMaintenancePlans} from "../../../../../graphql/Maintenance.type";
+import {AssetChooser, ISimpleItem} from "../../Assets/Commons/AssetChooser/AssetChooser";
+import {FETCH_EQUIPMENTS_AVAILABLE_GQL, IMaintenancePlans} from "../../../graphql/Maintenance.type";
+import {FETCH_EQUIPMENTS_PAGE_GQL, IEquipments} from "../../../graphql/equipment.type";
 
 interface IAssetChooserProps {
    multiple: boolean;
@@ -19,14 +20,14 @@ export const EquipmentChooserComp: FC<IAssetChooserProps> = ({disableItems, mult
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchEquipmentsAvailable, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(FETCH_EQUIPMENTS_AVAILABLE_GQL);
+   const [fetchEquipments, { called, loading, data }] = useLazyQuery<{equipments: IEquipments}, any>(FETCH_EQUIPMENTS_PAGE_GQL);
 
    useEffect(() => {
-      fetchEquipmentsAvailable({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
+      fetchEquipments({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
    }, []);
 
    useEffect(() => {
-      fetchEquipmentsAvailable({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
+      fetchEquipments({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
    }, [pageIndex, pageSize, searchString]);
 
    if (loading || !data) return <div>Loading</div>;
@@ -50,7 +51,7 @@ export const EquipmentChooserComp: FC<IAssetChooserProps> = ({disableItems, mult
    };
 
    return <AssetChooser
-      items = {data.maintenances.availableEquipments.content.map(e => ({
+      items = {data.equipments.page.content.map(e => ({
          itemId: e.equipmentId,
          code: e.code,
          name: e.name,
@@ -59,9 +60,9 @@ export const EquipmentChooserComp: FC<IAssetChooserProps> = ({disableItems, mult
       multiple={multiple}
       disableItems={disableItems}
       initialSelected={initialSelected}
-      pageIndex = {data.maintenances.availableEquipments.pageInfo.pageIndex}
-      pageSize = {data.maintenances.availableEquipments.pageInfo.pageSize}
-      totalCount = {data.maintenances.availableEquipments.totalCount}
+      pageIndex = {data.equipments.page.pageInfo.pageIndex}
+      pageSize = {data.equipments.page.pageInfo.pageSize}
+      totalCount = {data.equipments.page.totalCount}
       searchString = {searchString}
       onSelectItem = {onSelectItems || handleSelectEquipments}
       onChangePage = {handleChangePage}

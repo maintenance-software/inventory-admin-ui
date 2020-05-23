@@ -21,6 +21,7 @@ import {
    SAVE_EQUIPMENT
 } from "../../../../graphql/equipment.type";
 import {EquipmentContext} from "../../Routes";
+import moment from 'moment';
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -132,9 +133,10 @@ export const CreateEditEquipmentComp: React.FC =  () => {
          priority: equipment.priority || 0,
          hoursAverageDailyUse: equipment.hoursAverageDailyUse || 0,
          outOfService: equipment.outOfService || false,
-         purchaseDate: equipment.purchaseDate || '',
+         purchaseDate: moment(equipment.purchaseDate, 'YYYY-MM-DD').format("YYYY-MM-DD") || '',
       },
       onSaveEquipmentCallback: async (equipmentForm: IEquipmentForm, resetForm: Function) => {
+         const purchaseDate = moment(equipmentForm.purchaseDate, 'YYYY-MM-DD').format("YYYY-MM-DD HH:mm:ss.SSSSSS UTC");
          const mutationRequest: EquipmentMutationRequest = {
             equipmentId: equipmentId,
             name: equipmentForm.name,
@@ -149,24 +151,24 @@ export const CreateEditEquipmentComp: React.FC =  () => {
             priority: +equipmentForm.priority,
             hoursAverageDailyUse: +equipmentForm.hoursAverageDailyUse,
             outOfService: equipmentForm.outOfService,
-            purchaseDate: equipmentForm.purchaseDate || null,
+            purchaseDate: purchaseDate || null,
             parentId: pathTree.length > 0 ? pathTree[pathTree.length - 1].equipmentId : null
          };
          const response = await saveEquipment({
             variables: mutationRequest
             , update: (cache) => {
                clearCache(cache, 'equipments.page');
-               // clearCache(cache, 'inventories.list');
+               clearCache(cache, 'equipments.equipment');
             }
          });
          if(!response.data)
             return;
-         if(equipmentId > 0) {
-            resetForm({});
-         } else {
+         // if(equipmentId > 0) {
+         //    resetForm({});
+         // } else {
             getEquipmentById({variables: { equipmentId: response.data.equipments.saveEquipment.equipmentId }});
             history.push(response.data.equipments.saveEquipment.equipmentId.toString());
-         }
+         // }
       }
    };
 

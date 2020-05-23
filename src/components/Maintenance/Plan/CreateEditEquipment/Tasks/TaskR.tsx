@@ -175,6 +175,7 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
             modifiedDate: t.modifiedDate,
             createdDate: t.createdDate
          })),
+         maintenanceId: 0,
          modifiedDate: task.modifiedDate,
          createdDate: task.createdDate
       };

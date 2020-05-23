@@ -11,7 +11,7 @@ import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
 import {appendToPath, clearCache} from "../../../../utils/globalUtil";
 import {PlanDetailsComp} from "./PlanDetailsComp";
-import {PlanEquipmentComp} from "./Equipment/EquipmentComp";
+import {PlanEquipmentContainer} from "./Equipment/PlanEquipmentContainer";
 import {TaskComp} from "./Tasks/TaskComp";
 import {TaskRComp} from "./Tasks/TaskRComp";
 
@@ -100,7 +100,7 @@ export const CreateEditMaintenancePlanComp: React.FC =  () => {
                </Switch>
             </TabPanel>
             <TabPanel value={value} index="equipments">
-               <PlanEquipmentComp/>
+               <PlanEquipmentContainer/>
             </TabPanel>
       </Grid>
   );
