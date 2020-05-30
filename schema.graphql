@@ -64,7 +64,24 @@ type InventoryItem {
     modifiedDate: String
 }
 
-input AddressArg {
+type WorkOrder {
+    workOrderId: Int!
+    workOrderCode: String!
+    workOrderStatus: String!
+    estimateDuration: Int!
+    executionDuration: Int!
+    rate: Int!
+    totalCost: Float!
+    percentage: Float!
+    notes: String!
+    generatedBy: Person!
+    responsible: Person!
+    parent: WorkOrder
+    createdDate: String!
+    modifiedDate: String
+}
+
+type AddressArg {
     addressId: Int!
     street1: String!
     street2: String!
@@ -77,10 +94,11 @@ input AddressArg {
 
 type Users {
     user(entityId: Int!): User!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_User!
+    createUpdateUser(userId: Int!, username: String!, email: String!, status: String!, locale: String!, expiration: Boolean!, person: PersonArg!, roleIds: [Int!]!, privilegeIds: [Int!]!): User!
     resetPassword(entityId: Int!): String!
     changePassword(userId: Int!, password: String!, newPassword: String!): Boolean!
     updatePassword(userId: Int!, password: String!): Boolean!
-    list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [User!]!
 }
 
 type Employee {
@@ -106,9 +124,15 @@ type Person {
     documentId: String!
     createdDate: String!
     modifiedDate: String
-    address(address: AddressArg): Address
-    contactInfo(contactInfo: [ContactInfoArg!]): [ContactInfo!]!
-    account(user: UserArg): User
+    address: Address
+    contactInfo: [ContactInfo!]!
+}
+
+type Page_User {
+    totalCount: Int!
+    content: [User!]!
+    pageInfo: PageInfo!
+    sort: Sort!
 }
 
 type Maintenance {
@@ -120,15 +144,6 @@ type Maintenance {
     modifiedDate: String
     tasks: [Task!]!
     equipments: [Equipment!]!
-}
-
-input UserArg {
-    userId: Int!
-    username: String!
-    email: String!
-    status: String!
-    language: String!
-    expiration: Boolean!
 }
 
 type PageInfo {
@@ -166,6 +181,13 @@ type TaskActivity {
     triggerDescription: String!
     taskType: String!
     createdDate: String!
+}
+
+type Page_WorkOrder {
+    totalCount: Int!
+    content: [WorkOrder!]!
+    pageInfo: PageInfo!
+    sort: Sort!
 }
 
 type Page_InventoryItem {
@@ -219,6 +241,16 @@ type Page_Person {
     sort: Sort!
 }
 
+type PersonArg {
+    personId: Int!
+    firstName: String!
+    lastName: String!
+    documentType: String!
+    documentId: String!
+    address: AddressArg
+    contactInfo: [ContactInfoArg!]!
+}
+
 type Equipments {
     equipment(entityId: Int!): Equipment!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
@@ -238,14 +270,14 @@ type User {
     username: String!
     email: String!
     status: String!
-    language: String!
+    locale: String!
     expiration: Boolean!
     newPasswordRequired: Boolean!
+    person: Person!
+    roles: [Role!]!
+    privileges: [Privilege!]!
     createdDate: String!
     modifiedDate: String
-    person: Person!
-    privileges(privilegeIds: [Int!]): [Privilege!]!
-    roles(roleIds: [Int!]): [Role!]!
 }
 
 input Predicate {
@@ -259,7 +291,8 @@ input Predicate {
 type Mutation {
     savePrivilege(privilegeId: Int!, key: String!, name: String!, description: String, active: Boolean!): Privilege!
     saveRole(roleId: Int!, key: String!, name: String!, description: String, active: Boolean!): Role!
-    savePerson(personId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!): Person!
+    persons: Persons!
+    users: Users!
     saveCategory(categoryId: Int!, name: String!, scope: String!, description: String!): Category!
     saveUnit(unitId: Int!, key: String!, label: String!): Unit!
     inventoryItems: InventoryItems!
@@ -293,7 +326,7 @@ type Inventory {
     modifiedDate: String
 }
 
-input ContactInfoArg {
+type ContactInfoArg {
     contactId: Int!
     contact: String!
     contactType: String!
@@ -419,6 +452,9 @@ type Maintenances {
     createUpdateTasks(maintenanceId: Int, tasks: [TaskArg!]!): [Task!]!
     task(entityId: Int!): Task!
     equipmentTasks(entityId: Int!): [Task!]!
+    workOrder(entityId: Int!): WorkOrder!
+    workOrders(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkOrder!
+    createUpdateWorkOrder(workOrderId: Int!, workOrderStatus: String!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int!, responsibleId: Int!, parentId: Int, activityIds: [Int!]!, resources: [WorkOrderResourceArg!]!): WorkOrder!
 }
 
 type Page_Employee {
@@ -431,6 +467,7 @@ type Page_Employee {
 type Persons {
     person(entityId: Int!): Person!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Person!
+    createUpdatePerson(personId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!, address: AddressArg, contactInfo: [ContactInfoArg!]!): Person!
 }
 
 type Unit {
@@ -455,7 +492,7 @@ type Session {
     email: String!
     firstName: String!
     lastName: String!
-    language: String!
+    locale: String!
     permissions: [String!]!
 }
 
@@ -479,6 +516,14 @@ type Employees {
     employee(entityId: Int!): Employee!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Employee!
     saveEmployee(employeeId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!, hireDate: String, salary: Float!, employeeCategoryId: Int!, address: AddressArg, contactInfo: [ContactInfoArg!]!): Employee!
+}
+
+type WorkOrderResourceArg {
+    workOrderResourceId: Int!
+    humanResourceId: Int
+    inventoryItemId: Int
+    equipmentId: Int!
+    taskId: Int!
 }
 
 type Page_Item {

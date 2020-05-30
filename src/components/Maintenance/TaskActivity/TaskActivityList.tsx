@@ -77,6 +77,7 @@ export interface TaskActivity {
 }
 
 export interface Activity {
+   taskActivityId: number;
    scheduledDate: string;
    calculatedDate: string;
    status: EntityStatus;
@@ -98,77 +99,94 @@ interface TaskActivityProps {
    onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
    onSearchTaskActivity?(searchString: string) : void;
    onCreateActivityByEvent?() : void;
+   onCreateWorkOrder?() : void;
+   onSelectTaskActivity?(taskActivities: number[]): void;
 }
 
-const CustomRow: FC<TaskActivity> = (props) => {
-   const [open, setOpen] = React.useState(true);
-   const classes = useRowStyles();
-   return (
-      <>
-         <TableRow>
-            <TableCell className={!open? '' : classes.noBottomBorder} colSpan={7} style={{fontWeight: 'bold', fontSize: '1.1rem'}}>
-               <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                  {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-               </IconButton>
-                     {props.assetName}
-                     ({props.assetCode})
-            </TableCell>
-         </TableRow>
-         {open && props.activities.map((historyRow, index) => (
-            <TableRow key={historyRow.taskId}>
-               <TableCell padding="checkbox" className={index + 1 == props.activities.length? '' : classes.noBorder}>
-                  <Checkbox
-                     color='primary'
-                     checked={true}
-                     inputProps={{ 'aria-labelledby': index.toString() }}
-                  />
-               </TableCell>
-               <TableCell>{historyRow.taskName}</TableCell>
-               <TableCell>{historyRow.taskPriority}</TableCell>
-               <TableCell>{historyRow.triggerDescription}</TableCell>
-               <TableCell>{historyRow.scheduledDate}</TableCell>
-               <TableCell>{historyRow.calculatedDate}</TableCell>
-               <TableCell>{historyRow.status}</TableCell>
-            </TableRow>
-         ))}
-      </>
-   );
-};
-
-export const  CollapsibleTable: FC<{taskActivities: TaskActivity[]}> = ({taskActivities}) => {
-   const classes = useStyles2();
-   return (
-      <TableContainer className={classes.container}>
-         <Table stickyHeader aria-label="collapsible table" size="small">
-            <TableHead>
-               <TableRow>
-                  <TableCell/>
-                  <TableCell>Task</TableCell>
-                  <TableCell>Priority</TableCell>
-                  <TableCell>Trigger</TableCell>
-                  <TableCell>Scheduled</TableCell>
-                  <TableCell>Calc Date</TableCell>
-                  <TableCell>Status</TableCell>
-               </TableRow>
-            </TableHead>
-            <TableBody>
-               {taskActivities.map((row) => (
-                  <CustomRow key={row.assetId} {...row} />
-               ))}
-            </TableBody>
-         </Table>
-      </TableContainer>
-   );
-};
-
-export const TaskActivityList: FC<TaskActivityProps> = ({taskActivities, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSearchTaskActivity, onCreateActivityByEvent}) => {
+export const TaskActivityList: FC<TaskActivityProps> = ({taskActivities, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSearchTaskActivity, onCreateActivityByEvent, onCreateWorkOrder, onSelectTaskActivity}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
+   const [taskActivitiesSelected, setTaskActivitiesSelected] = React.useState<number[]>([]);
    const [searchInput, setSearchInput] = React.useState<string>(searchString || '');
    const onSearch = (event: FormEvent) => {
       event.preventDefault();
       onSearchTaskActivity && onSearchTaskActivity(searchInput);
+   };
+
+   const handleSelectTaskActivity = (value: number) => () => {
+      const currentIndex = taskActivitiesSelected.indexOf(value);
+      const newChecked = [...taskActivitiesSelected];
+
+      if (currentIndex === -1) {
+         newChecked.push(value);
+      } else {
+         newChecked.splice(currentIndex, 1);
+      }
+      setTaskActivitiesSelected(newChecked);
+      onSelectTaskActivity && onSelectTaskActivity(newChecked);
+   };
+
+   const CustomRow: FC<TaskActivity> = (props) => {
+      const [open, setOpen] = React.useState(true);
+      const classes = useRowStyles();
+      return (
+         <>
+            <TableRow>
+               <TableCell className={!open? '' : classes.noBottomBorder} colSpan={7} style={{fontWeight: 'bold', fontSize: '1.1rem'}}>
+                  <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                     {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                  </IconButton>
+                  {props.assetName}
+                  ({props.assetCode})
+               </TableCell>
+            </TableRow>
+            {open && props.activities.map((historyRow, index) => (
+               <TableRow key={historyRow.taskActivityId}>
+                  <TableCell padding="checkbox" className={index + 1 == props.activities.length? '' : classes.noBorder}>
+                     <Checkbox
+                        color='primary'
+                        onChange={handleSelectTaskActivity(historyRow.taskActivityId)}
+                        checked={taskActivitiesSelected.indexOf(historyRow.taskActivityId) !== -1}
+                        inputProps={{ 'aria-labelledby': index.toString() }}
+                     />
+                  </TableCell>
+                  <TableCell>{historyRow.taskName}</TableCell>
+                  <TableCell>{historyRow.taskPriority}</TableCell>
+                  <TableCell>{historyRow.triggerDescription}</TableCell>
+                  <TableCell>{historyRow.scheduledDate}</TableCell>
+                  <TableCell>{historyRow.calculatedDate}</TableCell>
+                  <TableCell>{historyRow.status}</TableCell>
+               </TableRow>
+            ))}
+         </>
+      );
+   };
+
+   const  CollapsibleTable: FC<{taskActivities: TaskActivity[]}> = ({taskActivities}) => {
+      const classes = useStyles2();
+      return (
+         <TableContainer className={classes.container}>
+            <Table stickyHeader aria-label="collapsible table" size="small">
+               <TableHead>
+                  <TableRow>
+                     <TableCell/>
+                     <TableCell>Task</TableCell>
+                     <TableCell>Priority</TableCell>
+                     <TableCell>Trigger</TableCell>
+                     <TableCell>Scheduled</TableCell>
+                     <TableCell>Calc Date</TableCell>
+                     <TableCell>Status</TableCell>
+                  </TableRow>
+               </TableHead>
+               <TableBody>
+                  {taskActivities.map((row) => (
+                     <CustomRow key={row.assetId} {...row} />
+                  ))}
+               </TableBody>
+            </Table>
+         </TableContainer>
+      );
    };
 
    return (
@@ -181,6 +199,8 @@ export const TaskActivityList: FC<TaskActivityProps> = ({taskActivities, pageInd
                   size="small"
                   startIcon={<AssignmentIcon/>}
                   className={buttonClasses.button}
+                  disabled={taskActivitiesSelected.length === 0}
+                  onClick={()=> onCreateWorkOrder && onCreateWorkOrder() }
                >
                   Create OT
                </Button>

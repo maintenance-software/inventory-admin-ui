@@ -71,6 +71,16 @@ export interface  IEmployeeJob {
    modifiedDate: string;
 }
 
+export const getPersonDefaultInstance = ():IPerson => ({
+   personId: 0,
+   firstName: '',
+   lastName: '',
+   documentType: '',
+   documentId: '',
+   address: null,
+   contactInfo: []
+});
+
 export const getEmployeeJobDefaultInstance = ():IEmployeeJob => ({
    employeeJobId: 0,
    tittle: '',

@@ -4,6 +4,7 @@ import {EntityStatus} from "./users.type";
 import {ICategory, IItem, IUnit} from "./item.type";
 import {IEquipment} from "./equipment.type";
 import {IEmployee, IEmployeeJob} from "./persons.type";
+import {IWorkOrder} from "./WorkOrder.ql";
 
 export interface IMaintenancePlans {
    maintenance: IMaintenancePlan;
@@ -13,7 +14,10 @@ export interface IMaintenancePlans {
    saveMaintenance: IMaintenancePlan;
    taskActivities: IPage<ITaskActivity>;
    addTaskActivityDate: boolean;
-   createUpdateTasks: ITask[]
+   createUpdateTasks: ITask[];
+   workOrder: IWorkOrder;
+   workOrders: IPage<IWorkOrder>;
+   createUpdateWorkOrder: IWorkOrder;
 }
 
 export interface ITaskActivity{

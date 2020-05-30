@@ -136,7 +136,7 @@ const MENUS = [
          {
             label: 'Work Orders',
             icon: () => <WorkIcon/>,
-            path: '/work-orders'
+            path: '/workOrders'
          }
       ]
    },
@@ -209,20 +209,19 @@ export const Leftbar: React.FC<{session: ISession}> = ({session}) => {
               >
                  <Container className={containerStyle.root}>
                     <MenuList>
-                       <MenuItem onClick={handleClose} component={Link} to="/session/profile">
+                       <MenuItem key={-100} onClick={handleClose} component={Link} to="/session/profile">
                           <ListItemIcon style={{minWidth: '2rem'}}><AccountCircleIcon/></ListItemIcon>
                           <ListItemText primary="My Account" />
                        </MenuItem>
-                       <MenuItem onClick={handleClose} component={Link} to="/session/settings">
+                       <MenuItem key={-101} onClick={handleClose} component={Link} to="/session/settings">
                           <ListItemIcon style={{minWidth: '2rem'}}><SettingsIcon/></ListItemIcon>
                           <ListItemText primary="Settings" />
                        </MenuItem>
-                       <MenuItem onClick={handleClose} component={Link} to="/session/profile">
+                       <MenuItem key={-102} onClick={handleClose} component={Link} to="/session/profile">
                           <ListItemIcon style={{minWidth: '2rem'}}><HistoryIcon/></ListItemIcon>
                           <ListItemText primary="Activity Logs" />
                        </MenuItem>
-
-                       <MenuItem onClick={handleClose} component='a' href="/logout">
+                       <MenuItem key={-103} onClick={handleClose} component='a' href="/logout">
                           <ListItemIcon style={{minWidth: '2rem'}}><ExitToAppIcon/></ListItemIcon>
                           <ListItemText primary="Logout" />
                        </MenuItem>
@@ -243,17 +242,17 @@ export const Leftbar: React.FC<{session: ISession}> = ({session}) => {
                  <>
                     { m.submenus && m.submenus.length > 0?
                        <>
-                          <ListItem button onClick={() => handleExpand(index.toString())}>
+                          <ListItem key={index} button onClick={() => handleExpand(index.toString())}>
                              <ListItemIcon style={{minWidth: '2rem'}}>
                                 {<m.icon/>}
                              </ListItemIcon>
                              <ListItemText primary={m.label}/>
                              {m.submenus && m.submenus.length > 0 ? !!options.find(o => o === index.toString()) ? <ExpandLess /> : <ExpandMore /> : '' }
                           </ListItem>
-                          <Collapse in={!!options.find(o => o === index.toString())} timeout="auto" unmountOnExit>
-                             <List component="div" disablePadding>
-                                { m.submenus.map(sm => (
-                                   <ListItem button component={Link} to={m.path + sm.path} className={classes.nested}>
+                          <Collapse key={index + '_' + index} in={!!options.find(o => o === index.toString())} timeout="auto" unmountOnExit>
+                             <List key={index + '' + index} component="div" disablePadding>
+                                { m.submenus.map((sm, i) => (
+                                   <ListItem key={i} button component={Link} to={m.path + sm.path} className={classes.nested}>
                                       <ListItemIcon style={{minWidth: '2rem'}}>{<sm.icon/>}</ListItemIcon>
                                       <ListItemText primary={sm.label}/>
                                    </ListItem>
@@ -262,7 +261,7 @@ export const Leftbar: React.FC<{session: ISession}> = ({session}) => {
                           </Collapse>
                        </>
                        :
-                       <ListItem button component={Link} to={m.path}>
+                       <ListItem key={index} button component={Link} to={m.path}>
                           <ListItemIcon style={{minWidth: '2rem'}}>
                              {<m.icon/>}
                           </ListItemIcon>

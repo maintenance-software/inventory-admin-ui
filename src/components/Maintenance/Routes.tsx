@@ -5,6 +5,7 @@ import {Redirect} from "react-router";
 import {MaintenancePlanComp} from "./Plan";
 import {CreateEditMaintenancePlanComp} from "./Plan/CreateEditEquipment/CreateEditMaintenancePlanComp";
 import {TaskActivityListContainer} from "./TaskActivity/TaskActivityListContainer";
+import {WorkOrderContainer} from "./WorkOrder/WorkOrder";
 
 interface IMaintenancePlanContext {
    maintenanceId: number;
@@ -26,6 +27,26 @@ const MaintenancePlanRoutes: React.FC =  () => {
    );
 };
 
+interface IWorkOrderContext {
+   taskActivities: number[];
+   setTaskActivities(a: number[]): void;
+}
+
+export const WorkOrderContext = createContext<IWorkOrderContext>({taskActivities: [], setTaskActivities: ()=>{}});
+
+const WorkOrderRoutes: React.FC =  () => {
+   const [taskActivities, setTaskActivities] = React.useState<number[]>([1,2,3]);
+   const { path } = useRouteMatch();
+   return (
+      <Switch>
+         <WorkOrderContext.Provider value={{taskActivities, setTaskActivities}}>
+            {/*<Route exact path={path} component={MaintenancePlanComp}/>*/}
+            <Route path={`${path}/:workOrderId`} component={WorkOrderContainer}/>
+         </WorkOrderContext.Provider>
+      </Switch>
+   );
+};
+
 const TaskActivityRoutes: React.FC =  () => {
    const { path } = useRouteMatch();
    return (
@@ -43,6 +64,7 @@ export const MaintenanceResourceRoutes: React.FC =  () => {
         <Redirect exact from={path} to={`${path}/plans`}/>
         <Route path={`${path}/plans`} component={MaintenancePlanRoutes}/>
         <Route path={`${path}/taskActivities`} component={TaskActivityRoutes}/>
+        <Route path={`${path}/workOrders`} component={WorkOrderRoutes}/>
         <Redirect exact from={`${path}/`} to="/invalidRoute" />
      </Switch>
   );

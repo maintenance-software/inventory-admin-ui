@@ -18,6 +18,7 @@ export const TaskActivityListContainer: React.FC = () => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const [open, setOpen] = React.useState(false);
+   const [taskActivitiesSelected, setTaskActivitiesSelected] = React.useState<number[]>([]);
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
@@ -55,6 +56,7 @@ export const TaskActivityListContainer: React.FC = () => {
          return item.assetId === taskActivity.assetId;
       });
       groupIndex !== -1 ? grouped[groupIndex].activities.push({
+            taskActivityId: taskActivity.taskActivityId,
             scheduledDate: taskActivity.scheduledDate,
             calculatedDate: taskActivity.calculatedDate,
             status: taskActivity.status,
@@ -62,7 +64,7 @@ export const TaskActivityListContainer: React.FC = () => {
             taskPriority: taskActivity.taskPriority,
             triggerDescription: taskActivity.triggerDescription,
             taskId: taskActivity.taskId,
-            taskTriggerId: taskActivity.taskTriggerId,
+            taskTriggerId: taskActivity.taskTriggerId
          })
          : grouped.push(
             {
@@ -72,6 +74,7 @@ export const TaskActivityListContainer: React.FC = () => {
                taskCount: 1,
                maintenanceCount: 2,
                activities: [{
+                  taskActivityId: taskActivity.taskActivityId,
                   scheduledDate: taskActivity.scheduledDate,
                   calculatedDate: taskActivity.calculatedDate,
                   status: taskActivity.status,
@@ -79,7 +82,7 @@ export const TaskActivityListContainer: React.FC = () => {
                   taskPriority: taskActivity.taskPriority,
                   triggerDescription: taskActivity.triggerDescription,
                   taskId: taskActivity.taskId,
-                  taskTriggerId: taskActivity.taskTriggerId,
+                  taskTriggerId: taskActivity.taskTriggerId
                }]
             });
    });
@@ -106,6 +109,10 @@ export const TaskActivityListContainer: React.FC = () => {
       setOpen(false);
    };
 
+   const handleNeWorkOrder = () => {
+      history.push({pathname: '/maintenances/workOrders/0', state: {taskActivityIds: taskActivitiesSelected}});
+   };
+
    return(
    <>
       <TaskActivityList
@@ -118,6 +125,8 @@ export const TaskActivityListContainer: React.FC = () => {
          onChangeRowsPerPage={handleChangeRowsPerPage}
          onSearchTaskActivity={handleSearch}
          onCreateActivityByEvent={() => setOpen(true)}
+         onCreateWorkOrder={() => handleNeWorkOrder()}
+         onSelectTaskActivity={(taskActivities: number[]) => setTaskActivitiesSelected(taskActivities)}
       />
       <TaskAvailableDialog open={open} setOpen={setOpen} onAccept={onAcceptHandle}/>
    </>);

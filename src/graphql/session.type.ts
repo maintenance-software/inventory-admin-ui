@@ -6,7 +6,7 @@ export interface ISession{
    email: string;
    firstName: string;
    lastName: string;
-   language: string;
+   locale: string;
    permissions: string[];
 }
 
@@ -18,7 +18,7 @@ export const GET_USER_SESSION_GQL = gql`
       email
       firstName
       lastName
-      language
+      locale
       permissions
     }
   }
