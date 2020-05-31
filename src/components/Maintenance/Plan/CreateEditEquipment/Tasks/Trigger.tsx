@@ -14,12 +14,12 @@ import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {
    getTaskTriggerDefaultInstance,
-   ITaskTrigger
-} from "../../../../../graphql/Maintenance.type";
+   ITaskTriggerQL
+} from "../../../../../graphql/Maintenance.ql";
 import TableFooter from '@material-ui/core/TableFooter';
 import { useQuery } from '@apollo/react-hooks';
 import {TriggerDialog} from "./TriggerDialog";
-import {FETCH_CATEGORIES, FETCH_UNITS, ICategory, IUnit} from "../../../../../graphql/item.type";
+import {FETCH_CATEGORIES, FETCH_UNITS, CategoryQL, UnitQL} from "../../../../../graphql/Item.ql";
 
 const useBottomNoneBorder = makeStyles({
    root: {
@@ -45,21 +45,21 @@ const useStyles2 = makeStyles({
    }
 });
 
-export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
+export const TaskTrigger: FC<{triggers: ITaskTriggerQL[]}> = ({triggers}) => {
    const history = useHistory();
    const classes = useStyles2();
    const bottomNoneBoder = useBottomNoneBorder();
    const [open, setOpen] = React.useState(false);
-   const [trigger, setTrigger] = useState<ITaskTrigger>(getTaskTriggerDefaultInstance());
-   const eventTriggersData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'EVENT_CATEGORY'}});
-   const unitsData = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
+   const [trigger, setTrigger] = useState<ITaskTriggerQL>(getTaskTriggerDefaultInstance());
+   const eventTriggersData = useQuery<{categories: CategoryQL[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'EVENT_CATEGORY'}});
+   const unitsData = useQuery<{units: UnitQL[]}, any>(FETCH_UNITS);
 
-   const handleAddEditTrigger = (trigger: ITaskTrigger) => {
+   const handleAddEditTrigger = (trigger: ITaskTriggerQL) => {
       setOpen(true);
       setTrigger(trigger);
    };
 
-   const handleSaveTrigger = (t: ITaskTrigger) => {
+   const handleSaveTrigger = (t: ITaskTriggerQL) => {
 
       if(t.taskTriggerId === 0) {
          triggers.push(t);
@@ -82,7 +82,7 @@ export const TaskTrigger: FC<{triggers: ITaskTrigger[]}> = ({triggers}) => {
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {triggers.sort((t1, t2) => t1.taskTriggerId - t2.taskTriggerId).map((row: ITaskTrigger, index) => (
+                  {triggers.sort((t1, t2) => t1.taskTriggerId - t2.taskTriggerId).map((row: ITaskTriggerQL, index) => (
                      <TableRow key={index} hover>
                         <TableCell>{row.triggerType}</TableCell>
                         <TableCell>{row.triggerType === 'EVENT' && row.eventTriggerCategory?row.eventTriggerCategory.name : row.description }</TableCell>

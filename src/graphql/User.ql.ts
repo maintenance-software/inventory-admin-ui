@@ -1,12 +1,12 @@
-import {IPerson} from "./persons.type";
+import {PersonQL} from "./Person.ql";
 import { gql } from "apollo-boost";
 
-export interface IUsers {
-   user: IUser;
-   list: IUser[];
+export interface UsersQL {
+   user: UserQL;
+   list: UserQL[];
 }
 
-export interface ISessionUser {
+export interface SessionUserQL {
    language: string;
    expiration: boolean;
    userId: number;
@@ -15,40 +15,40 @@ export interface ISessionUser {
    email: string;
    privileges: string[];
    roles: string[];
-   person: IPerson;
+   person: PersonQL;
 }
 
 
-export interface IUser {
-   status: EntityStatus;
+export interface UserQL {
+   status: EntityStatusQL;
    language: string;
    expiration: boolean;
    userId: number;
    username: string;
    password: string;
    email: string;
-   person: IPerson;
-   privileges: IPrivilege[];
-   roles: IRole[];
+   person: PersonQL;
+   privileges: PrivilegeQL[];
+   roles: RoleQL[];
 }
 
 
-export interface IRole {
+export interface RoleQL {
    roleId: number;
    key: number;
    name: string;
    description: string;
-   privileges: IPrivilege[];
+   privileges: PrivilegeQL[];
 }
 
-export interface IPrivilege{
+export interface PrivilegeQL{
    privilegeId: number;
    key: number;
    name: string;
    description: string;
 }
 
-export enum EntityStatus {
+export enum EntityStatusQL {
    ACTIVE = 'ACTIVE',
    INACTIVE = 'INACTIVE'
 }

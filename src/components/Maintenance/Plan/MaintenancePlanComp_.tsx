@@ -19,7 +19,7 @@ import {SearchInput} from '../../SearchInput/SearchInput';
 import {TablePaginationActions} from '../../../utils/TableUtils';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {IMaintenancePlan} from "../../../graphql/Maintenance.type";
+import {MaintenanceQL} from "../../../graphql/Maintenance.ql";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -40,7 +40,7 @@ const useStyles2 = makeStyles({
 });
 
 interface EquipmentProps {
-   maintenances: IMaintenancePlan[];
+   maintenances: MaintenanceQL[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
@@ -49,7 +49,7 @@ interface EquipmentProps {
    onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
    onSearchMaintenancePlan?(searchString: string) : void;
    onAddMaintenancePlan?(): void;
-   onEditMaintenancePlan?(maintenance: IMaintenancePlan): void;
+   onEditMaintenancePlan?(maintenance: MaintenanceQL): void;
 }
 
 export const MaintenancePlanComp_: FC<EquipmentProps> = ({maintenances, pageIndex, pageSize, totalCount, searchString, onChangePage, onChangeRowsPerPage, onSearchMaintenancePlan, onAddMaintenancePlan, onEditMaintenancePlan}) => {
@@ -103,7 +103,7 @@ export const MaintenancePlanComp_: FC<EquipmentProps> = ({maintenances, pageInde
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {maintenances.map((row: IMaintenancePlan, index) => (
+                  {maintenances.map((row: MaintenanceQL, index) => (
                      <TableRow key={row.maintenanceId} hover>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.description}</TableCell>

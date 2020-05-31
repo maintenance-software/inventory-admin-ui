@@ -1,18 +1,18 @@
 import React, {useEffect, FC} from 'react';
 import { useLazyQuery } from "@apollo/react-hooks";
-import { FETCH_ITEMS_GQL, IItem, IItems } from "../../../../graphql/item.type";
+import { FETCH_ITEMS_GQL, ItemQL, ItemsQL } from "../../../../graphql/Item.ql";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {AssetChooser, ISimpleItem} from './AssetChooser';
-import {FETCH_AVAILABLE_ITEMS} from "../../../../graphql/inventory.type";
-import {IPage} from "../../../../graphql/page.type";
+import {FETCH_AVAILABLE_ITEMS} from "../../../../graphql/Inventory.ql";
+import {PageQL} from "../../../../graphql/Common.ql";
 
 interface IAssetChooserProps {
    multiple: boolean;
    filters: any[];
    disableItems: number[];
    initialSelected: number[];
-   onSelectItems(item: IItem[]) : void
+   onSelectItems(item: ItemQL[]) : void
 }
 export const AssetChooserComp: FC<IAssetChooserProps> = ({disableItems, multiple, initialSelected, filters, onSelectItems}) => {
    const history = useHistory();
@@ -20,7 +20,7 @@ export const AssetChooserComp: FC<IAssetChooserProps> = ({disableItems, multiple
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchItems, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_ITEMS_GQL);
+   const [fetchItems, { called, loading, data }] = useLazyQuery<{items: ItemsQL}, any>(FETCH_ITEMS_GQL);
 
    useEffect(() => {
       fetchItems({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});
@@ -46,7 +46,7 @@ export const AssetChooserComp: FC<IAssetChooserProps> = ({disableItems, multiple
       setPageIndex(0);
    };
 
-   const handleSelectItem = (items: IItem[]) => {
+   const handleSelectItem = (items: ItemQL[]) => {
       onSelectItems && onSelectItems(items);
    };
 

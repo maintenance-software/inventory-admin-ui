@@ -9,9 +9,9 @@ import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
 import { useMutation } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
-import {IItem} from "../../../graphql/item.type";
+import {ItemQL} from "../../../graphql/Item.ql";
 import {InventoryItemAvailableComp} from "../../Assets/Commons/AssetChooser/InventoryItemAvailableComp";
-import {IInventories, SAVE_INVENTORY, SAVE_INVENTORY_ITEMS} from "../../../graphql/inventory.type";
+import {InventoriesQL, SAVE_INVENTORY, SAVE_INVENTORY_ITEMS} from "../../../graphql/Inventory.ql";
 import {clearCache} from "../../../utils/globalUtil";
 
 const useFormStyles = makeStyles((theme: Theme) =>
@@ -66,7 +66,7 @@ export const EditInventoryItemForm: React.FC<IInventoryFormProps> =  ({inventory
    const history = useHistory();
    const formClasses = useFormStyles();
    const buttonClasses = useButtonStyles();
-   const [selectedItems, setSelectedItems] = useState<IItem[]>([]);
+   const [selectedItems, setSelectedItems] = useState<ItemQL[]>([]);
    const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid } = useFormik<IInventoryItemForm>({
     initialValues: inventoryItemForm || {
        level: 0,
@@ -86,7 +86,7 @@ export const EditInventoryItemForm: React.FC<IInventoryFormProps> =  ({inventory
        onSaveInventoryItem && onSaveInventoryItem(values);
     }
   });
-   const [saveInventoryItems] = useMutation<{ inventories: IInventories }, any>(SAVE_INVENTORY_ITEMS);
+   const [saveInventoryItems] = useMutation<{ inventories: InventoriesQL }, any>(SAVE_INVENTORY_ITEMS);
    const [activeStep, setActiveStep] = useState(0);
    const [skipped, setSkipped] = React.useState(new Set<number>());
    const isStepSkipped = (step: number) => {
@@ -122,7 +122,7 @@ export const EditInventoryItemForm: React.FC<IInventoryFormProps> =  ({inventory
       setActiveStep(prevActiveStep => prevActiveStep - 1);
    };
 
-   const handleSelectItem = (items: IItem[]) => {
+   const handleSelectItem = (items: ItemQL[]) => {
       setSelectedItems(items);
    };
 

@@ -1,27 +1,26 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {useParams, useRouteMatch} from 'react-router-dom';
-import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import {useLazyQuery, useMutation, useQuery} from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 
 import {
-   IMaintenancePlans,
+   MaintenancesQL,
    GET_TASK_BY_ID,
-   ITask,
-   getTaskDefaultInstance, ITaskCategory, SAVE_MAINTENANCE_TASKS
-} from "../../../../../graphql/Maintenance.type";
+   TaskQL,
+   getTaskDefaultInstance, SAVE_MAINTENANCE_TASKS
+} from "../../../../../graphql/Maintenance.ql";
 import {TaskR} from "./TaskR";
 import {appendToPath, clearCache} from "../../../../../utils/globalUtil";
-import {FETCH_CATEGORIES, ICategory} from "../../../../../graphql/item.type";
+import {FETCH_CATEGORIES, CategoryQL} from "../../../../../graphql/Item.ql";
 
 export const TaskRComp: React.FC =  () => {
    const params = useParams();
    const history = useHistory();
    const { path, url } = useRouteMatch();
    const [task, setTask] = useState(getTaskDefaultInstance());
-   const [getTaskById, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(GET_TASK_BY_ID);
-   const categoryData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'TASK_CATEGORY'}});
-   const [saveMaintenanceTasks, saveStatus] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_MAINTENANCE_TASKS);
+   const [getTaskById, { called, loading, data }] = useLazyQuery<{maintenances: MaintenancesQL}, any>(GET_TASK_BY_ID);
+   const categoryData = useQuery<{categories: CategoryQL[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'TASK_CATEGORY'}});
+   const [saveMaintenanceTasks, saveStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_MAINTENANCE_TASKS);
    const taskId = +params.taskId;
    const maintenanceId = +params.maintenanceId;
 
@@ -40,7 +39,7 @@ export const TaskRComp: React.FC =  () => {
    if (loading || saveStatus.loading || (!data && taskId > 0))
       return <div>Loading</div>;
 
-   const onSaveTask = async (task: ITask) => {
+   const onSaveTask = async (task: TaskQL) => {
       const response = await saveMaintenanceTasks({
          variables: {
             maintenanceId: maintenanceId,

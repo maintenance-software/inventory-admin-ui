@@ -1,7 +1,7 @@
 import React, {FC, useState, useEffect} from 'react';
 import Button from '@material-ui/core/Button';
 import Radio from '@material-ui/core/Radio';
-import { ITaskTrigger } from "../../../../../graphql/Maintenance.type";
+import { ITaskTriggerQL } from "../../../../../graphql/Maintenance.ql";
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -11,17 +11,17 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import {ICategory, IUnit} from "../../../../../graphql/item.type";
+import {CategoryQL, UnitQL} from "../../../../../graphql/Item.ql";
 import FormLabel from '@material-ui/core/FormLabel';
 
 interface ITriggerDialogProps {
    open: boolean;
    setOpen(open: boolean): void;
    triggerTypes: string[],
-   trigger: ITaskTrigger;
-   triggerEvents: ICategory[];
-   units: IUnit[];
-   onSaveTrigger(trigger: ITaskTrigger): void;
+   trigger: ITaskTriggerQL;
+   triggerEvents: CategoryQL[];
+   units: UnitQL[];
+   onSaveTrigger(trigger: ITaskTriggerQL): void;
 }
 
 export const TriggerDialog: FC<ITriggerDialogProps> = ({open, setOpen, triggerTypes, trigger, triggerEvents, units, onSaveTrigger}) => {

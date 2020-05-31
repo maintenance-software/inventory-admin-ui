@@ -3,23 +3,23 @@ import {useParams} from "react-router-dom";
 import {Equipment} from './Equipment';
 import {
    GET_MAINTENANCE_PLAN_BY_ID, getMaintenancePlanDefaultInstance,
-   IMaintenancePlans,
+   MaintenancesQL,
    SAVE_TASK_ACTIVITY_DATE_GQL
-} from "../../../../../graphql/Maintenance.type";
+} from "../../../../../graphql/Maintenance.ql";
 import { useMutation, useLazyQuery } from '@apollo/react-hooks';
 import {MaintenanceEquipmentDialog} from "./MaintenanceEquipmentDialog";
 import moment from 'moment';
 import {clearCache} from "../../../../../utils/globalUtil";
-import {IEquipment, SET_MAINTENANCE_GQL} from "../../../../../graphql/equipment.type";
+import {EquipmentQL, SET_MAINTENANCE_GQL} from "../../../../../graphql/Equipment.ql";
 
 export const PlanEquipmentContainer: React.FC = () => {
    const params = useParams();
    const maintenanceId = +params.maintenanceId;
    const [open, setOpen] = React.useState(false);
    const [maintenance, setMaintenance] = useState(getMaintenancePlanDefaultInstance());
-   const [getMaintenanceById, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(GET_MAINTENANCE_PLAN_BY_ID);
-   const [saveTaskActivity, saveActivityStatus] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_TASK_ACTIVITY_DATE_GQL);
-   const [saveSetMaintenance, saveSetMaintenanceStatus] = useMutation<{ equipments: IEquipment }, any>(SET_MAINTENANCE_GQL);
+   const [getMaintenanceById, { called, loading, data }] = useLazyQuery<{maintenances: MaintenancesQL}, any>(GET_MAINTENANCE_PLAN_BY_ID);
+   const [saveTaskActivity, saveActivityStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_TASK_ACTIVITY_DATE_GQL);
+   const [saveSetMaintenance, saveSetMaintenanceStatus] = useMutation<{ equipments: EquipmentQL }, any>(SET_MAINTENANCE_GQL);
 
    useEffect(() => {
       if(maintenanceId && maintenanceId > 0) {

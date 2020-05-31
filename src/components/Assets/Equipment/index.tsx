@@ -3,7 +3,7 @@ import { useLazyQuery } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {EquipmentComp_} from './EquipmentComp_';
-import {FETCH_EQUIPMENTS_PAGE_GQL, IEquipment, IEquipments} from "../../../graphql/equipment.type";
+import {FETCH_EQUIPMENTS_PAGE_GQL, EquipmentQL, EquipmentsQL} from "../../../graphql/Equipment.ql";
 import {EquipmentContext} from "../Routes";
 
 export const EquipmentComp: React.FC = () => {
@@ -14,7 +14,7 @@ export const EquipmentComp: React.FC = () => {
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchEquipments, { called, loading, data }] = useLazyQuery<{equipments: IEquipments}, any>(FETCH_EQUIPMENTS_PAGE_GQL);
+   const [fetchEquipments, { called, loading, data }] = useLazyQuery<{equipments: EquipmentsQL}, any>(FETCH_EQUIPMENTS_PAGE_GQL);
 
    useEffect(() => {
       fetchEquipments({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize }});
@@ -46,7 +46,7 @@ export const EquipmentComp: React.FC = () => {
       setPageIndex(0);
    };
 
-   const handleExpand = (equipment: IEquipment) => {
+   const handleExpand = (equipment: EquipmentQL) => {
       setPathTree(pathTree.concat(equipment));
    };
 
@@ -80,6 +80,6 @@ export const EquipmentComp: React.FC = () => {
       onExpand={handleExpand}
       onBreadcrumbs={handleBreadcrumbs}
       onAddEquipment={() => history.push(path + '/' + 0)}
-      onEditEquipment={(equipment: IEquipment) => history.push(path + '/' + equipment.equipmentId)}
+      onEditEquipment={(equipment: EquipmentQL) => history.push(path + '/' + equipment.equipmentId)}
    />;
 };

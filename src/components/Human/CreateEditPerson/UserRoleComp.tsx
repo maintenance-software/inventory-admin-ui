@@ -22,7 +22,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
 import SaveIcon from '@material-ui/icons/Save';
-import {IRole} from "../../../graphql/users.type";
+import {RoleQL} from "../../../graphql/User.ql";
 
 export const GET_ROLES = gql`
   query fetchRoles{
@@ -38,7 +38,7 @@ export const GET_ROLES = gql`
 `;
 
 interface IUserRoleProps {
-   userRoles: IRole[];
+   userRoles: RoleQL[];
    onSaveUserRoles: Function;
 }
 
@@ -90,7 +90,7 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
-   const { called, loading, data } = useQuery<{roles: {list: IRole[]}}, any>(GET_ROLES);
+   const { called, loading, data } = useQuery<{roles: {list: RoleQL[]}}, any>(GET_ROLES);
    const classes = useStyles();
    const searchInputClasses = useSearchInputStyles();
    const buttonClasses = useButtonStyles();

@@ -1,26 +1,26 @@
 import {gql} from 'apollo-boost';
-import {IPage, IPageInfo} from "./page.type";
-import {EntityStatus} from "./users.type";
-import {IItem} from "./item.type";
+import {PageQL, PageInfoQL} from "./Common.ql";
+import {EntityStatusQL} from "./User.ql";
+import {ItemQL} from "./Item.ql";
 
-export interface IInventories {
-   inventory: IInventory;
-   list: IInventory[];
-   saveInventory: IInventory;
+export interface InventoriesQL {
+   inventory: InventoryQL;
+   list: InventoryQL[];
+   saveInventory: InventoryQL;
 }
 
-export interface IInventory{
+export interface InventoryQL {
    inventoryId: number;
    name: string;
    description: string;
    allowNegativeStocks: boolean;
-   status: EntityStatus;
-   inventoryItems: IPage<IInventoryItem>;
+   status: EntityStatusQL;
+   inventoryItems: PageQL<InventoryItemQL>;
    createdDate: string;
    modifiedDate: string;
 }
 
-export interface IInventoryItem{
+export interface InventoryItemQL{
    inventoryItemId: number;
    level: number;
    maxLevelAllowed: number;
@@ -28,18 +28,18 @@ export interface IInventoryItem{
    price: number;
    location: string;
    dateExpiry: number;
-   item: IItem;
+   item: ItemQL;
    createdDate: string;
    modifiedDate: string;
 }
 
 
-export const getInventoryDefaultInstance = ():IInventory => ({
+export const getInventoryDefaultInstance = ():InventoryQL => ({
    inventoryId: 0,
    name: '',
    description: '',
    allowNegativeStocks: false,
-   status: EntityStatus.INACTIVE,
+   status: EntityStatusQL.INACTIVE,
    inventoryItems: {
       totalCount: 0,
       content: [],

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
 import { useLazyQuery, useMutation } from "@apollo/react-hooks";
-import {EntityStatus, GET_USERS_GQL, IPrivilege, IUser, IUsers} from "../../../graphql/users.type";
+import {EntityStatusQL, GET_USERS_GQL, PrivilegeQL, UserQL, UsersQL} from "../../../graphql/User.ql";
 import {EditUserForm, UserForm} from "./CreateEditUserForm";
 import {useHistory} from "react-router";
 import UserRoleComp from "./UserRoleComp";
@@ -86,7 +86,7 @@ const SAVE_USER = gql`
 
 
 interface IEditProps {
-   user: IUser;
+   user: UserQL;
 }
 
 interface TabPanelProps {
@@ -160,8 +160,8 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [savePerson, mutation] = useMutation<{ savePerson: {account: IUser} }, any>(SAVE_USER);
-   const [getUserById, { called, loading, data }] = useLazyQuery<{users: IUsers}, any>(GET_USER_BY_ID);
+   const [savePerson, mutation] = useMutation<{ savePerson: {account: UserQL} }, any>(SAVE_USER);
+   const [getUserById, { called, loading, data }] = useLazyQuery<{users: UsersQL}, any>(GET_USER_BY_ID);
    const [hasError, setHasError] = useState(false);
    const userId = +params.userId;
    const toggle = (tab: string) => {
@@ -189,12 +189,12 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
    if (loading || (!data && userId > 0))
       return <div>Loading</div>;
 
-   let user: IUser = {
+   let user: UserQL = {
       userId: 0,
       username: '',
       email: '',
       password: '',
-      status: EntityStatus.INACTIVE,
+      status: EntityStatusQL.INACTIVE,
       language: 'es_BO',
       expiration: false,
       privileges: [],
@@ -298,7 +298,7 @@ const CreateEditUser: React.FC<IEditProps> =  (props) => {
       savePerson({ variables: request, refetchQueries:refetchQueries});
    };
 
-   let userRolePrivileges:IPrivilege[] = [];
+   let userRolePrivileges:PrivilegeQL[] = [];
    user.roles.map(r => r.privileges).flat().forEach( t => {
       if(userRolePrivileges.findIndex(p => p.privilegeId === t.privilegeId) === -1) {
          userRolePrivileges.push(t)

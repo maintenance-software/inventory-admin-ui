@@ -23,7 +23,7 @@ import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton/IconButton";
 import {TablePaginationActions} from "../../utils/TableUtils";
-import {FETCH_INVENTORIES_GQL, IInventories, IInventory} from "../../graphql/inventory.type";
+import {FETCH_INVENTORIES_GQL, InventoriesQL, InventoryQL} from "../../graphql/Inventory.ql";
 import {SearchInput} from "../SearchInput/SearchInput";
 
 const useButtonStyles = makeStyles(theme => ({
@@ -51,7 +51,7 @@ export const InventoryComp: React.FC = () => {
    const [searchInput, setSearchInput] = React.useState<string>('');
    const [searchString, setSearchString] = React.useState<string>('');
    const buttonClasses = useButtonStyles();
-   const [fetchInventories, { called, loading, data }] = useLazyQuery<{inventories: IInventories}, any>(FETCH_INVENTORIES_GQL);
+   const [fetchInventories, { called, loading, data }] = useLazyQuery<{inventories: InventoriesQL}, any>(FETCH_INVENTORIES_GQL);
    // const [changeItemStatus] = useMutation<{inventories: IInventories}, any>(CHANGE_INVENTORY_STATUS);
    // const defaultFilters = [{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType", operator: "=", value: "TOOLS"}];
 
@@ -184,7 +184,7 @@ export const InventoryComp: React.FC = () => {
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {data.inventories.list.map((row: IInventory) => (
+                  {data.inventories.list.map((row: InventoryQL) => (
                      <TableRow key={row.inventoryId}>
                         <TableCell style={{padding: '0'}}>
                            <Checkbox

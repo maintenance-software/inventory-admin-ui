@@ -15,7 +15,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import {useHistory} from "react-router";
 import {useParams, useRouteMatch} from 'react-router-dom';
-import {GET_WORK_ORDER_BY_ID_QL, getWorkOrderDefaultInstance, IWorkOrder} from "../../../graphql/WorkOrder.ql";
+import {GET_WORK_ORDER_BY_ID_QL, getWorkOrderDefaultInstance, WorkOrderQL} from "../../../graphql/WorkOrder.ql";
 
 const useDateStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -44,8 +44,8 @@ export const WorkOrderContainer: React.FC =  () => {
    const params = useParams();
    const buttonClasses = useButtonStyles();
    const dateStyle = useDateStyles();
-   const [workOrder, setWorOrder] = React.useState<IWorkOrder>(getWorkOrderDefaultInstance());
-   const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{maintenances: {workOrder: IWorkOrder}}, any>(GET_WORK_ORDER_BY_ID_QL);
+   const [workOrder, setWorOrder] = React.useState<WorkOrderQL>(getWorkOrderDefaultInstance());
+   const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{maintenances: {workOrder: WorkOrderQL}}, any>(GET_WORK_ORDER_BY_ID_QL);
    const workOrderId = +params.workOrderId;
    const taskActivityIds: number[] = history.location.state? history.location.state.taskActivityIds : [53, 52, 54, 56];
 

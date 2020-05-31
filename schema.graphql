@@ -81,7 +81,7 @@ type WorkOrder {
     modifiedDate: String
 }
 
-type AddressArg {
+input AddressArg {
     addressId: Int!
     street1: String!
     street2: String!
@@ -326,7 +326,7 @@ type Inventory {
     modifiedDate: String
 }
 
-type ContactInfoArg {
+input ContactInfoArg {
     contactId: Int!
     contact: String!
     contactType: String!
@@ -374,6 +374,12 @@ type Equipment {
     category: Category!
     createdDate: String!
     modifiedDate: String
+}
+
+type WoAssetTask {
+    taskId: Int!
+    name: String!
+    requiredResource: Boolean!
 }
 
 type Item {
@@ -441,6 +447,12 @@ input SubTaskArg {
     subTaskCategoryId: Int
 }
 
+type WoAssets {
+    assetId: Int!
+    name: String!
+    tasks: [WoAssetTask!]!
+}
+
 type Maintenances {
     maintenance(entityId: Int!): Maintenance!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Maintenance!
@@ -455,6 +467,7 @@ type Maintenances {
     workOrder(entityId: Int!): WorkOrder!
     workOrders(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkOrder!
     createUpdateWorkOrder(workOrderId: Int!, workOrderStatus: String!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int!, responsibleId: Int!, parentId: Int, activityIds: [Int!]!, resources: [WorkOrderResourceArg!]!): WorkOrder!
+    woPreResources(entityIds: [Int!]!): [WoAssets!]!
 }
 
 type Page_Employee {

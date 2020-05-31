@@ -10,16 +10,16 @@ import {Theme} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
-import {EntityStatus} from "../../../../graphql/users.type";
+import {EntityStatusQL} from "../../../../graphql/User.ql";
 import {EditEquipmentForm, IEquipmentForm, IEquipmentFormProps} from "./CreateEditEquipmentForm";
 import {clearCache} from "../../../../utils/globalUtil";
 import {
    GET_EQUIPMENT_BY_ID,
    getDefaultEquipmentInstance,
-   IEquipment,
-   IEquipments,
+   EquipmentQL,
+   EquipmentsQL,
    SAVE_EQUIPMENT
-} from "../../../../graphql/equipment.type";
+} from "../../../../graphql/Equipment.ql";
 import {EquipmentContext} from "../../Routes";
 import moment from 'moment';
 
@@ -94,8 +94,8 @@ export const CreateEditEquipmentComp: React.FC =  () => {
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [saveEquipment] = useMutation<{ equipments: IEquipments }, any>(SAVE_EQUIPMENT);
-   const [getEquipmentById, { called, loading, data }] = useLazyQuery<{equipments: IEquipments}, any>(GET_EQUIPMENT_BY_ID);
+   const [saveEquipment] = useMutation<{ equipments: EquipmentsQL }, any>(SAVE_EQUIPMENT);
+   const [getEquipmentById, { called, loading, data }] = useLazyQuery<{equipments: EquipmentsQL}, any>(GET_EQUIPMENT_BY_ID);
    const [hasError, setHasError] = useState(false);
    const {pathTree, setPathTree} = useContext(EquipmentContext);
    const equipmentId = +params.equipmentId;
@@ -113,7 +113,7 @@ export const CreateEditEquipmentComp: React.FC =  () => {
    if (loading || (!data && equipmentId > 0))
       return <div>Loading</div>;
 
-   let equipment: IEquipment= getDefaultEquipmentInstance();
+   let equipment: EquipmentQL= getDefaultEquipmentInstance();
 
    if(data) {
       equipment = data.equipments.equipment;
@@ -128,7 +128,7 @@ export const CreateEditEquipmentComp: React.FC =  () => {
          manufacturer: equipment.manufacturer || '',
          model: equipment.model || '',
          notes: equipment.notes || '',
-         status: equipment.status || EntityStatus.ACTIVE,
+         status: equipment.status || EntityStatusQL.ACTIVE,
          images: equipment.images || [],
          priority: equipment.priority || 0,
          hoursAverageDailyUse: equipment.hoursAverageDailyUse || 0,

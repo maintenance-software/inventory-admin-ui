@@ -2,14 +2,14 @@ import React, {useEffect, FC} from 'react';
 import { useLazyQuery } from "@apollo/react-hooks";
 import {useRouteMatch} from "react-router-dom";
 import {AssetChooser, ISimpleItem} from '../../Commons/AssetChooser/AssetChooser';
-import {IPage} from "../../../../graphql/page.type";
-import {FETCH_EQUIPMENTS_PAGE_GQL, IEquipment} from "../../../../graphql/equipment.type";
+import {PageQL} from "../../../../graphql/Common.ql";
+import {FETCH_EQUIPMENTS_PAGE_GQL, EquipmentQL} from "../../../../graphql/Equipment.ql";
 
 export const EquipmentSelectableComp: FC<{itemId: number,onSelectItem?(items: ISimpleItem[]) : void}> = ({itemId, onSelectItem}) => {
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchEquipments, { called, loading, data }] = useLazyQuery<{equipments: {page: IPage<IEquipment>}}, any>(FETCH_EQUIPMENTS_PAGE_GQL);
+   const [fetchEquipments, { called, loading, data }] = useLazyQuery<{equipments: {page: PageQL<EquipmentQL>}}, any>(FETCH_EQUIPMENTS_PAGE_GQL);
    const filters = [
          {field: "status",operator: "=", value: "ACTIVE"},
          {field: "itemId",operator: "!=", value: itemId.toString()}

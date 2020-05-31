@@ -10,7 +10,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import DirectionsIcon from '@material-ui/icons/Directions';
 import UserAccount from "./session";
-import {ISession} from "../graphql/session.type";
+import {SessionQL} from "../graphql/Session.ql";
 import FormControl from '@material-ui/core/FormControl';
 import {fetchLocalizations} from "../api/localization.api";
 import TextField from '@material-ui/core/TextField';
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
    }),
 );
 
-export const CustomizedInputBase: FC<{session: ISession}> = ({session}) => {
+export const CustomizedInputBase: FC<{session: SessionQL}> = ({session}) => {
    const classes = useStyles();
    const [lang, setLang] = useState<string>('en');
    const [t, i18n] = useTranslation();

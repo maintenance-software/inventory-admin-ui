@@ -1,12 +1,12 @@
-export interface IPageInfo {
+export interface PageInfoQL {
    hasNext: boolean;
    hasPreview: boolean;
    pageSize: number;
    pageIndex: number
 }
 
-export interface IPage<T> {
+export interface PageQL<T> {
    totalCount: number;
    content: T[];
-   pageInfo: IPageInfo;
+   pageInfo: PageInfoQL;
 }

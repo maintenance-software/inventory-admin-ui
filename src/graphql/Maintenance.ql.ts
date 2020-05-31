@@ -1,31 +1,31 @@
 import {gql} from 'apollo-boost';
-import {IPage, IPageInfo} from "./page.type";
-import {EntityStatus} from "./users.type";
-import {ICategory, IItem, IUnit} from "./item.type";
-import {IEquipment} from "./equipment.type";
-import {IEmployee, IEmployeeJob} from "./persons.type";
-import {IWorkOrder} from "./WorkOrder.ql";
+import {PageQL, PageInfoQL} from "./Common.ql";
+import {EntityStatusQL} from "./User.ql";
+import {CategoryQL, ItemQL, UnitQL} from "./Item.ql";
+import {EquipmentQL} from "./Equipment.ql";
+import {IEmployeeQL, IEmployeeJobQL} from "./Person.ql";
+import {WorkOrderQL} from "./WorkOrder.ql";
 
-export interface IMaintenancePlans {
-   maintenance: IMaintenancePlan;
-   task: ITask;
-   page: IPage<IMaintenancePlan>;
-   availableEquipments: IPage<IEquipment>;
-   saveMaintenance: IMaintenancePlan;
-   taskActivities: IPage<ITaskActivity>;
+export interface MaintenancesQL {
+   maintenance: MaintenanceQL;
+   task: TaskQL;
+   page: PageQL<MaintenanceQL>;
+   availableEquipments: PageQL<EquipmentQL>;
+   saveMaintenance: MaintenanceQL;
+   taskActivities: PageQL<TaskActivityQL>;
    addTaskActivityDate: boolean;
-   createUpdateTasks: ITask[];
-   workOrder: IWorkOrder;
-   workOrders: IPage<IWorkOrder>;
-   createUpdateWorkOrder: IWorkOrder;
+   createUpdateTasks: TaskQL[];
+   workOrder: WorkOrderQL;
+   workOrders: PageQL<WorkOrderQL>;
+   createUpdateWorkOrder: WorkOrderQL;
 }
 
-export interface ITaskActivity{
+export interface TaskActivityQL {
    taskActivityId: number;
    scheduledDate: string;
    calculatedDate: string;
    rescheduled: boolean;
-   status: EntityStatus;
+   status: EntityStatusQL;
    assetId: number;
    assetName: string;
    assetCode: string;
@@ -38,18 +38,18 @@ export interface ITaskActivity{
    triggerDescription: string;
 }
 
-export interface IMaintenancePlan{
+export interface MaintenanceQL{
    maintenanceId: number;
    name: string;
    description: string;
-   status: EntityStatus;
+   status: EntityStatusQL;
    createdDate: string;
    modifiedDate: string;
-   tasks: ITask[];
-   equipments: IEquipment[];
+   tasks: TaskQL[];
+   equipments: EquipmentQL[];
 }
 
-export interface ITask{
+export interface TaskQL{
    taskId: number;
    name: string;
    description: string;
@@ -61,13 +61,13 @@ export interface ITask{
    createdDate: string;
    modifiedDate: string;
    maintenanceId: number;
-   taskCategory?: ICategory | null;
-   subTasks: ISubTask[];
-   taskTriggers: ITaskTrigger[];
-   taskResources: ITaskResource[];
+   taskCategory?: CategoryQL | null;
+   subTasks: SubTaskQL[];
+   taskTriggers: ITaskTriggerQL[];
+   taskResources: TaskResourceQL[];
 }
 
-export interface ITaskTrigger {
+export interface ITaskTriggerQL {
    taskTriggerId: number;
    triggerType: string;
    description: string;
@@ -78,42 +78,26 @@ export interface ITaskTrigger {
    repeat: boolean;
    operator: string;
    value: string;
-   unit?: IUnit;
-   eventTriggerCategory?: ICategory;
+   unit?: UnitQL;
+   eventTriggerCategory?: CategoryQL;
    createdDate: string;
    modifiedDate: string;
 
 }
 
-export interface ITaskCategory {
-   taskCategoryId: number;
-   name: string;
-   description: string;
-   createdDate: string;
-   modifiedDate: string;
-}
-
-// export interface IEventTrigger {
-//    eventTriggerId: number;
-//    name: string;
-//    description: string;
-//    createdDate: string;
-//    modifiedDate: string;
-// }
-
-export interface ITaskResource {
+export interface TaskResourceQL {
    taskResourceId: number;
    order: number;
    amount: number;
    resourceType: string;
-   unit: IUnit;
-   employeeCategory?: ICategory;
-   inventoryResource?: IItem;
+   unit: UnitQL;
+   employeeCategory?: CategoryQL;
+   inventoryResource?: ItemQL;
    createdDate: string;
    modifiedDate: string;
 }
 
-export interface ISubTask {
+export interface SubTaskQL {
    subTaskId: number;
    order: number;
    group: string;
@@ -121,29 +105,21 @@ export interface ISubTask {
    mandatory: boolean;
    createdDate: string;
    modifiedDate: string;
-   subTaskCategory: ICategory;
+   subTaskCategory: CategoryQL;
 }
 
-// export interface ISubTaskKind {
-//    subTaskKindId: number;
-//    name: string;
-//    description: string;
-//    createdDate: string;
-//    modifiedDate: string;
-// }
-
-export const getMaintenancePlanDefaultInstance = ():IMaintenancePlan => ({
+export const getMaintenancePlanDefaultInstance = ():MaintenanceQL => ({
    maintenanceId: 0,
    name: '',
    description: '',
-   status: EntityStatus.ACTIVE,
+   status: EntityStatusQL.ACTIVE,
    createdDate: '',
    modifiedDate: '',
    tasks: [],
    equipments: [],
 });
 
-export const getTaskDefaultInstance = ():ITask => ({
+export const getTaskDefaultInstance = ():TaskQL => ({
    taskId: 0,
    name: '',
    description: '',
@@ -161,7 +137,7 @@ export const getTaskDefaultInstance = ():ITask => ({
    taskResources: []
 });
 
-export const getTaskResourceDefaultInstance = ():ITaskResource => ({
+export const getTaskResourceDefaultInstance = ():TaskResourceQL => ({
    taskResourceId: 0,
    order: 0,
    amount: 1,
@@ -175,7 +151,7 @@ export const getTaskResourceDefaultInstance = ():ITaskResource => ({
    modifiedDate: ''
 });
 
-export const getTaskTriggerDefaultInstance = ():ITaskTrigger => ({
+export const getTaskTriggerDefaultInstance = ():ITaskTriggerQL => ({
    taskTriggerId: 0,
    triggerType: '',
    description: '',
@@ -190,7 +166,7 @@ export const getTaskTriggerDefaultInstance = ():ITaskTrigger => ({
    modifiedDate: ''
 });
 
-export const getSubTaskDefaultInstance = ():ISubTask => ({
+export const getSubTaskDefaultInstance = ():SubTaskQL => ({
    subTaskId: 0,
    order: 0,
    group: '',

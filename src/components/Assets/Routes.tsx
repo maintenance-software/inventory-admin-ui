@@ -10,7 +10,7 @@ import {SparePartsSuppliesItemComp} from "./SparePartsSupplies";
 import {CreateEditSparePartsSuppliesItemComp} from "./SparePartsSupplies/CreateSparePartsSuppliesItem/CreateEditSparePartsSuppliesItemComp";
 import {EquipmentComp} from "./Equipment";
 import {CreateEditEquipmentComp} from "./Equipment/CreateEditEquipment/CreateEditEquipmentComp";
-import {IEquipment} from "../../graphql/equipment.type";
+import {EquipmentQL} from "../../graphql/Equipment.ql";
 
 const ToolsResourceRoutes: React.FC =  () => {
    const { path } = useRouteMatch();
@@ -33,13 +33,13 @@ const SparePartsSupplieRoutes: React.FC =  () => {
 };
 
 interface IEquipmentContext {
-   pathTree: IEquipment[];
+   pathTree: EquipmentQL[];
    setPathTree: Function;
 }
 
 export const EquipmentContext = createContext<IEquipmentContext>({pathTree: [], setPathTree: ()=>{}});
 const EquipmentAssetRoutes: React.FC =  () => {
-   const [pathTree, setPathTree] = React.useState<IEquipment[]>([]);
+   const [pathTree, setPathTree] = React.useState<EquipmentQL[]>([]);
    const { path } = useRouteMatch();
    return (
       <Switch>

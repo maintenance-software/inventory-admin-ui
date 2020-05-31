@@ -11,7 +11,7 @@ import Button from "@material-ui/core/Button/Button";
 import CancelIcon from '@material-ui/icons/Cancel';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SaveIcon from '@material-ui/icons/Save';
-import {ICategory, IUnit} from "../../../../graphql/item.type";
+import {CategoryQL, UnitQL} from "../../../../graphql/Item.ql";
 import {useHistory} from "react-router";
 import IconButton from "@material-ui/core/IconButton/IconButton";
 
@@ -49,8 +49,8 @@ const useButtonStyles = makeStyles(theme => ({
 
 export interface IItemFormProps {
    itemForm: IItemForm;
-   units: IUnit[];
-   categories: ICategory[];
+   units: UnitQL[];
+   categories: CategoryQL[];
    onSaveItemToolCallback: Function;
 }
 

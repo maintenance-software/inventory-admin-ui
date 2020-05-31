@@ -15,7 +15,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import Button from '@material-ui/core/Button';
-import {IEquipment} from "../../../graphql/equipment.type";
+import {EquipmentQL} from "../../../graphql/Equipment.ql";
 import {SearchInput} from '../../SearchInput/SearchInput';
 import {TablePaginationActions} from '../../../utils/TableUtils';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -25,7 +25,7 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Switch from '@material-ui/core/Switch';
-import {EntityStatus} from "../../../graphql/users.type";
+import {EntityStatusQL} from "../../../graphql/User.ql";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -46,19 +46,19 @@ const useStyles2 = makeStyles({
 });
 
 interface EquipmentProps {
-   equipments: IEquipment[];
+   equipments: EquipmentQL[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
    searchString?: string;
-   treePath: IEquipment[];
+   treePath: EquipmentQL[];
    onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
    onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
    onSearchEquipment?(searchString: string) : void;
-   onExpand?(equipment: IEquipment): void;
+   onExpand?(equipment: EquipmentQL): void;
    onBreadcrumbs?(index: number): void;
    onAddEquipment?(): void;
-   onEditEquipment?(equipment: IEquipment): void;
+   onEditEquipment?(equipment: EquipmentQL): void;
 }
 
 export const EquipmentComp_: FC<EquipmentProps> = ({equipments, pageIndex, pageSize, totalCount, searchString, treePath, onChangePage, onChangeRowsPerPage, onSearchEquipment, onExpand, onBreadcrumbs, onAddEquipment, onEditEquipment}) => {
@@ -118,7 +118,7 @@ export const EquipmentComp_: FC<EquipmentProps> = ({equipments, pageIndex, pageS
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {equipments.map((row: IEquipment, index) => (
+                  {equipments.map((row: EquipmentQL, index) => (
                      <TableRow key={row.equipmentId} hover>
                         <TableCell>{row.code}</TableCell>
                         <TableCell>{row.name}</TableCell>

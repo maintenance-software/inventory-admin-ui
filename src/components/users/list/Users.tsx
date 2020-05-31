@@ -3,11 +3,11 @@ import './Users.scss';
 import EditIcon from '@material-ui/icons/Edit';
 import { useTranslation } from 'react-i18next';
 import ListIcon from '@material-ui/icons/List';
-import {IUser, IUsers, GET_USERS_GQL} from "../../../graphql/users.type";
+import {UserQL, UsersQL, GET_USERS_GQL} from "../../../graphql/User.ql";
 import {SearchInput} from "../../SearchInput/SearchInput";
 import {useHistory} from "react-router";
 import Container from '@material-ui/core/Container';
-import {IEquipment} from "../../../graphql/equipment.type";
+import {EquipmentQL} from "../../../graphql/Equipment.ql";
 import {TablePaginationActions} from "../../../utils/TableUtils";
 import Grid from '@material-ui/core/Grid';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -31,7 +31,7 @@ const useButtonStyles = makeStyles(theme => ({
 }));
 
 interface IUserProps {
-   users: IUser[];
+   users: UserQL[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
@@ -40,7 +40,7 @@ interface IUserProps {
    onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
    onSearchUser?(searchString: string) : void;
    onAddUser?(): void;
-   onEditUser?(user: IUser): void;
+   onEditUser?(user: UserQL): void;
 }
 
 
@@ -107,7 +107,7 @@ export const Users: React.FC<IUserProps> =  ({ users
                    </TableRow>
                 </TableHead>
                 <TableBody>
-                   {users.map((row: IUser, index) => (
+                   {users.map((row: UserQL, index) => (
                       <TableRow key={row.userId} hover>
                          <TableCell>{row.username}</TableCell>
                          <TableCell>{row.roles}</TableCell>

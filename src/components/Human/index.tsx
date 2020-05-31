@@ -19,9 +19,9 @@ import TableFooter from "@material-ui/core/TableFooter/TableFooter";
 import TableHead from "@material-ui/core/TableHead/TableHead";
 import {gql} from 'apollo-boost';
 import {useLazyQuery} from "@apollo/react-hooks";
-import {IUsers} from "../../graphql/users.type";
-import {IPerson} from "../../graphql/persons.type";
-import {IPage} from "../../graphql/page.type";
+import {UsersQL} from "../../graphql/User.ql";
+import {PersonQL} from "../../graphql/Person.ql";
+import {PageQL} from "../../graphql/Common.ql";
 import Grid from "@material-ui/core/Grid/Grid";
 import Checkbox from "@material-ui/core/Checkbox/Checkbox";
 import Button from "@material-ui/core/Button/Button";
@@ -171,7 +171,7 @@ export const HumanResourceComp: React.FC = () => {
    const [pageSize, setPageSize] = React.useState(5);
    const buttonClasses = useButtonStyles();
    const searchInputClasses = useSearchInputStyles();
-   const [fetchPersons, { called, loading, data }] = useLazyQuery<{persons: {page: IPage<IPerson>}}, any>(FETCH_PERSONS_GQL);
+   const [fetchPersons, { called, loading, data }] = useLazyQuery<{persons: {page: PageQL<PersonQL>}}, any>(FETCH_PERSONS_GQL);
    useEffect(() => {
       fetchPersons({variables: { pageIndex: pageIndex, pageSize: pageSize}});
    }, []);

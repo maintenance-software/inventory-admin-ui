@@ -1,6 +1,6 @@
 import { gql } from 'apollo-boost';
 
-export interface ISession{
+export interface SessionQL{
    authId: string;
    username: string;
    email: string;

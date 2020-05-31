@@ -13,11 +13,11 @@ import {EquipmentChooserComp} from "./EquipmentChooserComp";
 import {
    FETCH_TASKS_FOR_EQUIPMENT_QL,
    getTaskDefaultInstance,
-   ITask,
-   ITaskTrigger
-} from "../../../graphql/Maintenance.type";
+   TaskQL,
+   ITaskTriggerQL
+} from "../../../graphql/Maintenance.ql";
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
-import {FETCH_CATEGORIES, ICategory} from "../../../graphql/item.type";
+import {FETCH_CATEGORIES, CategoryQL} from "../../../graphql/Item.ql";
 import {ITaskItems, TaskChooser} from "./TaskChooser";
 
 const useDateStyles = makeStyles((theme: Theme) =>
@@ -58,8 +58,8 @@ export const TaskAvailableDialog: React.FC<ITaskAvailableProps> =  ({open, setOp
    const [incidentDate, setIncidentDate] = React.useState('');
    const [hasFailure, setHasFailure] = React.useState(true);
    const [taskItems, setTaskItems] = React.useState<ITaskItems[]>([]);
-   const [fetchTasks, { called, loading, data }] = useLazyQuery<{maintenances: {equipmentTasks: ITask[]}}, any>(FETCH_TASKS_FOR_EQUIPMENT_QL);
-   const eventTriggersData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'EVENT_CATEGORY'}});
+   const [fetchTasks, { called, loading, data }] = useLazyQuery<{maintenances: {equipmentTasks: TaskQL[]}}, any>(FETCH_TASKS_FOR_EQUIPMENT_QL);
+   const eventTriggersData = useQuery<{categories: CategoryQL[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'EVENT_CATEGORY'}});
 
    useEffect(() => {
       setActiveStep(0);

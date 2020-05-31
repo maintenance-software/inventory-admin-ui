@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
 import {useQuery} from "@apollo/react-hooks";
-import {IPrivilege} from "../../../graphql/users.type";
+import {PrivilegeQL} from "../../../graphql/User.ql";
 import {useHistory} from "react-router";
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import {createStyles, Theme} from "@material-ui/core";
@@ -82,8 +82,8 @@ const useButtonStyles = makeStyles(theme => ({
 }));
 
 interface IUserPrivilegeProps {
-   userPrivileges: IPrivilege[];
-   userRolePrivileges: IPrivilege[];
+   userPrivileges: PrivilegeQL[];
+   userRolePrivileges: PrivilegeQL[];
    onSaveUserPermission: Function;
 }
 
@@ -91,7 +91,7 @@ const UserPrivilegeComp: React.FC<IUserPrivilegeProps> =  (props) => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
-   const { called, loading, data } = useQuery<{privileges: {list: IPrivilege[]}}, any>(GET_PRIVILEGES);
+   const { called, loading, data } = useQuery<{privileges: {list: PrivilegeQL[]}}, any>(GET_PRIVILEGES);
    const classes = useStyles();
    const searchInputClasses = useSearchInputStyles();
    const buttonClasses = useButtonStyles();

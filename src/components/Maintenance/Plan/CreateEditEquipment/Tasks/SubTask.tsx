@@ -12,7 +12,7 @@ import {useHistory} from "react-router";
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import { getSubTaskDefaultInstance, ISubTask } from "../../../../../graphql/Maintenance.type";
+import { getSubTaskDefaultInstance, SubTaskQL } from "../../../../../graphql/Maintenance.ql";
 import TableFooter from '@material-ui/core/TableFooter';
 import Modal from '@material-ui/core/Modal';
 import Dialog from '@material-ui/core/Dialog';
@@ -27,7 +27,7 @@ import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import {SubTaskDialog} from "./SubTaskDialog";
-import {FETCH_CATEGORIES, ICategory} from "../../../../../graphql/item.type";
+import {FETCH_CATEGORIES, CategoryQL} from "../../../../../graphql/Item.ql";
 
 const useBottomNoneBorder = makeStyles({
    root: {
@@ -53,23 +53,23 @@ const useStyles2 = makeStyles({
    }
 });
 
-export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
+export const SubTask: FC<{subtasks: SubTaskQL[]}> = ({subtasks}) => {
    const history = useHistory();
    const classes = useStyles2();
    const bottomNoneBoder = useBottomNoneBorder();
    const [open, setOpen] = React.useState(false);
-   const [subTask, setSubTask] = useState<ISubTask>(getSubTaskDefaultInstance());
-   const subtaskKindsData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'SUBTASK_CATEGORY'}});
+   const [subTask, setSubTask] = useState<SubTaskQL>(getSubTaskDefaultInstance());
+   const subtaskKindsData = useQuery<{categories: CategoryQL[]}, any>(FETCH_CATEGORIES, {variables: {scope: 'SUBTASK_CATEGORY'}});
 
    // useEffect(() => {
    // }, [subTask]);
 
-   const handleAddEditSubTask = (subTask: ISubTask) => {
+   const handleAddEditSubTask = (subTask: SubTaskQL) => {
       setOpen(true);
       setSubTask(subTask);
    };
 
-   const handleSaveSubTask = (kind: ICategory, description: string, mandatory: boolean) => {
+   const handleSaveSubTask = (kind: CategoryQL, description: string, mandatory: boolean) => {
       if(subTask.subTaskId === 0) {
          subTask.order = subtasks.length + 1;
          subTask.description = description;
@@ -102,7 +102,7 @@ export const SubTask: FC<{subtasks: ISubTask[]}> = ({subtasks}) => {
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {subtasks.sort((t1, t2) => t1.order - t2.order).map((row: ISubTask, index) => (
+                  {subtasks.sort((t1, t2) => t1.order - t2.order).map((row: SubTaskQL, index) => (
                      <TableRow key={index} hover>
                         <TableCell>{row.order}</TableCell>
                         <TableCell>{row.description}</TableCell>

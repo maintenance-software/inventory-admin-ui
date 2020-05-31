@@ -13,11 +13,11 @@ import Grid from "@material-ui/core/Grid/Grid";
 import {
    GET_INVENTORY_BY_ID,
    getInventoryDefaultInstance,
-   IInventories,
-   IInventory,
+   InventoriesQL,
+   InventoryQL,
    SAVE_INVENTORY
-} from "../../../graphql/inventory.type";
-import {EntityStatus} from "../../../graphql/users.type";
+} from "../../../graphql/Inventory.ql";
+import {EntityStatusQL} from "../../../graphql/User.ql";
 import {EditInventoryForm, IInventoryForm, IInventoryFormProps} from "./CreateEditInventoryForm";
 import {clearCache} from "../../../utils/globalUtil";
 import {InventoryStockComp} from "./InventoryStockComp";
@@ -74,7 +74,7 @@ interface InventoryMutationRequest {
    name: string;
    description: string;
    allowNegativeStocks: boolean;
-   status: EntityStatus;
+   status: EntityStatusQL;
 }
 
 export const CreateEditInventoryComp: React.FC =  () => {
@@ -85,8 +85,8 @@ export const CreateEditInventoryComp: React.FC =  () => {
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [saveInventory] = useMutation<{ inventories: IInventories }, any>(SAVE_INVENTORY);
-   const [getInventoryById, { called, loading, data }] = useLazyQuery<{inventories: IInventories}, any>(GET_INVENTORY_BY_ID);
+   const [saveInventory] = useMutation<{ inventories: InventoriesQL }, any>(SAVE_INVENTORY);
+   const [getInventoryById, { called, loading, data }] = useLazyQuery<{inventories: InventoriesQL}, any>(GET_INVENTORY_BY_ID);
    const [hasError, setHasError] = useState(false);
    const inventoryId = +params.inventoryId;
    const toggle = (tab: string) => {
@@ -103,7 +103,7 @@ export const CreateEditInventoryComp: React.FC =  () => {
    if (loading || (!data && inventoryId > 0))
       return <div>Loading</div>;
 
-   let inventory: IInventory= getInventoryDefaultInstance();
+   let inventory: InventoryQL= getInventoryDefaultInstance();
 
    if(data) {
       inventory = data.inventories.inventory;
@@ -122,7 +122,7 @@ export const CreateEditInventoryComp: React.FC =  () => {
             name: inventoryForm.name,
             description: inventoryForm.description,
             allowNegativeStocks: inventoryForm.allowNegativeStocks,
-            status: EntityStatus.ACTIVE
+            status: EntityStatusQL.ACTIVE
          };
          const response = await saveInventory({
             variables: mutationRequest

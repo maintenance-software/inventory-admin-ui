@@ -3,7 +3,7 @@ import { useLazyQuery } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {AssetChooser, ISimpleItem} from "../../../../Assets/Commons/AssetChooser/AssetChooser";
-import {FETCH_EQUIPMENTS_AVAILABLE_GQL, IMaintenancePlans} from "../../../../../graphql/Maintenance.type";
+import {FETCH_EQUIPMENTS_AVAILABLE_GQL, MaintenancesQL} from "../../../../../graphql/Maintenance.ql";
 
 interface IAssetChooserProps {
    multiple: boolean;
@@ -19,7 +19,7 @@ export const EquipmentAvailableChooserComp: FC<IAssetChooserProps> = ({disableIt
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchEquipmentsAvailable, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(FETCH_EQUIPMENTS_AVAILABLE_GQL);
+   const [fetchEquipmentsAvailable, { called, loading, data }] = useLazyQuery<{maintenances: MaintenancesQL}, any>(FETCH_EQUIPMENTS_AVAILABLE_GQL);
 
    useEffect(() => {
       fetchEquipmentsAvailable({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});

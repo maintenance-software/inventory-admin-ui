@@ -15,15 +15,15 @@ import {
    FETCH_UNITS,
    GET_ITEM_TOOL_BY_ID,
    getItemDefaultInstance,
-   ICategory,
-   IItem,
-   IItems,
-   ItemType,
-   IUnit,
+   CategoryQL,
+   ItemQL,
+   ItemsQL,
+   ItemTypeQL,
+   UnitQL,
    SAVE_ITEM_TOOL
-} from "../../../../graphql/item.type";
+} from "../../../../graphql/Item.ql";
 import {EditItemToolForm, IItemForm, IItemFormProps} from "./CreateEditItemToolForm";
-import {EntityStatus} from "../../../../graphql/users.type";
+import {EntityStatusQL} from "../../../../graphql/User.ql";
 import {clearCache} from "../../../../utils/globalUtil";
 
 interface TabPanelProps {
@@ -78,13 +78,13 @@ interface ItemMutationRequest {
    defaultPrice: number;
    description: string;
    images: string[];
-   itemType: ItemType;
+   itemType: ItemTypeQL;
    manufacturer: string;
    model: string;
    name: string;
    notes: string;
    partNumber: string;
-   status: EntityStatus;
+   status: EntityStatusQL;
    unitId: number;
    categoryId: number;
 }
@@ -97,10 +97,10 @@ export const CreateEditItemToolComp: React.FC =  () => {
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [saveItem] = useMutation<{ items: IItems }, any>(SAVE_ITEM_TOOL);
-   const [getItemToolById, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(GET_ITEM_TOOL_BY_ID);
-   const categoryQL = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES);
-   const unitQL = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
+   const [saveItem] = useMutation<{ items: ItemsQL }, any>(SAVE_ITEM_TOOL);
+   const [getItemToolById, { called, loading, data }] = useLazyQuery<{items: ItemsQL}, any>(GET_ITEM_TOOL_BY_ID);
+   const categoryQL = useQuery<{categories: CategoryQL[]}, any>(FETCH_CATEGORIES);
+   const unitQL = useQuery<{units: UnitQL[]}, any>(FETCH_UNITS);
    const [hasError, setHasError] = useState(false);
    const itemId = +params.itemId;
    const toggle = (tab: string) => {
@@ -117,7 +117,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
    if (loading || (!data && itemId > 0))
       return <div>Loading</div>;
 
-   let item: IItem = getItemDefaultInstance();
+   let item: ItemQL = getItemDefaultInstance();
 
    if(data) {
       item = data.items.item;
@@ -134,7 +134,7 @@ export const CreateEditItemToolComp: React.FC =  () => {
          name: item.name || '',
          notes: item.notes || '',
          partNumber: item.partNumber || '',
-         status: EntityStatus[item.status],
+         status: EntityStatusQL[item.status],
          unitId: item.unit.unitId,
          categoryId: item.category.categoryId
       },
@@ -147,13 +147,13 @@ export const CreateEditItemToolComp: React.FC =  () => {
             defaultPrice: +itemForm.defaultPrice || 0.0,
             description: itemForm.description,
             images: itemForm.images || [],
-            itemType: ItemType.TOOLS,
+            itemType: ItemTypeQL.TOOLS,
             manufacturer: itemForm.manufacturer,
             model: itemForm.model,
             name: itemForm.name,
             notes: itemForm.notes,
             partNumber: itemForm.partNumber,
-            status: item.itemId > 0 ? itemForm.status as EntityStatus : EntityStatus.ACTIVE,
+            status: item.itemId > 0 ? itemForm.status as EntityStatusQL : EntityStatusQL.ACTIVE,
             unitId: itemForm.unitId,
             categoryId: itemForm.categoryId
          };

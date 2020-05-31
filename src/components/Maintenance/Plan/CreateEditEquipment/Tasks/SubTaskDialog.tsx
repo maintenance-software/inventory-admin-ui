@@ -1,6 +1,6 @@
 import React, {FC, useState, useEffect} from 'react';
 import Button from '@material-ui/core/Button';
-import { ISubTask } from "../../../../../graphql/Maintenance.type";
+import { SubTaskQL } from "../../../../../graphql/Maintenance.ql";
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -10,14 +10,14 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import {ICategory} from "../../../../../graphql/item.type";
+import {CategoryQL} from "../../../../../graphql/Item.ql";
 
 interface ISubTaskDialogProps {
    open: boolean;
    setOpen(open: boolean): void;
-   subTask: ISubTask;
-   subTaskCategories: ICategory[];
-   onSaveSubTask(taskKind: ICategory, description: string, mandatory: boolean): void;
+   subTask: SubTaskQL;
+   subTaskCategories: CategoryQL[];
+   onSaveSubTask(taskKind: CategoryQL, description: string, mandatory: boolean): void;
 }
 
 export const SubTaskDialog: FC<ISubTaskDialogProps> = ({open, setOpen, subTask, subTaskCategories, onSaveSubTask}) => {

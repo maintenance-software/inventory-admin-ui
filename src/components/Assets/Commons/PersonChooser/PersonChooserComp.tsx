@@ -2,7 +2,7 @@ import React, {useEffect, FC} from 'react';
 import { useLazyQuery } from "@apollo/react-hooks";
 import {useRouteMatch} from "react-router-dom";
 import {ISimplePerson, PersonChooser} from './PersonChooser';
-import {FETCH_EMPLOYEES, IEmployees, IPerson} from "../../../../graphql/persons.type";
+import {FETCH_EMPLOYEES, IEmployeesQL, PersonQL} from "../../../../graphql/Person.ql";
 import {buildFullName} from "../../../../utils/globalUtil";
 
 interface IPersonChooserProps {
@@ -17,7 +17,7 @@ export const PersonChooserComp: FC<IPersonChooserProps> = ({disableItems,multipl
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchEmployees, { called, loading, data }] = useLazyQuery<{employees: IEmployees}, any>(FETCH_EMPLOYEES);
+   const [fetchEmployees, { called, loading, data }] = useLazyQuery<{employees: IEmployeesQL}, any>(FETCH_EMPLOYEES);
 
    useEffect(() => {
       fetchEmployees({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize, filters: filters}});

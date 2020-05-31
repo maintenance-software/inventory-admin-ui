@@ -36,7 +36,7 @@ import Divider from '@material-ui/core/Divider';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import {ISession} from "../../graphql/session.type";
+import {SessionQL} from "../../graphql/Session.ql";
 import {buildFullName} from "../../utils/globalUtil";
 import FormControl from '@material-ui/core/FormControl';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -152,7 +152,7 @@ const MENUS = [
    }
 ];
 
-export const Leftbar: React.FC<{session: ISession}> = ({session}) => {
+export const Leftbar: React.FC<{session: SessionQL}> = ({session}) => {
   const [t, i18n] = useTranslation();
   let location = useLocation();
    const classes = useStyles();

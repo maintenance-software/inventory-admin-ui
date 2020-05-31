@@ -8,7 +8,7 @@ import {useTranslation} from "react-i18next";
 import {fetchLocalizations} from "../api/localization.api";
 import LanguageIcon from '@material-ui/icons/Language';
 import {useQuery} from "@apollo/react-hooks";
-import {GET_USER_SESSION_GQL, ISession} from "../graphql/session.type";
+import {GET_USER_SESSION_GQL, SessionQL} from "../graphql/Session.ql";
 import UserProfile from "./session/profile";
 import UserSettings from "./session/settings";
 import {Container, Grid, FormControl, MenuItem, Select, TextField, InputAdornment, Box, Divider, IconButton} from "@material-ui/core";
@@ -60,7 +60,7 @@ const App: React.FC = () => {
   // const appName = useSelector((state: IRootState) => state.appName);
   const [lang, setLang] = useState<string>('en');
   const [t, i18n] = useTranslation();
-  const sessionQL = useQuery<{session: ISession}, any>(GET_USER_SESSION_GQL);
+  const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
   const classes = useStyles();
 
    if (sessionQL.loading || !sessionQL.data) return <div>Loading</div>;

@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import {buildFullName} from "../../utils/globalUtil";
 import {useLazyQuery, useQuery} from "@apollo/react-hooks";
-import {GET_USER_SESSION_GQL, ISession} from "../../graphql/session.type";
-import {IUsers} from "../../graphql/users.type";
+import {GET_USER_SESSION_GQL, SessionQL} from "../../graphql/Session.ql";
+import {UsersQL} from "../../graphql/User.ql";
 import {GET_USER_BY_ID} from "../users/CreateEditPerson/CreateEditUser";
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
@@ -24,9 +24,9 @@ import Divider from '@material-ui/core/Divider';
 const UserProfile: React.FC<{firstName: string, lastName: string}> =  (props) => {
    const [t, i18n] = useTranslation();
    const { path, url } = useRouteMatch();
-   const sessionQL = useQuery<{session: ISession}, any>(GET_USER_SESSION_GQL);
+   const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
    const authId = sessionQL && sessionQL.data && +sessionQL.data.session.authId;
-   const { called, loading, data } = useQuery<{users: IUsers}, any>(GET_USER_BY_ID, {variables: { userId: authId}});
+   const { called, loading, data } = useQuery<{users: UsersQL}, any>(GET_USER_BY_ID, {variables: { userId: authId}});
    const [modal, setModal] = useState(false);
 
    if (loading)

@@ -8,7 +8,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import CommentIcon from '@material-ui/icons/Comment';
-import {ITask} from "../../../graphql/Maintenance.type";
+import {TaskQL} from "../../../graphql/Maintenance.ql";
 import {ISimpleItem} from "../../Assets/Commons/AssetChooser/AssetChooser";
 
 const useStyles = makeStyles((theme: Theme) =>

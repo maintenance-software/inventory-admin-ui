@@ -9,10 +9,10 @@ import Radio from '@material-ui/core/Radio';
 import Grid from "@material-ui/core/Grid/Grid";
 import Button from "@material-ui/core/Button/Button";
 import {useHistory} from "react-router";
-import {getItemDefaultInstance, ICategory, IItem, IUnit} from "../../../../../graphql/item.type";
-import {ITaskResource} from "../../../../../graphql/Maintenance.type";
+import {getItemDefaultInstance, CategoryQL, ItemQL, UnitQL} from "../../../../../graphql/Item.ql";
+import {TaskResourceQL} from "../../../../../graphql/Maintenance.ql";
 import {AssetChooserComp} from "../../../../Assets/Commons/AssetChooser/AssetChooserComp";
-import {IEmployee, IEmployeeJob} from "../../../../../graphql/persons.type";
+import {IEmployeeQL, IEmployeeJobQL} from "../../../../../graphql/Person.ql";
 
 const useFormStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -35,12 +35,12 @@ const useButtonStyles = makeStyles(theme => ({
 }));
 
 export interface IInventoryFormProps {
-   taskResource: ITaskResource;
-   employeeCategories: ICategory[];
-   units: IUnit[];
+   taskResource: TaskResourceQL;
+   employeeCategories: CategoryQL[];
+   units: UnitQL[];
    open: boolean;
    setOpen(open: boolean): void;
-   onAccept(t: ITaskResource) : void;
+   onAccept(t: TaskResourceQL) : void;
 }
 
 export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource, employeeCategories, units, open, setOpen, onAccept}) => {
@@ -72,7 +72,7 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
 
    const handleNext = async () => {
       if(activeStep + 1 === 3) {
-         const r: ITaskResource = {
+         const r: TaskResourceQL = {
             taskResourceId: taskResource.taskResourceId,
             order: taskResource.order,
             amount: amount,
@@ -184,7 +184,7 @@ export const TaskResourceDialog: React.FC<IInventoryFormProps> =  ({taskResource
                filters={[{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType", operator: "in", value: "SPARE_PARTS,TOOLS,SUPPLIES"}]}
                multiple={false}
                initialSelected={inventoryResource? [inventoryResource.itemId] : []}
-               onSelectItems={(items: IItem[]) => {
+               onSelectItems={(items: ItemQL[]) => {
                   if(items.length === 1) {
                      setInventoryResource(items[0]);
                      setUnitId(items[0].unit.unitId)

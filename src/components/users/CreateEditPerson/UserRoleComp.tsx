@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { gql } from 'apollo-boost';
 import {useQuery} from "@apollo/react-hooks";
-import { IRole } from "../../../graphql/users.type";
+import { RoleQL } from "../../../graphql/User.ql";
 import {useHistory} from "react-router";
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import {createStyles, Theme} from "@material-ui/core";
@@ -38,7 +38,7 @@ export const GET_ROLES = gql`
 `;
 
 interface IUserRoleProps {
-   userRoles: IRole[];
+   userRoles: RoleQL[];
    onSaveUserRoles: Function;
 }
 
@@ -90,7 +90,7 @@ const UserRoleComp: React.FC<IUserRoleProps> =  (props) => {
    const [t, i18n] = useTranslation();
    const params = useParams();
    const history = useHistory();
-   const { called, loading, data } = useQuery<{roles: {list: IRole[]}}, any>(GET_ROLES);
+   const { called, loading, data } = useQuery<{roles: {list: RoleQL[]}}, any>(GET_ROLES);
    const classes = useStyles();
    const searchInputClasses = useSearchInputStyles();
    const buttonClasses = useButtonStyles();

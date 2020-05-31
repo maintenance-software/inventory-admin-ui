@@ -15,7 +15,7 @@ import { SearchInput } from "../../../SearchInput/SearchInput";
 import { TablePaginationActions } from "../../../../utils/TableUtils";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
-import {getItemDefaultInstance, IItem, ItemType} from "../../../../graphql/item.type";
+import {getItemDefaultInstance, ItemQL, ItemTypeQL} from "../../../../graphql/Item.ql";
 import Button from '@material-ui/core/Button';
 import {Checkbox, Typography} from '@material-ui/core';
 

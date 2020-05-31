@@ -18,9 +18,9 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {TablePaginationActions} from "../../../../../utils/TableUtils";
-import {ITask} from "../../../../../graphql/Maintenance.type";
+import {TaskQL} from "../../../../../graphql/Maintenance.ql";
 import TableFooter from '@material-ui/core/TableFooter';
-import {IEquipment} from "../../../../../graphql/equipment.type";
+import {EquipmentQL} from "../../../../../graphql/Equipment.ql";
 
 const useBottomNoneBorder = makeStyles({
    root: {
@@ -47,7 +47,7 @@ const useStyles2 = makeStyles({
 });
 
 interface EquipmentProps {
-   equipments: IEquipment[];
+   equipments: EquipmentQL[];
    onAddEquipment(): void;
    // onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
    // onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
@@ -74,7 +74,7 @@ export const Equipment: FC<EquipmentProps> = ({equipments, onAddEquipment }) => 
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {equipments.map((row: IEquipment, index) => (
+                  {equipments.map((row: EquipmentQL, index) => (
                      <TableRow key={row.equipmentId} hover>
                         <TableCell>{row.code}</TableCell>
                         <TableCell>{row.name}</TableCell>

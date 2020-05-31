@@ -1,14 +1,14 @@
 import {gql} from 'apollo-boost';
-import {IPage} from "./page.type";
-import {EntityStatus} from "./users.type";
+import {PageQL} from "./Common.ql";
+import {EntityStatusQL} from "./User.ql";
 
-export interface IEquipments {
-   equipment: IEquipment;
-   page: IPage<IEquipment>;
-   saveEquipment: IEquipment;
+export interface EquipmentsQL {
+   equipment: EquipmentQL;
+   page: PageQL<EquipmentQL>;
+   saveEquipment: EquipmentQL;
 }
 
-export interface IEquipment {
+export interface EquipmentQL {
    equipmentId: number;
    name: string;
    description: string;
@@ -17,19 +17,19 @@ export interface IEquipment {
    manufacturer: string;
    model: string;
    notes: string;
-   status: EntityStatus;
+   status: EntityStatusQL;
    images: string[];
    priority: number;
    hoursAverageDailyUse: number;
    outOfService: boolean;
    purchaseDate: string;
-   children: IEquipment[];
-   parent: IEquipment | null;
+   children: EquipmentQL[];
+   parent: EquipmentQL | null;
    createdDate: string;
    modifiedDate: String;
 }
 
-export const getDefaultEquipmentInstance = ():IEquipment => ({
+export const getDefaultEquipmentInstance = ():EquipmentQL => ({
    equipmentId: 0,
    name: '',
    description: '',
@@ -38,7 +38,7 @@ export const getDefaultEquipmentInstance = ():IEquipment => ({
    manufacturer: '',
    model: '',
    notes: '',
-   status: EntityStatus.ACTIVE,
+   status: EntityStatusQL.ACTIVE,
    images: [],
    priority: 0,
    hoursAverageDailyUse: 0,

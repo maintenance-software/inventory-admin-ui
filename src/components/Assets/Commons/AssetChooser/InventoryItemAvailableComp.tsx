@@ -1,19 +1,19 @@
 import React, {useEffect, FC} from 'react';
 import { useLazyQuery } from "@apollo/react-hooks";
-import { FETCH_ITEMS_GQL, IItem, IItems } from "../../../../graphql/item.type";
+import { FETCH_ITEMS_GQL, ItemQL, ItemsQL } from "../../../../graphql/Item.ql";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {AssetChooser} from './AssetChooser';
-import {FETCH_AVAILABLE_ITEMS} from "../../../../graphql/inventory.type";
-import {IPage} from "../../../../graphql/page.type";
+import {FETCH_AVAILABLE_ITEMS} from "../../../../graphql/Inventory.ql";
+import {PageQL} from "../../../../graphql/Common.ql";
 
-export const InventoryItemAvailableComp: FC<{inventoryId: number, onSelectItem?(item: IItem[]) : void}> = ({inventoryId, onSelectItem}) => {
+export const InventoryItemAvailableComp: FC<{inventoryId: number, onSelectItem?(item: ItemQL[]) : void}> = ({inventoryId, onSelectItem}) => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchItemTools, { called, loading, data }] = useLazyQuery<{inventories: {inventory: {availableItems: IPage<IItem>}}}, any>(FETCH_AVAILABLE_ITEMS);
+   const [fetchItemTools, { called, loading, data }] = useLazyQuery<{inventories: {inventory: {availableItems: PageQL<ItemQL>}}}, any>(FETCH_AVAILABLE_ITEMS);
    const defaultFilters = [
         {field: "status",operator: "=", value: "ACTIVE"}
       // , {field: "itemType",operator: "in", value: "SUPPLIES,SPARE_PARTS"}
@@ -43,7 +43,7 @@ export const InventoryItemAvailableComp: FC<{inventoryId: number, onSelectItem?(
       setPageIndex(0);
    };
 
-   const handleSelectItem = (items: IItem[]) => {
+   const handleSelectItem = (items: ItemQL[]) => {
       console.log(items)
    };
 

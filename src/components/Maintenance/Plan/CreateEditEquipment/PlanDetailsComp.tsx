@@ -10,16 +10,16 @@ import {Theme} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
-import {EntityStatus} from "../../../../graphql/users.type";
+import {EntityStatusQL} from "../../../../graphql/User.ql";
 import {EditEquipmentForm, IMaintenancePlanForm, IMaintenancePlanFormProps} from "./CreateEditMaintenancePlanForm";
 import {buildPath, clearCache} from "../../../../utils/globalUtil";
 import {MaintenancePlanContext} from "../../Routes";
 import {
    GET_MAINTENANCE_PLAN_BY_ID, getMaintenancePlanDefaultInstance, getTaskDefaultInstance,
-   IMaintenancePlan,
-   IMaintenancePlans,
+   MaintenanceQL,
+   MaintenancesQL,
    SAVE_MAINTENANCE_PLAN
-} from "../../../../graphql/Maintenance.type";
+} from "../../../../graphql/Maintenance.ql";
 import {Task} from "./Tasks/Task";
 import {Equipment} from "./Equipment/Equipment";
 import {MaintenancePlanComp} from "../index";
@@ -52,8 +52,8 @@ export const PlanDetailsComp: React.FC =  () => {
    const history = useHistory();
    const { path, url } = useRouteMatch();
    const [maintenance, setMaintenance] = useState(getMaintenancePlanDefaultInstance());
-   const [saveMaintenance, saveStatus] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_MAINTENANCE_PLAN);
-   const [getMaintenancePlanById, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(GET_MAINTENANCE_PLAN_BY_ID);
+   const [saveMaintenance, saveStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_MAINTENANCE_PLAN);
+   const [getMaintenancePlanById, { called, loading, data }] = useLazyQuery<{maintenances: MaintenancesQL}, any>(GET_MAINTENANCE_PLAN_BY_ID);
    useEffect(() => {
      const maintenanceId = +params.maintenanceId;
      if(maintenanceId && maintenanceId > 0) {
@@ -74,7 +74,7 @@ export const PlanDetailsComp: React.FC =  () => {
       maintenanceForm: {
          name: maintenance.name || '',
          description: maintenance.description || '',
-         status: maintenance.status || EntityStatus.ACTIVE,
+         status: maintenance.status || EntityStatusQL.ACTIVE,
       },
       onSaveMaintenancePlanCallback: async (maintenanceForm: IMaintenancePlanForm, resetForm: Function) => {
          const mutationRequest: MaintenancePlanMutationRequest = {

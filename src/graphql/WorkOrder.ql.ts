@@ -1,7 +1,7 @@
 import {gql} from 'apollo-boost';
-import {getPersonDefaultInstance, IPerson} from "./persons.type";
+import {getPersonDefaultInstance, PersonQL} from "./Person.ql";
 
-export interface IWorkOrder {
+export interface WorkOrderQL {
    workOrderId: number;
    workOrderCode: string;
    workOrderStatus: string;
@@ -11,14 +11,14 @@ export interface IWorkOrder {
    totalCost: number;
    percentage: number;
    notes: string;
-   generatedBy: IPerson;
-   responsible: IPerson;
-   parent?: IWorkOrder;
+   generatedBy: PersonQL;
+   responsible: PersonQL;
+   parent?: WorkOrderQL;
    createdDate: string;
    modifiedDate: string;
 }
 
-export const getWorkOrderDefaultInstance = ():IWorkOrder => ({
+export const getWorkOrderDefaultInstance = ():WorkOrderQL => ({
    workOrderId: 0,
    workOrderCode: '',
    workOrderStatus: '',

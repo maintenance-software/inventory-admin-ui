@@ -1,40 +1,40 @@
 import {gql} from 'apollo-boost';
-import {IPage} from "./page.type";
-import {EntityStatus} from "./users.type";
+import {PageQL} from "./Common.ql";
+import {EntityStatusQL} from "./User.ql";
 
-export interface IItems {
-   item: IItem;
-   page: IPage<IItem>;
-   saveItem: IItem;
+export interface ItemsQL {
+   item: ItemQL;
+   page: PageQL<ItemQL>;
+   saveItem: ItemQL;
    changeItemStatus: boolean;
 }
 
-export interface IItem {
+export interface ItemQL {
    itemId: number;
    code: string;
    defaultPrice: number;
    description: string;
    images: string[];
-   itemType: ItemType;
+   itemType: ItemTypeQL;
    manufacturer: string;
    model: string;
    name: string;
    notes: string;
    partNumber: string;
-   status: EntityStatus;
-   category: ICategory;
-   unit: IUnit;
+   status: EntityStatusQL;
+   category: CategoryQL;
+   unit: UnitQL;
    createdDate: string;
    modifiedDate: string;
 }
 
-export interface ICategory {
+export interface CategoryQL {
    categoryId: number;
    name: string;
    description: string;
 }
 
-export interface IUnit {
+export interface UnitQL {
    unitId: number;
    key: string;
    label: string;
@@ -54,7 +54,7 @@ export enum Units {
    MG,
 }
 
-export enum ItemType {
+export enum ItemTypeQL {
    SPARE_PARTS = 'SPARE_PARTS',
    TOOLS = 'TOOLS',
    SUPPLIES = 'SUPPLIES',
@@ -62,19 +62,19 @@ export enum ItemType {
    NONE = 'NONE'
 }
 
-export const getItemDefaultInstance = ():IItem => ({
+export const getItemDefaultInstance = ():ItemQL => ({
    itemId: 0,
    code: '',
    defaultPrice: 0,
    description: '',
    images: [],
-   itemType: ItemType.NONE,
+   itemType: ItemTypeQL.NONE,
    manufacturer: '',
    model: '',
    name: '',
    notes: '',
    partNumber: '',
-   status: EntityStatus.INACTIVE,
+   status: EntityStatusQL.INACTIVE,
    unit: {
       unitId: 0,
       key: '',

@@ -14,11 +14,11 @@ import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {
    getTaskResourceDefaultInstance,
-   ITaskResource
-} from "../../../../../graphql/Maintenance.type";
+   TaskResourceQL
+} from "../../../../../graphql/Maintenance.ql";
 import TableFooter from '@material-ui/core/TableFooter';
 import { useQuery } from '@apollo/react-hooks';
-import {FETCH_CATEGORIES, FETCH_UNITS, ICategory, IUnit} from "../../../../../graphql/item.type";
+import {FETCH_CATEGORIES, FETCH_UNITS, CategoryQL, UnitQL} from "../../../../../graphql/Item.ql";
 import {buildFullName} from "../../../../../utils/globalUtil";
 import {TaskResourceDialog} from "./TaskResourceDialog";
 
@@ -40,22 +40,22 @@ const useStyles2 = makeStyles({
    }
 });
 
-export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecources}) => {
+export const TaskResource: FC<{taskRecources: TaskResourceQL[]}> = ({taskRecources}) => {
    const history = useHistory();
    const classes = useStyles2();
    const bottomNoneBoder = useBottomNoneBorder();
    const [open, setOpen] = React.useState(false);
-   const [resource, setResource] = useState<ITaskResource>(getTaskResourceDefaultInstance());
+   const [resource, setResource] = useState<TaskResourceQL>(getTaskResourceDefaultInstance());
    // const employeeJobsData = useQuery<{maintenances: {employeeJobs: IEmployeeJob[]}}, any>(FETCH_EMPLOYEE_JOBS);
-   const employeeJobsData = useQuery<{categories: ICategory[]}, any>(FETCH_CATEGORIES, {variables: {scope:'EMPLOYEE_JOB_CATEGORY'}});
-   const unitsData = useQuery<{units: IUnit[]}, any>(FETCH_UNITS);
+   const employeeJobsData = useQuery<{categories: CategoryQL[]}, any>(FETCH_CATEGORIES, {variables: {scope:'EMPLOYEE_JOB_CATEGORY'}});
+   const unitsData = useQuery<{units: UnitQL[]}, any>(FETCH_UNITS);
 
-   const handleAddEditResource = (trigger: ITaskResource) => {
+   const handleAddEditResource = (trigger: TaskResourceQL) => {
       setOpen(true);
       setResource(trigger);
    };
 
-   const handleSaveResource = (t: ITaskResource) => {
+   const handleSaveResource = (t: TaskResourceQL) => {
       t.order = taskRecources.length;
       if(t.taskResourceId === 0) {
          t.taskResourceId = -taskRecources.length;
@@ -67,7 +67,7 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
       setOpen(false);
    };
 
-   const getDescription = (r: ITaskResource) => {
+   const getDescription = (r: TaskResourceQL) => {
       switch (r.resourceType) {
          case 'INVENTORY': return r.inventoryResource? r.inventoryResource.name : '';
          case 'HUMAN': return r.employeeCategory? r.employeeCategory.name : '';
@@ -88,7 +88,7 @@ export const TaskResource: FC<{taskRecources: ITaskResource[]}> = ({taskRecource
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {taskRecources.sort((t1, t2) => t1.order - t2.order).map((row: ITaskResource, index) => (
+                  {taskRecources.sort((t1, t2) => t1.order - t2.order).map((row: TaskResourceQL, index) => (
                      <TableRow key={row.taskResourceId} hover>
                         <TableCell>{getDescription(row)}
                         </TableCell>

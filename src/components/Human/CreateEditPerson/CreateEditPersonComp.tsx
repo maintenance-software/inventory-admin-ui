@@ -12,7 +12,7 @@ import {Theme} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import Grid from "@material-ui/core/Grid/Grid";
-import {ContactType, IPerson} from "../../../graphql/persons.type";
+import {ContactTypeQL, PersonQL} from "../../../graphql/Person.ql";
 import {FETCH_PERSONS_GQL} from "../index";
 
 export const GET_PERSON_BY_ID = gql`
@@ -72,7 +72,7 @@ const SAVE_PERSON = gql`
 
 
 interface IEditProps {
-   user: IPerson;
+   user: PersonQL;
 }
 
 interface TabPanelProps {
@@ -147,8 +147,8 @@ const CreateEditPersonComp: React.FC<IEditProps> =  (props) => {
    const [activeTab, setActiveTab] = useState('1');
    const classes = useStyles();
    const [value, setValue] = React.useState(0);
-   const [savePerson, mutation] = useMutation<{ savePerson: IPerson }, any>(SAVE_PERSON);
-   const [getUserById, { called, loading, data }] = useLazyQuery<{persons: {person: IPerson}}, any>(GET_PERSON_BY_ID);
+   const [savePerson, mutation] = useMutation<{ savePerson: PersonQL }, any>(SAVE_PERSON);
+   const [getUserById, { called, loading, data }] = useLazyQuery<{persons: {person: PersonQL}}, any>(GET_PERSON_BY_ID);
    const [hasError, setHasError] = useState(false);
    const personId = +params.personId;
    const toggle = (tab: string) => {
@@ -176,7 +176,7 @@ const CreateEditPersonComp: React.FC<IEditProps> =  (props) => {
    if (loading || (!data && personId > 0))
       return <div>Loading</div>;
 
-   let person: IPerson = {
+   let person: PersonQL = {
       personId: 0,
       firstName: '',
       lastName: '',
@@ -207,7 +207,7 @@ const CreateEditPersonComp: React.FC<IEditProps> =  (props) => {
       firstName: person.firstName,
       lastName: person.lastName,
       email: person.contactInfo
-         .filter(c => c.contactType === ContactType.EMAIL)
+         .filter(c => c.contactType === ContactTypeQL.EMAIL)
          .map(c => c.contact)
          .find(c => true) || '',
       documentId: person.documentId,
@@ -216,15 +216,15 @@ const CreateEditPersonComp: React.FC<IEditProps> =  (props) => {
       state: person.address.state,
       country: person.address.country,
       workPhone: person.contactInfo
-         .filter(c => c.contactType === ContactType.WORK_PHONE)
+         .filter(c => c.contactType === ContactTypeQL.WORK_PHONE)
          .map(c => c.contact)
          .find(c => true) || '',
       cellPhone: person.contactInfo
-         .filter(c => c.contactType === ContactType.CELL_PHONE)
+         .filter(c => c.contactType === ContactTypeQL.CELL_PHONE)
          .map(c => c.contact)
          .find(c => true) || '',
       whatsapp: person.contactInfo
-         .filter(c => c.contactType === ContactType.WHATSAPP)
+         .filter(c => c.contactType === ContactTypeQL.WHATSAPP)
          .map(c => c.contact)
          .find(c => true) || '',
       onSavePersonCallback: (personForm: IPersonFormProps, resetForm: Function) => {
@@ -245,21 +245,21 @@ const CreateEditPersonComp: React.FC<IEditProps> =  (props) => {
                country: personForm.country
             },
             contactInfo: [{
-                          contactId: person.contactInfo.filter(c => c.contactType === ContactType.EMAIL).map(c => c.contactId).find(c =>true) || 0,
+                          contactId: person.contactInfo.filter(c => c.contactType === ContactTypeQL.EMAIL).map(c => c.contactId).find(c =>true) || 0,
                           contact: personForm.email,
-                          contactType: ContactType.EMAIL
+                          contactType: ContactTypeQL.EMAIL
                         }].concat([{
-                           contactId: person.contactInfo.filter(c => c.contactType === ContactType.WORK_PHONE).map(c => c.contactId).find(c =>true) || 0,
+                           contactId: person.contactInfo.filter(c => c.contactType === ContactTypeQL.WORK_PHONE).map(c => c.contactId).find(c =>true) || 0,
                            contact: personForm.workPhone,
-                           contactType: ContactType.WORK_PHONE
+                           contactType: ContactTypeQL.WORK_PHONE
                         }]).concat([{
-                           contactId: person.contactInfo.filter(c => c.contactType === ContactType.CELL_PHONE).map(c => c.contactId).find(c =>true) || 0,
+                           contactId: person.contactInfo.filter(c => c.contactType === ContactTypeQL.CELL_PHONE).map(c => c.contactId).find(c =>true) || 0,
                            contact: personForm.cellPhone,
-                           contactType: ContactType.CELL_PHONE
+                           contactType: ContactTypeQL.CELL_PHONE
                         }]).concat([{
-                           contactId: person.contactInfo.filter(c => c.contactType === ContactType.WHATSAPP).map(c => c.contactId).find(c =>true) || 0,
+                           contactId: person.contactInfo.filter(c => c.contactType === ContactTypeQL.WHATSAPP).map(c => c.contactId).find(c =>true) || 0,
                            contact: personForm.whatsapp,
-                           contactType: ContactType.WHATSAPP
+                           contactType: ContactTypeQL.WHATSAPP
                         }])
          };
          onSavePerson(mutationRequest);

@@ -13,7 +13,7 @@ import {useHistory} from "react-router";
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {getTaskDefaultInstance, ITask} from "../../../../../graphql/Maintenance.type";
+import {getTaskDefaultInstance, TaskQL} from "../../../../../graphql/Maintenance.ql";
 import TableFooter from '@material-ui/core/TableFooter';
 import {appendToPath} from "../../../../../utils/globalUtil";
 import { useRouteMatch } from 'react-router-dom';
@@ -44,7 +44,7 @@ const useStyles2 = makeStyles({
 
 interface TaskProps {
    maintenanceId: number;
-   tasks: ITask[];
+   tasks: TaskQL[];
 }
 
 export const Task: FC<TaskProps> = ({maintenanceId, tasks}) => {
@@ -66,7 +66,7 @@ export const Task: FC<TaskProps> = ({maintenanceId, tasks}) => {
                      </TableRow>
                   </TableHead>
                   <TableBody>
-                     {tasks.sort((t1, t2) => t1.taskId - t2.taskId).map((row: ITask, index) => (
+                     {tasks.sort((t1, t2) => t1.taskId - t2.taskId).map((row: TaskQL, index) => (
                         <TableRow key={row.taskId} hover>
                            <TableCell>{row.name}</TableCell>
                            <TableCell>{row.taskCategory? row.taskCategory.name : ''}</TableCell>

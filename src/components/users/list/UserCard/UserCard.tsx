@@ -2,10 +2,10 @@ import React from 'react';
 import './UserCard.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {buildFullName, buildShortName} from '../../../../utils/globalUtil';
-import {IUser} from "../../../../graphql/users.type";
+import {UserQL} from "../../../../graphql/User.ql";
 
 export interface IUserCardProps {
-   user: IUser;
+   user: UserQL;
 }
 
 const UserCard: React.FC<IUserCardProps> =  (props) => {

@@ -1,24 +1,24 @@
 import {gql} from 'apollo-boost';
-import {IPage} from "./page.type";
-import {EntityStatus} from "./users.type";
-import {IItem, ItemType} from "./item.type";
+import {PageQL} from "./Common.ql";
+import {EntityStatusQL} from "./User.ql";
+import {ItemQL, ItemTypeQL} from "./Item.ql";
 
-export interface IPersons {
-   person: IPerson;
-   list: IPerson[];
+export interface PersonsQL {
+   person: PersonQL;
+   list: PersonQL[];
 }
 
-export interface IPerson {
+export interface PersonQL {
    personId: number;
    firstName: string;
    lastName: string;
    documentType: string;
    documentId: string;
-   address: Address | null;
-   contactInfo: ContactInfo[];
+   address: AddressQL | null;
+   contactInfo: ContactInfoQL[];
 }
 
-export interface Address {
+export interface AddressQL {
    addressId: number;
    street1: string;
    street2: string;
@@ -29,26 +29,26 @@ export interface Address {
    country: string;
 }
 
-export interface ContactInfo {
+export interface ContactInfoQL {
    contactId: number;
    contact: string;
    contactType: string;
 }
 
-export enum ContactType{
+export enum ContactTypeQL{
    EMAIL = 'EMAIL',
    WORK_PHONE = 'WORK_PHONE',
    CELL_PHONE = 'CELL_PHONE',
    WHATSAPP = 'WHATSAPP'
 }
 
-export interface IEmployees {
-   employee: IEmployee;
-   page: IPage<IEmployee>;
-   saveEmployee: IEmployee;
+export interface IEmployeesQL {
+   employee: IEmployeeQL;
+   page: PageQL<IEmployeeQL>;
+   saveEmployee: IEmployeeQL;
 }
 
-export interface IEmployee {
+export interface IEmployeeQL {
    employeeId: number;
    firstName: string;
    lastName: string;
@@ -56,14 +56,14 @@ export interface IEmployee {
    documentId: string;
    hireDate: string;
    salary: number;
-   employeeJob: IEmployeeJob;
-   address: Address;
-   contactInfo: ContactInfo[];
+   employeeJob: IEmployeeJobQL;
+   address: AddressQL;
+   contactInfo: ContactInfoQL[];
    createdDate: string;
    modifiedDate: string;
 }
 
-export interface  IEmployeeJob {
+export interface  IEmployeeJobQL {
    employeeJobId: number;
    tittle: string;
    description: string;
@@ -71,7 +71,7 @@ export interface  IEmployeeJob {
    modifiedDate: string;
 }
 
-export const getPersonDefaultInstance = ():IPerson => ({
+export const getPersonDefaultInstance = ():PersonQL => ({
    personId: 0,
    firstName: '',
    lastName: '',
@@ -81,7 +81,7 @@ export const getPersonDefaultInstance = ():IPerson => ({
    contactInfo: []
 });
 
-export const getEmployeeJobDefaultInstance = ():IEmployeeJob => ({
+export const getEmployeeJobDefaultInstance = ():IEmployeeJobQL => ({
    employeeJobId: 0,
    tittle: '',
    description: '',

@@ -21,11 +21,11 @@ import ListIcon from '@material-ui/icons/List';
 import EditIcon from '@material-ui/icons/Edit';
 import {SearchInput} from "../../SearchInput/SearchInput";
 import { TablePaginationActions } from "../../../utils/TableUtils";
-import {CHANGE_ITEM_STATUS, FETCH_ITEMS_GQL, IItem, IItems, ItemType} from "../../../graphql/item.type";
+import {CHANGE_ITEM_STATUS, FETCH_ITEMS_GQL, ItemQL, ItemsQL, ItemTypeQL} from "../../../graphql/Item.ql";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton/IconButton";
-import {EntityStatus} from "../../../graphql/users.type";
+import {EntityStatusQL} from "../../../graphql/User.ql";
 import {clearCache} from "../../../utils/globalUtil";
 import {grapqhQlClient} from "../../../index";
 
@@ -54,10 +54,10 @@ export const SparePartsSuppliesItemComp: React.FC = () => {
    const [searchInput, setSearchInput] = React.useState<string>('');
    const [searchString, setSearchString] = React.useState<string>('');
    const buttonClasses = useButtonStyles();
-   const [fetchItemTools, { called, loading, data }] = useLazyQuery<{items: IItems}, any>(FETCH_ITEMS_GQL);
-   const [changeItemStatus] = useMutation<{items: IItems}, any>(CHANGE_ITEM_STATUS);
+   const [fetchItemTools, { called, loading, data }] = useLazyQuery<{items: ItemsQL}, any>(FETCH_ITEMS_GQL);
+   const [changeItemStatus] = useMutation<{items: ItemsQL}, any>(CHANGE_ITEM_STATUS);
    const defaultFilters = [{field: "status",operator: "=", value: "ACTIVE"}
-      , {field: "itemType",operator: "=", value: ItemType.SPARE_PARTS}
+      , {field: "itemType",operator: "=", value: ItemTypeQL.SPARE_PARTS}
    ];
 
    useEffect(() => {
@@ -75,7 +75,7 @@ export const SparePartsSuppliesItemComp: React.FC = () => {
    };
 
    const onDeleteItems = (event: React.MouseEvent<HTMLButtonElement>) => {
-      changeItemStatus({variables: {itemIds: selectedItems, status: EntityStatus.INACTIVE }
+      changeItemStatus({variables: {itemIds: selectedItems, status: EntityStatusQL.INACTIVE }
          , update: (cache) => clearCache(cache, 'items.page')
       }).then((changeStatusResponse) => {
          if(changeStatusResponse.data && changeStatusResponse.data.items.changeItemStatus) {
@@ -190,7 +190,7 @@ export const SparePartsSuppliesItemComp: React.FC = () => {
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {data.items.page.content.map((row: IItem) => (
+                  {data.items.page.content.map((row: ItemQL) => (
                      <TableRow key={row.itemId}>
                         <TableCell style={{padding: '0'}}>
                            <Checkbox

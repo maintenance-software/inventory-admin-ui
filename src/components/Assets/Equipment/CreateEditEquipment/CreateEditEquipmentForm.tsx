@@ -12,7 +12,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SaveIcon from '@material-ui/icons/Save';
 import {useHistory} from "react-router";
 import IconButton from "@material-ui/core/IconButton/IconButton";
-import {EntityStatus} from "../../../../graphql/users.type";
+import {EntityStatusQL} from "../../../../graphql/User.ql";
 const useFormStyles = makeStyles((theme: Theme) =>
    createStyles({
       root: {
@@ -57,7 +57,7 @@ export interface IEquipmentForm {
    manufacturer: string;
    model: string;
    notes: string;
-   status: EntityStatus;
+   status: EntityStatusQL;
    images: string[];
    priority: number;
    hoursAverageDailyUse: number;

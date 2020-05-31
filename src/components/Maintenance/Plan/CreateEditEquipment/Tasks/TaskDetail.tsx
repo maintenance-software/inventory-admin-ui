@@ -2,15 +2,13 @@ import React, { useEffect, FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import {FormikHelpers, useFormik} from 'formik';
 import * as Yup from "yup";
-import { isNumber } from 'util';
-import {ITaskCategory} from "../../../../../graphql/Maintenance.type";
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import MenuItem from '@material-ui/core/MenuItem';
-import {ICategory} from "../../../../../graphql/item.type";
+import {CategoryQL} from "../../../../../graphql/Item.ql";
 
 const useSliderStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -23,7 +21,7 @@ const useSliderStyles = makeStyles((theme: Theme) =>
    }),
 );
 
-export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: ICategory[]}> =  ({taskDetailForm, taskCategories}) => {
+export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: CategoryQL[]}> =  ({taskDetailForm, taskCategories}) => {
    const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid, setFieldValue } = taskDetailForm;
    const classes = useSliderStyles();
   //  const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid, setFieldValue } = useFormik<ITaskDetail>({

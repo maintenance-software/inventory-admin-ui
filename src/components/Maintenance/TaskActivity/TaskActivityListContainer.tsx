@@ -5,14 +5,14 @@ import {useRouteMatch} from "react-router-dom";
 import {TaskActivity, TaskActivityList} from './TaskActivityList';
 import {
    FETCH_TASK_ACTIVITIES_GQL, GET_MAINTENANCE_PLAN_BY_ID,
-   IMaintenancePlans,
-   ITaskActivity,
+   MaintenancesQL,
+   TaskActivityQL,
    SAVE_TASK_ACTIVITY_EVENT_GQL
-} from "../../../graphql/Maintenance.type";
+} from "../../../graphql/Maintenance.ql";
 import {TaskAvailableDialog} from "./TaskActivityEventDialog";
 import {clearCache} from "../../../utils/globalUtil";
 import moment from 'moment';
-import {GET_USER_SESSION_GQL, ISession} from "../../../graphql/session.type";
+import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
 
 export const TaskActivityListContainer: React.FC = () => {
    const history = useHistory();
@@ -22,9 +22,9 @@ export const TaskActivityListContainer: React.FC = () => {
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const sessionQL = useQuery<{session: ISession}, any>(GET_USER_SESSION_GQL);
-   const [fetchTaskActivities, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(FETCH_TASK_ACTIVITIES_GQL);
-   const [saveTaskActivityEvent, saveActivityStatus] = useMutation<{ maintenances: IMaintenancePlans }, any>(SAVE_TASK_ACTIVITY_EVENT_GQL);
+   const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
+   const [fetchTaskActivities, { called, loading, data }] = useLazyQuery<{maintenances: MaintenancesQL}, any>(FETCH_TASK_ACTIVITIES_GQL);
+   const [saveTaskActivityEvent, saveActivityStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_TASK_ACTIVITY_EVENT_GQL);
    useEffect(() => {
       fetchTaskActivities({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize }});
    }, []);
@@ -51,7 +51,7 @@ export const TaskActivityListContainer: React.FC = () => {
 
    const grouped: TaskActivity[] = [];
 
-   data.maintenances.taskActivities.content.forEach((taskActivity: ITaskActivity) => {
+   data.maintenances.taskActivities.content.forEach((taskActivity: TaskActivityQL) => {
       const groupIndex = grouped.findIndex((item: TaskActivity) => {
          return item.assetId === taskActivity.assetId;
       });

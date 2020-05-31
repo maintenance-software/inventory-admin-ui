@@ -21,13 +21,13 @@ import ListIcon from '@material-ui/icons/List';
 import EditIcon from '@material-ui/icons/Edit';
 import {SearchInput} from "../../SearchInput/SearchInput";
 import { TablePaginationActions } from "../../../utils/TableUtils";
-import {CHANGE_ITEM_STATUS, FETCH_ITEMS_GQL, IItem, IItems} from "../../../graphql/item.type";
+import {CHANGE_ITEM_STATUS, FETCH_ITEMS_GQL, ItemQL, ItemsQL} from "../../../graphql/Item.ql";
 import {useHistory} from "react-router";
 import IconButton from "@material-ui/core/IconButton/IconButton";
-import {EntityStatus} from "../../../graphql/users.type";
+import {EntityStatusQL} from "../../../graphql/User.ql";
 import {clearCache} from "../../../utils/globalUtil";
 import {grapqhQlClient} from "../../../index";
-import {FETCH_INVENTORY_ITEMS, IInventories, IInventoryItem} from "../../../graphql/inventory.type";
+import {FETCH_INVENTORY_ITEMS, InventoriesQL, InventoryItemQL} from "../../../graphql/Inventory.ql";
 import {EditInventoryItemForm, IInventoryItemForm} from "./CreateInventoryItemForm";
 import Dialog from '@material-ui/core/Dialog';
 import {DialogContent} from '@material-ui/core';
@@ -60,7 +60,7 @@ export const InventoryStockComp: React.FC = () => {
    const [open, setOpen] = React.useState(false);
    const [selectedItems, setSelectedItems] = React.useState<number[]>([]);
    const buttonClasses = useButtonStyles();
-   const [fetchInventoryItems, { called, loading, data }] = useLazyQuery<{inventories: IInventories}, any>(FETCH_INVENTORY_ITEMS);
+   const [fetchInventoryItems, { called, loading, data }] = useLazyQuery<{inventories: InventoriesQL}, any>(FETCH_INVENTORY_ITEMS);
    // const [changeItemStatus] = useMutation<{items: IItems}, any>(CHANGE_ITEM_STATUS);
    // const defaultFilters = [{field: "status",operator: "=", value: "ACTIVE"}, {field: "itemType",operator: "=", value: "TOOLS"}];
    const inventoryId = +params.inventoryId;
@@ -121,7 +121,7 @@ export const InventoryStockComp: React.FC = () => {
       }
    };
 
-   const handleSelectItems = (items: IItem[]) => {
+   const handleSelectItems = (items: ItemQL[]) => {
       setSelectedItems(items.map(item => item.itemId));
    };
 
@@ -199,7 +199,7 @@ export const InventoryStockComp: React.FC = () => {
                      </TableRow>
                   </TableHead>
                   <TableBody>
-                     {data.inventories.inventory.inventoryItems.content.map((row: IInventoryItem) => (
+                     {data.inventories.inventory.inventoryItems.content.map((row: InventoryItemQL) => (
                         <TableRow key={row.inventoryItemId}>
                            <TableCell style={{padding: '0'}}>
                               <Checkbox

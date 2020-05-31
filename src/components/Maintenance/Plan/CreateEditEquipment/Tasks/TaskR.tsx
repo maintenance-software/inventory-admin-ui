@@ -9,9 +9,8 @@ import {AppBar, Button, Divider} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs/Tabs";
 import Tab from "@material-ui/core/Tab/Tab";
 import {
-   ITask,
-   ITaskCategory
-} from "../../../../../graphql/Maintenance.type";
+   TaskQL
+} from "../../../../../graphql/Maintenance.ql";
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import {TaskDetailComp} from "./TaskDetail";
@@ -19,7 +18,7 @@ import {TaskTrigger} from "./Trigger";
 import {appendToPath, clearCache} from "../../../../../utils/globalUtil";
 import {SubTask} from "./SubTask";
 import {TaskResource} from "./TaskResource";
-import {ICategory} from "../../../../../graphql/item.type";
+import {CategoryQL} from "../../../../../graphql/Item.ql";
 
 interface TabPanelProps {
    children?: React.ReactNode;
@@ -59,9 +58,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface ITaskProps {
-   task: ITask;
-   taskCategories: ICategory[];
-   onSaveTask(task: ITask): void;
+   task: TaskQL;
+   taskCategories: CategoryQL[];
+   onSaveTask(task: TaskQL): void;
 }
 
 interface ITaskDetailForm {
@@ -128,7 +127,7 @@ export const TaskR: React.FC<ITaskProps> =  ({task, taskCategories, onSaveTask})
       const downTimeDurationMM = +taskDetailFormik.getFieldProps('downTimeDurationMM').value;
       const categoryId = +taskDetailFormik.getFieldProps('taskCategoryId').value;
 
-      const newTask: ITask = {
+      const newTask: TaskQL = {
          taskId: task.taskId,
          name: taskDetailFormik.getFieldProps('name').value,
          description: taskDetailFormik.getFieldProps('description').value,

@@ -4,7 +4,7 @@ import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {MaintenancePlanComp_} from './MaintenancePlanComp_';
 import {MaintenancePlanContext} from "../Routes";
-import {FETCH_MAINTENANCE_PLAN_GQL, IMaintenancePlan, IMaintenancePlans} from "../../../graphql/Maintenance.type";
+import {FETCH_MAINTENANCE_PLAN_GQL, MaintenanceQL, MaintenancesQL} from "../../../graphql/Maintenance.ql";
 import {appendToPath} from "../../../utils/globalUtil";
 
 export const MaintenancePlanComp: React.FC = () => {
@@ -14,7 +14,7 @@ export const MaintenancePlanComp: React.FC = () => {
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
-   const [fetchMaintenancePlans, { called, loading, data }] = useLazyQuery<{maintenances: IMaintenancePlans}, any>(FETCH_MAINTENANCE_PLAN_GQL);
+   const [fetchMaintenancePlans, { called, loading, data }] = useLazyQuery<{maintenances: MaintenancesQL}, any>(FETCH_MAINTENANCE_PLAN_GQL);
 
    useEffect(() => {
       fetchMaintenancePlans({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize }});
@@ -50,6 +50,6 @@ export const MaintenancePlanComp: React.FC = () => {
       onChangeRowsPerPage={handleChangeRowsPerPage}
       onSearchMaintenancePlan={handleSearch}
       onAddMaintenancePlan={() => history.push(appendToPath(url, '0'))}
-      onEditMaintenancePlan={(maintenance: IMaintenancePlan) => history.push(appendToPath(url, maintenance.maintenanceId.toString()))}
+      onEditMaintenancePlan={(maintenance: MaintenanceQL) => history.push(appendToPath(url, maintenance.maintenanceId.toString()))}
    />;
 };
