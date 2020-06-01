@@ -31,7 +31,7 @@ import Collapse from '@material-ui/core/Collapse';
 import Box from '@material-ui/core/Box';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
-import {ITaskActivity} from "./TaskActivityListContainer";
+import {ITaskActivity} from "../TaskActivity/TaskActivityListContainer";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -67,30 +67,14 @@ const useRowStyles = makeStyles({
    }
 });
 
-interface ITaskActivityProps {
-   taskActivities: ITaskActivity[];
-   pageIndex: number;
-   pageSize: number;
-   totalCount: number;
-   searchString?: string;
-   taskActivitiesSelected: number[];
-   onChangePage?(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
-   onChangeRowsPerPage?(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
-   onSearchTaskActivity?(searchString: string) : void;
-   onCreateActivityByEvent?() : void;
-   onCreateWorkOrder() : void;
-   onSelectTaskActivity(taskActivityId: number, assetId: number, taskId: number, checked: boolean): void;
+interface IWorkOrderTaskProps {
+   workOrderTasks: ITaskActivity[];
 }
 
-export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIndex, pageSize, totalCount, searchString, taskActivitiesSelected, onChangePage, onChangeRowsPerPage, onSearchTaskActivity, onCreateActivityByEvent, onCreateWorkOrder, onSelectTaskActivity}) => {
+export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
-   const [searchInput, setSearchInput] = React.useState<string>(searchString || '');
-   const onSearch = (event: FormEvent) => {
-      event.preventDefault();
-      onSearchTaskActivity && onSearchTaskActivity(searchInput);
-   };
 
    const CustomRow: FC<ITaskActivity> = (props) => {
       const [open, setOpen] = React.useState(true);
@@ -111,8 +95,6 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
                   <TableCell padding="checkbox" className={index + 1 == props.activities.length? '' : classes.noBorder}>
                      <Checkbox
                         color='primary'
-                        onChange={(event) => onSelectTaskActivity(historyRow.taskActivityId, props.assetId, historyRow.taskId, event.target.checked)}
-                        checked={taskActivitiesSelected.indexOf(historyRow.taskActivityId) !== -1}
                         inputProps={{ 'aria-labelledby': index.toString() }}
                      />
                   </TableCell>
@@ -127,10 +109,9 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
          </>
       );
    };
-
-   const  CollapsibleTable: FC<{taskActivities: ITaskActivity[]}> = ({taskActivities}) => {
-      const classes = useStyles2();
-      return (
+   //const classes = useStyles2();
+   return (
+      <Paper className={classes.root}>
          <TableContainer className={classes.container}>
             <Table stickyHeader aria-label="collapsible table" size="small">
                <TableHead>
@@ -145,74 +126,12 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {taskActivities.map((row) => (
+                  {workOrderTasks.map((row) => (
                      <CustomRow key={row.assetId} {...row} />
                   ))}
                </TableBody>
             </Table>
          </TableContainer>
-      );
-   };
-
-   return (
-      <Paper className={classes.root}>
-         <Grid container direction="row" justify="flex-start" wrap='nowrap'>
-            <Grid container wrap='nowrap'>
-               <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  startIcon={<AssignmentIcon/>}
-                  className={buttonClasses.button}
-                  disabled={taskActivitiesSelected.length === 0}
-                  onClick={()=> onCreateWorkOrder() }
-               >
-                  Create OT
-               </Button>
-               <Button
-                  variant="contained"
-                  color="default"
-                  size="small"
-                  startIcon={<WorkIcon/>}
-                  onClick={()=> onCreateActivityByEvent && onCreateActivityByEvent() }
-                  className={buttonClasses.button}
-               >
-                  Tarea no planificada
-               </Button>
-
-               <Button
-                  variant="contained"
-                  color="default"
-                  size='small'
-                  startIcon={<ListIcon/>}
-                  className={buttonClasses.button}
-               >
-                  Options
-               </Button>
-            </Grid>
-            <Grid container alignItems='center' justify='flex-end' style={{paddingRight:'.5rem'}}>
-               <form  noValidate autoComplete="off" onSubmit={onSearch}>
-                  <SearchInput placeholder="Search" value={searchInput} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchInput(event.target.value)}/>
-               </form>
-            </Grid>
-         </Grid>
-
-         <CollapsibleTable taskActivities={taskActivities}/>
-
-         <TablePagination
-            component="div"
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-            count={totalCount}
-            rowsPerPage={pageSize}
-            page={pageIndex}
-            SelectProps={{
-               inputProps: { 'aria-label': 'rows per page' },
-               native: true,
-            }}
-            onChangePage={onChangePage || (() =>{})}
-            onChangeRowsPerPage={onChangeRowsPerPage}
-            ActionsComponent={TablePaginationActions}
-         />
       </Paper>
    );
 };

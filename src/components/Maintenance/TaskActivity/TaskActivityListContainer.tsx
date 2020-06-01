@@ -2,9 +2,9 @@ import React, {useEffect, useContext} from 'react';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
-import {TaskActivity, TaskActivityList} from './TaskActivityList';
+import {TaskActivityList} from './TaskActivityList';
 import {
-   FETCH_TASK_ACTIVITIES_GQL, GET_MAINTENANCE_PLAN_BY_ID,
+   FETCH_TASK_ACTIVITIES_GQL,
    MaintenancesQL,
    TaskActivityQL,
    SAVE_TASK_ACTIVITY_EVENT_GQL
@@ -13,12 +13,34 @@ import {TaskAvailableDialog} from "./TaskActivityEventDialog";
 import {clearCache} from "../../../utils/globalUtil";
 import moment from 'moment';
 import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
+import {EntityStatusQL} from "../../../graphql/User.ql";
+
+export interface ITaskActivity {
+   assetId: number;
+   assetName: string;
+   assetCode: string;
+   taskCount: number;
+   maintenanceCount: number;
+   activities: IActivity[];
+}
+
+export interface IActivity {
+   taskActivityId: number;
+   scheduledDate: string;
+   calculatedDate: string;
+   status: EntityStatusQL;
+   taskName: string;
+   taskPriority: number;
+   triggerDescription: string;
+   taskId: number;
+   taskTriggerId: number;
+}
 
 export const TaskActivityListContainer: React.FC = () => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const [open, setOpen] = React.useState(false);
-   const [taskActivitiesSelected, setTaskActivitiesSelected] = React.useState<number[]>([]);
+   const [taskActivitiesSelected, setTaskActivitiesSelected] = React.useState<ITaskActivity[]>([]);
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
@@ -49,13 +71,13 @@ export const TaskActivityListContainer: React.FC = () => {
       setPageIndex(0);
    };
 
-   const grouped: TaskActivity[] = [];
+   const taskActivities: ITaskActivity[] = [];
 
    data.maintenances.taskActivities.content.forEach((taskActivity: TaskActivityQL) => {
-      const groupIndex = grouped.findIndex((item: TaskActivity) => {
+      const groupIndex = taskActivities.findIndex((item: ITaskActivity) => {
          return item.assetId === taskActivity.assetId;
       });
-      groupIndex !== -1 ? grouped[groupIndex].activities.push({
+      groupIndex !== -1 ? taskActivities[groupIndex].activities.push({
             taskActivityId: taskActivity.taskActivityId,
             scheduledDate: taskActivity.scheduledDate,
             calculatedDate: taskActivity.calculatedDate,
@@ -66,7 +88,7 @@ export const TaskActivityListContainer: React.FC = () => {
             taskId: taskActivity.taskId,
             taskTriggerId: taskActivity.taskTriggerId
          })
-         : grouped.push(
+         : taskActivities.push(
             {
                assetId: taskActivity.assetId,
                assetName: taskActivity.assetName,
@@ -110,23 +132,68 @@ export const TaskActivityListContainer: React.FC = () => {
    };
 
    const handleNeWorkOrder = () => {
-      history.push({pathname: '/maintenances/workOrders/0', state: {taskActivityIds: taskActivitiesSelected}});
+      history.push({pathname: '/maintenances/workOrders/0', state: {taskActivities: taskActivitiesSelected}});
+   };
+
+   const handleSelectTaskActivity = (taskActivityId: number, assetId: number, taskId: number, checked: boolean) => {
+      let newSelected = taskActivitiesSelected.concat();
+      if(checked) {
+         const [taskActivity] = taskActivities.filter(ta => !!ta.activities.find(a => a.taskActivityId === taskActivityId));
+         const [activity] = taskActivity.activities.filter(a => a.taskActivityId === taskActivityId);
+
+         if(!newSelected.find(ta => ta.assetId === assetId)) {
+            newSelected.push({
+               assetId: taskActivity.assetId,
+               assetName: taskActivity.assetName,
+               assetCode: taskActivity.assetCode,
+               taskCount: taskActivity.taskCount,
+               maintenanceCount: taskActivity.maintenanceCount,
+               activities: []
+            });
+         }
+
+         const [ta] = newSelected.filter(ta => ta.assetId === assetId);
+         if(!ta.activities.find(a => a.taskActivityId === taskActivityId)) {
+            ta.activities.push({
+               taskActivityId: activity.taskActivityId,
+               scheduledDate: activity.scheduledDate,
+               calculatedDate: activity.calculatedDate,
+               status: activity.status,
+               taskName: activity.taskName,
+               taskPriority: activity.taskPriority,
+               triggerDescription: activity.triggerDescription,
+               taskId: activity.taskId,
+               taskTriggerId: activity.taskTriggerId
+            })
+         }
+      } else {
+          newSelected = newSelected.map( ta => ({
+             assetId: ta.assetId,
+             assetName: ta.assetName,
+             assetCode: ta.assetCode,
+             taskCount: ta.taskCount,
+             maintenanceCount: ta.maintenanceCount,
+             activities: ta.activities.filter(a => a.taskActivityId !== taskActivityId)
+          })).filter(ta => ta.activities.length > 0);
+      }
+      setTaskActivitiesSelected(newSelected);
    };
 
    return(
    <>
       <TaskActivityList
-         taskActivities={grouped}
+         taskActivities={taskActivities}
          totalCount={data.maintenances.taskActivities.totalCount}
          pageIndex={data.maintenances.taskActivities.pageInfo.pageIndex}
          pageSize={data.maintenances.taskActivities.pageInfo.pageSize}
          searchString={searchString}
+         taskActivitiesSelected={taskActivitiesSelected.map(ta => ta.activities.map(a => a.taskActivityId)).flat()}
          onChangePage={handleChangePage}
          onChangeRowsPerPage={handleChangeRowsPerPage}
          onSearchTaskActivity={handleSearch}
          onCreateActivityByEvent={() => setOpen(true)}
          onCreateWorkOrder={() => handleNeWorkOrder()}
-         onSelectTaskActivity={(taskActivities: number[]) => setTaskActivitiesSelected(taskActivities)}
+         onSelectTaskActivity={handleSelectTaskActivity}
       />
       <TaskAvailableDialog open={open} setOpen={setOpen} onAccept={onAcceptHandle}/>
    </>);

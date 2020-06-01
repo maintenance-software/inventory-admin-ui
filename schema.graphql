@@ -241,7 +241,7 @@ type Page_Person {
     sort: Sort!
 }
 
-type PersonArg {
+input PersonArg {
     personId: Int!
     firstName: String!
     lastName: String!

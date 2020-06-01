@@ -16,6 +16,8 @@ import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import {useHistory} from "react-router";
 import {useParams, useRouteMatch} from 'react-router-dom';
 import {GET_WORK_ORDER_BY_ID_QL, getWorkOrderDefaultInstance, WorkOrderQL} from "../../../graphql/WorkOrder.ql";
+import {ITaskActivity} from "../TaskActivity/TaskActivityListContainer";
+import {WorkOrderTasks} from "./WorkOrderTasks";
 
 const useDateStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -47,7 +49,7 @@ export const WorkOrderContainer: React.FC =  () => {
    const [workOrder, setWorOrder] = React.useState<WorkOrderQL>(getWorkOrderDefaultInstance());
    const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{maintenances: {workOrder: WorkOrderQL}}, any>(GET_WORK_ORDER_BY_ID_QL);
    const workOrderId = +params.workOrderId;
-   const taskActivityIds: number[] = history.location.state? history.location.state.taskActivityIds : [53, 52, 54, 56];
+   const taskActivities: ITaskActivity[] = history.location.state? history.location.state.taskActivities : [];
 
    useEffect(() => {
       if(workOrderId) {
@@ -61,7 +63,7 @@ export const WorkOrderContainer: React.FC =  () => {
       }
    }, [called, loading, data]);
 
-   console.log(taskActivityIds);
+   console.log(taskActivities);
   return (
      <>
         <Grid container spacing={1}>
@@ -114,6 +116,8 @@ export const WorkOrderContainer: React.FC =  () => {
               </Grid>
 
            </Grid>
+
+           <WorkOrderTasks workOrderTasks={taskActivities}/>
         </Grid>
      </>
   );
