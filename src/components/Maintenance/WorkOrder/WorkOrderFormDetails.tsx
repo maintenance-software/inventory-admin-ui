@@ -40,34 +40,15 @@ const useButtonStyles = makeStyles(theme => ({
    },
 }));
 
-export const WorkOrderContainer: React.FC =  () => {
+export const WorkOrderFormDetails: React.FC =  () => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const params = useParams();
    const buttonClasses = useButtonStyles();
-   const dateStyle = useDateStyles();
-   const [workOrder, setWorOrder] = React.useState<WorkOrderQL>(getWorkOrderDefaultInstance());
-   const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{maintenances: {workOrder: WorkOrderQL}}, any>(GET_WORK_ORDER_BY_ID_QL);
-   const workOrderId = +params.workOrderId;
-   const taskActivities: ITaskActivity[] = history.location.state? history.location.state.taskActivities : [];
 
-   useEffect(() => {
-      if(workOrderId) {
-         getWorkOrderById({variables: {workOrderId}})
-      }
-   }, []);
-
-   useEffect(() => {
-      if(called && !loading && data) {
-         setWorOrder(data.maintenances.workOrder);
-      }
-   }, [called, loading, data]);
-
-   console.log(taskActivities);
   return (
      <>
         <Grid container spacing={1}>
-
            <Grid container wrap='nowrap'>
               <Button
                  variant="contained"
@@ -114,10 +95,7 @@ export const WorkOrderContainer: React.FC =  () => {
                     </Grid>
                  </Grid>
               </Grid>
-
            </Grid>
-
-           <WorkOrderTasks workOrderTasks={taskActivities}/>
         </Grid>
      </>
   );

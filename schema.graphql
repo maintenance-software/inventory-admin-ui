@@ -178,6 +178,8 @@ type TaskActivity {
     taskName: String!
     taskPriority: Int!
     taskTriggerId: Int!
+    taskCategoryId: Int
+    taskCategoryName: String
     triggerDescription: String!
     taskType: String!
     createdDate: String!
@@ -531,7 +533,7 @@ type Employees {
     saveEmployee(employeeId: Int!, firstName: String!, lastName: String!, documentType: String!, documentId: String!, hireDate: String, salary: Float!, employeeCategoryId: Int!, address: AddressArg, contactInfo: [ContactInfoArg!]!): Employee!
 }
 
-type WorkOrderResourceArg {
+input WorkOrderResourceArg {
     workOrderResourceId: Int!
     humanResourceId: Int
     inventoryItemId: Int

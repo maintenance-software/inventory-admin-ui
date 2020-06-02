@@ -3,7 +3,8 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import TableContainer from "@material-ui/core/TableContainer/TableContainer";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TablePagination from "@material-ui/core/TablePagination/TablePagination";
+import NoteAddIcon from '@material-ui/icons/NoteAdd';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TableCell from '@material-ui/core/TableCell';
@@ -24,7 +25,6 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import VisibilityIcon from '@material-ui/icons/Visibility';
 import {TaskActivityQL} from "../../../graphql/Maintenance.ql";
 import {EntityStatusQL} from "../../../graphql/User.ql";
 import Collapse from '@material-ui/core/Collapse';
@@ -32,6 +32,8 @@ import Box from '@material-ui/core/Box';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import {ITaskActivity} from "../TaskActivity/TaskActivityListContainer";
+import moment from 'moment';
+import {WorkOrderResourceDialog} from "./WorkOrderResourceDialog";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -69,9 +71,10 @@ const useRowStyles = makeStyles({
 
 interface IWorkOrderTaskProps {
    workOrderTasks: ITaskActivity[];
+   onSetWorkOrderResource(taskId: number): void;
 }
 
-export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks}) => {
+export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks, onSetWorkOrderResource}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
@@ -82,56 +85,60 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks}) => {
       return (
          <>
             <TableRow>
-               <TableCell className={!open? '' : classes.noBottomBorder} colSpan={7} style={{fontWeight: 'bold', fontSize: '1.1rem'}}>
-                  <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                     {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                  </IconButton>
+               <TableCell className={!open? '' : classes.noBottomBorder} style={{paddingLeft: 0, paddingRight: 0}}>
+                  <div style={{display: 'flex'}}>
+                     <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                     </IconButton>
+                     <IconButton aria-label="expand row" size="small"><VisibilityIcon/></IconButton>
+                  </div>
+               </TableCell>
+               <TableCell colSpan={5} style={{fontWeight: 'bold', fontSize: '1.1rem'}}>
                   {props.assetName}
                   ({props.assetCode})
                </TableCell>
             </TableRow>
             {open && props.activities.map((historyRow, index) => (
                <TableRow key={historyRow.taskActivityId}>
-                  <TableCell padding="checkbox" className={index + 1 == props.activities.length? '' : classes.noBorder}>
-                     <Checkbox
-                        color='primary'
-                        inputProps={{ 'aria-labelledby': index.toString() }}
-                     />
+                  <TableCell padding="checkbox"
+                             className={index + 1 == props.activities.length? '' : classes.noBorder}
+                             style={{paddingRight: 0}}
+                  >
+                     <IconButton color="secondary" aria-label="Set Task Resources" onClick={() => onSetWorkOrderResource(historyRow.taskId)}>
+                        <NoteAddIcon/>
+                     </IconButton>
                   </TableCell>
                   <TableCell>{historyRow.taskName}</TableCell>
                   <TableCell>{historyRow.taskPriority}</TableCell>
-                  <TableCell>{historyRow.triggerDescription}</TableCell>
-                  <TableCell>{historyRow.scheduledDate}</TableCell>
-                  <TableCell>{historyRow.calculatedDate}</TableCell>
-                  <TableCell>{historyRow.status}</TableCell>
+                  <TableCell>{moment(historyRow.calculatedDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm')}</TableCell>
+                  <TableCell>{historyRow.taskCategoryName}</TableCell>
                </TableRow>
             ))}
          </>
       );
    };
-   //const classes = useStyles2();
+
    return (
-      <Paper className={classes.root}>
-         <TableContainer className={classes.container}>
-            <Table stickyHeader aria-label="collapsible table" size="small">
-               <TableHead>
-                  <TableRow>
-                     <TableCell/>
-                     <TableCell>Task</TableCell>
-                     <TableCell>Priority</TableCell>
-                     <TableCell>Trigger</TableCell>
-                     <TableCell>Scheduled</TableCell>
-                     <TableCell>Calc Date</TableCell>
-                     <TableCell>Status</TableCell>
-                  </TableRow>
-               </TableHead>
-               <TableBody>
-                  {workOrderTasks.map((row) => (
-                     <CustomRow key={row.assetId} {...row} />
-                  ))}
-               </TableBody>
-            </Table>
-         </TableContainer>
-      </Paper>
+      <>
+         <Paper className={classes.root}>
+            <TableContainer className={classes.container}>
+               <Table stickyHeader aria-label="collapsible table" size="small">
+                  <TableHead>
+                     <TableRow>
+                        <TableCell colSpan={2}>Assets / Task</TableCell>
+                        <TableCell>Priority</TableCell>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Task Type</TableCell>
+                     </TableRow>
+                  </TableHead>
+                  <TableBody>
+                     {workOrderTasks.map((row) => (
+                        <CustomRow key={row.assetId} {...row} />
+                     ))}
+                  </TableBody>
+               </Table>
+            </TableContainer>
+         </Paper>
+      </>
    );
 };

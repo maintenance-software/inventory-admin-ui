@@ -5,7 +5,7 @@ import {Redirect} from "react-router";
 import {MaintenancePlanComp} from "./Plan";
 import {CreateEditMaintenancePlanComp} from "./Plan/CreateEditEquipment/CreateEditMaintenancePlanComp";
 import {TaskActivityListContainer} from "./TaskActivity/TaskActivityListContainer";
-import {WorkOrderContainer} from "./WorkOrder/WorkOrder";
+import {WorkOrderContainer} from "./WorkOrder/WorkOrderContainer";
 
 interface IMaintenancePlanContext {
    maintenanceId: number;

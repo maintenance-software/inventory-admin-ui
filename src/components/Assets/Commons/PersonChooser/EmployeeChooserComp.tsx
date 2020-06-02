@@ -5,14 +5,14 @@ import {ISimplePerson, PersonChooser} from './PersonChooser';
 import {FETCH_EMPLOYEES, IEmployeesQL, PersonQL} from "../../../../graphql/Person.ql";
 import {buildFullName} from "../../../../utils/globalUtil";
 
-interface IPersonChooserProps {
+interface IEmployeeChooserProps {
    multiple: boolean;
    filters: any[];
    disableItems: number[];
    onSelectPerson?(person: ISimplePerson) : void
    onSelectPersons?(person: ISimplePerson[]) : void
 }
-export const PersonChooserComp: FC<IPersonChooserProps> = ({disableItems,multiple, filters, onSelectPersons}) => {
+export const EmployeeChooserComp: FC<IEmployeeChooserProps> = ({disableItems,multiple, filters, onSelectPersons}) => {
    const { path } = useRouteMatch();
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);

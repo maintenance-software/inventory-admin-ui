@@ -34,6 +34,8 @@ export interface TaskActivityQL {
    taskId: number;
    taskName: string;
    taskPriority: number;
+   taskCategoryId: number;
+   taskCategoryName: string;
    taskTriggerId: number;
    triggerDescription: string;
 }
@@ -265,6 +267,8 @@ export const FETCH_TASK_ACTIVITIES_GQL = gql`
                taskId
                taskName
                taskPriority
+               taskCategoryId
+               taskCategoryName
                taskTriggerId
                triggerDescription
             }

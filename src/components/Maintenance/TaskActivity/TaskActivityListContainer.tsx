@@ -31,6 +31,8 @@ export interface IActivity {
    status: EntityStatusQL;
    taskName: string;
    taskPriority: number;
+   taskCategoryId: number;
+   taskCategoryName: string;
    triggerDescription: string;
    taskId: number;
    taskTriggerId: number;
@@ -84,6 +86,8 @@ export const TaskActivityListContainer: React.FC = () => {
             status: taskActivity.status,
             taskName: taskActivity.taskName,
             taskPriority: taskActivity.taskPriority,
+            taskCategoryId: taskActivity.taskCategoryId,
+            taskCategoryName: taskActivity.taskCategoryName,
             triggerDescription: taskActivity.triggerDescription,
             taskId: taskActivity.taskId,
             taskTriggerId: taskActivity.taskTriggerId
@@ -102,6 +106,8 @@ export const TaskActivityListContainer: React.FC = () => {
                   status: taskActivity.status,
                   taskName: taskActivity.taskName,
                   taskPriority: taskActivity.taskPriority,
+                  taskCategoryId: taskActivity.taskCategoryId,
+                  taskCategoryName: taskActivity.taskCategoryName,
                   triggerDescription: taskActivity.triggerDescription,
                   taskId: taskActivity.taskId,
                   taskTriggerId: taskActivity.taskTriggerId
@@ -161,6 +167,8 @@ export const TaskActivityListContainer: React.FC = () => {
                status: activity.status,
                taskName: activity.taskName,
                taskPriority: activity.taskPriority,
+               taskCategoryId: activity.taskCategoryId,
+               taskCategoryName: activity.taskCategoryName,
                triggerDescription: activity.triggerDescription,
                taskId: activity.taskId,
                taskTriggerId: activity.taskTriggerId

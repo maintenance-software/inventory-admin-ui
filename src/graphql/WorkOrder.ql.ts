@@ -1,5 +1,7 @@
 import {gql} from 'apollo-boost';
 import {getPersonDefaultInstance, PersonQL} from "./Person.ql";
+import {TaskResourceQL} from "./Maintenance.ql";
+import {CategoryQL, ItemQL, UnitQL} from "./Item.ql";
 
 export interface WorkOrderQL {
    workOrderId: number;
@@ -16,6 +18,17 @@ export interface WorkOrderQL {
    parent?: WorkOrderQL;
    createdDate: string;
    modifiedDate: string;
+}
+
+export interface WorkOrderResourceQL {
+   resourceId: number;
+   name: string;
+   itemId: number;
+   inventoryItemId: number;
+   employeeCategoryId: number;
+   personId: number;
+   resourceType: string;
+   amount: number;
 }
 
 export const getWorkOrderDefaultInstance = ():WorkOrderQL => ({
@@ -97,7 +110,6 @@ export const SAVE_WORK_ORDER_QL = gql`
         $workOrderId: Int!,
         $workOrderStatus: String!,
         $estimateDuration: Int!,
-        $executionDuration: Int!,
         $rate: Int!,
         $notes: String!,
         $generatedById: Int!,
@@ -109,14 +121,43 @@ export const SAVE_WORK_ORDER_QL = gql`
             workOrderId: $workOrderId,
             workOrderStatus: $workOrderStatus,
             estimateDuration: $estimateDuration,
-            executionDuration: $executionDuration,
             rate: $rate,
             notes: $notes,
             generatedById: $generatedById,
             responsibleId: $responsibleId,
-            activityIds: $activityIds,    
+            activityIds: $activityIds,
+            resources: []
          ) {
             workOrderId            
+         }
+      }
+   }
+`;
+
+export const GET_TASK_RESOURCE_BY_ID_QL = gql`
+   query getTaskForWorkOrderById($taskId: Int!) {
+      maintenances {
+         task(entityId: $taskId) {
+            taskResources {
+               taskResourceId
+               order
+               amount
+               resourceType
+               unit {
+                  unitId
+                  label
+               }
+               employeeCategory {
+                  categoryId
+                  name
+                  description
+               }
+               inventoryResource {
+                  itemId
+                  code
+                  name
+               }
+            }
          }
       }
    }
