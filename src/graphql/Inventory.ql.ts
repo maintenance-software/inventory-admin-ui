@@ -7,6 +7,7 @@ export interface InventoriesQL {
    inventory: InventoryQL;
    list: InventoryQL[];
    saveInventory: InventoryQL;
+   fetchInventoriesForItem: InventoryQL[];
 }
 
 export interface InventoryQL {
@@ -29,6 +30,7 @@ export interface InventoryItemQL{
    location: string;
    dateExpiry: number;
    item: ItemQL;
+   inventory: InventoryQL;
    createdDate: string;
    modifiedDate: string;
 }
@@ -64,6 +66,18 @@ export const FETCH_INVENTORIES_GQL = gql`
             allowNegativeStocks
             status
          }         
+      }
+   }
+`;
+
+export const FETCH_INVENTORIES_FOR_ITEM_GQL = gql`
+   query fetchInventoriesForItem($itemId: Int!) {
+      inventories {
+         fetchInventoriesForItem(entityId: $itemId) {
+            inventoryId
+            name
+            status
+         }
       }
    }
 `;

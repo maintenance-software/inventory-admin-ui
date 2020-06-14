@@ -1,7 +1,7 @@
 import {gql} from 'apollo-boost';
 import {getPersonDefaultInstance, PersonQL} from "./Person.ql";
-import {TaskResourceQL} from "./Maintenance.ql";
-import {CategoryQL, ItemQL, UnitQL} from "./Item.ql";
+import {EntityStatusQL} from "./User.ql";
+import {ITaskTriggerQL, TaskQL} from "./Maintenance.ql";
 
 export interface WorkOrderQL {
    workOrderId: number;
@@ -16,6 +16,22 @@ export interface WorkOrderQL {
    generatedBy: PersonQL;
    responsible: PersonQL;
    parent?: WorkOrderQL;
+   workQueues: WorkQueueQL[];
+   // workOrderResource: WorkOrderResourceQL[];
+   createdDate: string;
+   modifiedDate: string;
+}
+
+export interface WorkQueueQL {
+   workQueueId: number;
+   rescheduledDate: string;
+   scheduledDate: string;
+   incidentDate: string;
+   rescheduled: boolean;
+   status: EntityStatusQL;
+   workType: string;
+   task: TaskQL;
+   taskTrigger: ITaskTriggerQL;
    createdDate: string;
    modifiedDate: string;
 }
@@ -43,9 +59,71 @@ export const getWorkOrderDefaultInstance = ():WorkOrderQL => ({
    notes: '',
    generatedBy: getPersonDefaultInstance(),
    responsible: getPersonDefaultInstance(),
+   workQueues: [],
    createdDate: '',
    modifiedDate: ''
 });
+
+
+export const FETCH_WORK_QUEUES_QL = gql`
+   query fetchWorkQueues($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]) {
+      equipments {
+         fetchWorkQueues(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+            content {
+               equipmentId
+               name
+               code
+               workQueues {
+                  workQueueId
+                  rescheduledDate
+                  scheduledDate
+                  incidentDate
+                  status
+                  workType
+                  task {
+                     taskId
+                     name
+                     taskCategory {
+                        categoryId
+                        name
+                     }
+                  }
+                  taskTrigger {
+                     taskTriggerId
+                     description
+                     triggerType
+                  }
+               }
+            }
+            totalCount
+            pageInfo {
+               hasNext
+               hasPreview
+               pageSize
+               pageIndex
+            }
+         }
+      }
+   }
+`;
+
+export const GET_INVENTORY_ITEMS_BY_ITEM_ID_QL = gql`
+   query getInventoryItemByItemId($itemId: Int!) {
+      items {
+         item (entityId: $itemId) {
+            inventoryItems {
+               content {
+                  inventoryItemId
+                  inventory {
+                     inventoryId
+                     name
+                  }
+               }
+            }
+         }
+      }
+   }
+`;
 
 export const FETCH_WORK_ORDERS_QL = gql`
    query fetchWorkOrders {
@@ -107,28 +185,28 @@ export const GET_WORK_ORDER_BY_ID_QL = gql`
 
 export const SAVE_WORK_ORDER_QL = gql`
    mutation saveWorkOrder(
-        $workOrderId: Int!,
-        $workOrderStatus: String!,
-        $estimateDuration: Int!,
-        $rate: Int!,
-        $notes: String!,
-        $generatedById: Int!,
-        $responsibleId: Int!,
-        $activityIds: [Int!]!
+      $workOrderId: Int!
+      $estimateDuration: Int!
+      $rate: Int!
+      $notes: String!
+      $generatedById: Int!
+      $responsibleId: Int!
+      $workQueueIds: [Int!]!
+      $resources: [WorkOrderResourceArg!]!
    ) {
       maintenances {
          createUpdateWorkOrder(
-            workOrderId: $workOrderId,
-            workOrderStatus: $workOrderStatus,
-            estimateDuration: $estimateDuration,
-            rate: $rate,
-            notes: $notes,
-            generatedById: $generatedById,
-            responsibleId: $responsibleId,
-            activityIds: $activityIds,
-            resources: []
+            workOrderId: $workOrderId
+            estimateDuration: $estimateDuration
+            rate: $rate
+            notes: $notes
+            generatedById: $generatedById
+            responsibleId: $responsibleId
+            workQueueIds: $workQueueIds
+            resources: $resources
          ) {
-            workOrderId            
+            workOrderId
+            workOrderCode
          }
       }
    }

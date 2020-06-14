@@ -10,10 +10,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import Grid from "@material-ui/core/Grid/Grid";
 import ListIcon from '@material-ui/icons/List';
-import AddIcon from '@material-ui/icons/Add';
-import EditIcon from '@material-ui/icons/Edit';
 import {useHistory} from "react-router";
-import {useRouteMatch} from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import WorkIcon from '@material-ui/icons/Work';
 import AssignmentIcon from '@material-ui/icons/Assignment';
@@ -22,16 +19,8 @@ import {TablePaginationActions} from '../../../utils/TableUtils';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import {TaskActivityQL} from "../../../graphql/Maintenance.ql";
-import {EntityStatusQL} from "../../../graphql/User.ql";
-import Collapse from '@material-ui/core/Collapse';
-import Box from '@material-ui/core/Box';
 import Checkbox from '@material-ui/core/Checkbox';
-import Typography from '@material-ui/core/Typography';
-import {ITaskActivity} from "./TaskActivityListContainer";
+import {IWorkQueueEquipment} from "./WorkQueueListContainer";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -67,8 +56,8 @@ const useRowStyles = makeStyles({
    }
 });
 
-interface ITaskActivityProps {
-   taskActivities: ITaskActivity[];
+interface IWorkQueueProps {
+   workQueues: IWorkQueueEquipment[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
@@ -82,7 +71,7 @@ interface ITaskActivityProps {
    onSelectTaskActivity(taskActivityId: number, assetId: number, taskId: number, checked: boolean): void;
 }
 
-export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIndex, pageSize, totalCount, searchString, taskActivitiesSelected, onChangePage, onChangeRowsPerPage, onSearchTaskActivity, onCreateActivityByEvent, onCreateWorkOrder, onSelectTaskActivity}) => {
+export const WorkQueueList: FC<IWorkQueueProps> = ({workQueues, pageIndex, pageSize, totalCount, searchString, taskActivitiesSelected, onChangePage, onChangeRowsPerPage, onSearchTaskActivity, onCreateActivityByEvent, onCreateWorkOrder, onSelectTaskActivity}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
@@ -92,7 +81,7 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
       onSearchTaskActivity && onSearchTaskActivity(searchInput);
    };
 
-   const CustomRow: FC<ITaskActivity> = (props) => {
+   const CustomRow: FC<IWorkQueueEquipment> = (props) => {
       const [open, setOpen] = React.useState(true);
       const classes = useRowStyles();
       return (
@@ -102,25 +91,25 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
                   <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                      {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
-                  {props.assetName}
-                  ({props.assetCode})
+                  {props.name}
+                  ({props.code})
                </TableCell>
             </TableRow>
-            {open && props.activities.map((historyRow, index) => (
-               <TableRow key={historyRow.taskActivityId}>
-                  <TableCell padding="checkbox" className={index + 1 == props.activities.length? '' : classes.noBorder}>
+            {open && props.workQueueTasks.map((historyRow, index) => (
+               <TableRow key={historyRow.workQueueTaskId}>
+                  <TableCell padding="checkbox" className={index + 1 == props.workQueueTasks.length? '' : classes.noBorder}>
                      <Checkbox
                         color='primary'
-                        onChange={(event) => onSelectTaskActivity(historyRow.taskActivityId, props.assetId, historyRow.taskId, event.target.checked)}
-                        checked={taskActivitiesSelected.indexOf(historyRow.taskActivityId) !== -1}
+                        onChange={(event) => onSelectTaskActivity(historyRow.workQueueTaskId, props.equipmentId, historyRow.taskId, event.target.checked)}
+                        checked={taskActivitiesSelected.indexOf(historyRow.workQueueTaskId) !== -1}
                         inputProps={{ 'aria-labelledby': index.toString() }}
                      />
                   </TableCell>
                   <TableCell>{historyRow.taskName}</TableCell>
                   <TableCell>{historyRow.taskPriority}</TableCell>
                   <TableCell>{historyRow.triggerDescription}</TableCell>
+                  <TableCell>{historyRow.rescheduledDate}</TableCell>
                   <TableCell>{historyRow.scheduledDate}</TableCell>
-                  <TableCell>{historyRow.calculatedDate}</TableCell>
                   <TableCell>{historyRow.status}</TableCell>
                </TableRow>
             ))}
@@ -128,7 +117,7 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
       );
    };
 
-   const  CollapsibleTable: FC<{taskActivities: ITaskActivity[]}> = ({taskActivities}) => {
+   const  CollapsibleTable: FC<{taskActivities: IWorkQueueEquipment[]}> = ({taskActivities}) => {
       const classes = useStyles2();
       return (
          <TableContainer className={classes.container}>
@@ -146,7 +135,7 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
                </TableHead>
                <TableBody>
                   {taskActivities.map((row) => (
-                     <CustomRow key={row.assetId} {...row} />
+                     <CustomRow key={row.equipmentId} {...row} />
                   ))}
                </TableBody>
             </Table>
@@ -197,7 +186,7 @@ export const TaskActivityList: FC<ITaskActivityProps> = ({taskActivities, pageIn
             </Grid>
          </Grid>
 
-         <CollapsibleTable taskActivities={taskActivities}/>
+         <CollapsibleTable taskActivities={workQueues}/>
 
          <TablePagination
             component="div"

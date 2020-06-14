@@ -87,24 +87,23 @@ const App: React.FC = () => {
                 </Grid>
 
                 <Grid item container style={{flexGrow: 1}}>
-                   <Paper className={classes.paper}>
-                      <Box display="flex" className={classes.breadcrumbsContainer} justifyContent="space-between">
-                        <NavigationBar/>
-                      </Box>
-                      {/*<Divider/>*/}
-                      <Switch>
-                         <Redirect exact from="/" to="/home"/>
-                         <Route path="/home" component={Home}/>
-                         <Route path="/users" component={Users}/>
-                         <Route path="/humans" component={HumanResourceRoutes}/>
-                         <Route path="/assets" component={ResourceRoutes}/>
-                         <Route path="/maintenances" component={MaintenanceResourceRoutes}/>
-                         <Route path="/inventories" component={InventoryRoute}/>
-                         <Route path="/session/profile" component={UserProfile}/>
-                         <Route path="/session/settings" component={UserSettings}/>
-                         <Route path="/pageNotFound" component={PageNotFoundComp}/>
-                         <Route path="/invalidRoute" component={InvalidRoutePageComp}/>
-                      </Switch>
+                   <Paper className={classes.paper} style={{display: 'flex', flexDirection: 'column'}}>
+                      <NavigationBar/>
+                      <div style={{display: 'flex', flex: 1}}>
+                         <Switch>
+                            <Redirect exact from="/" to="/home"/>
+                            <Route path="/home" component={Home}/>
+                            <Route path="/users" component={Users}/>
+                            <Route path="/humans" component={HumanResourceRoutes}/>
+                            <Route path="/assets" component={ResourceRoutes}/>
+                            <Route path="/maintenances" component={MaintenanceResourceRoutes}/>
+                            <Route path="/inventories" component={InventoryRoute}/>
+                            <Route path="/session/profile" component={UserProfile}/>
+                            <Route path="/session/settings" component={UserSettings}/>
+                            <Route path="/pageNotFound" component={PageNotFoundComp}/>
+                            <Route path="/invalidRoute" component={InvalidRoutePageComp}/>
+                         </Switch>
+                      </div>
                    </Paper>
                 </Grid>
              </Grid>

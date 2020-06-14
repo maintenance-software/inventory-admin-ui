@@ -23,17 +23,8 @@ import {TablePaginationActions} from '../../../utils/TableUtils';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {TaskActivityQL} from "../../../graphql/Maintenance.ql";
-import {EntityStatusQL} from "../../../graphql/User.ql";
-import Collapse from '@material-ui/core/Collapse';
-import Box from '@material-ui/core/Box';
-import Checkbox from '@material-ui/core/Checkbox';
-import Typography from '@material-ui/core/Typography';
-import {ITaskActivity} from "../TaskActivity/TaskActivityListContainer";
+import {IWorkQueueEquipment} from "../WorkQueue/WorkQueueListContainer";
 import moment from 'moment';
-import {WorkOrderResourceDialog} from "./WorkOrderResourceDialog";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -48,7 +39,7 @@ const useStyles2 = makeStyles({
       width: '100%',
    },
    container: {
-      height: '31rem',
+      // height: '31rem',
    },
    title: {
       flex: '1 1 100%',
@@ -70,16 +61,16 @@ const useRowStyles = makeStyles({
 });
 
 interface IWorkOrderTaskProps {
-   workOrderTasks: ITaskActivity[];
-   onSetWorkOrderResource(taskId: number): void;
+   workQueueEquipments: IWorkQueueEquipment[];
+   onSetWorkOrderResource(workQueueTaskId: number, equipmentId: number, taskId: number): void;
 }
 
-export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks, onSetWorkOrderResource}) => {
+export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workQueueEquipments, onSetWorkOrderResource}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
 
-   const CustomRow: FC<ITaskActivity> = (props) => {
+   const CustomRow: FC<IWorkQueueEquipment> = (props) => {
       const [open, setOpen] = React.useState(true);
       const classes = useRowStyles();
       return (
@@ -94,23 +85,23 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks, onSetWo
                   </div>
                </TableCell>
                <TableCell colSpan={5} style={{fontWeight: 'bold', fontSize: '1.1rem'}}>
-                  {props.assetName}
-                  ({props.assetCode})
+                  {props.name}
+                  ({props.code})
                </TableCell>
             </TableRow>
-            {open && props.activities.map((historyRow, index) => (
-               <TableRow key={historyRow.taskActivityId}>
+            {open && props.workQueueTasks.map((historyRow, index) => (
+               <TableRow key={historyRow.workQueueTaskId}>
                   <TableCell padding="checkbox"
-                             className={index + 1 == props.activities.length? '' : classes.noBorder}
+                             className={index + 1 == props.workQueueTasks.length? '' : classes.noBorder}
                              style={{paddingRight: 0}}
                   >
-                     <IconButton color="secondary" aria-label="Set Task Resources" onClick={() => onSetWorkOrderResource(historyRow.taskId)}>
+                     <IconButton color="secondary" aria-label="Set Task Resources" onClick={() => onSetWorkOrderResource(historyRow.workQueueTaskId, props.equipmentId, historyRow.taskId)}>
                         <NoteAddIcon/>
                      </IconButton>
                   </TableCell>
                   <TableCell>{historyRow.taskName}</TableCell>
                   <TableCell>{historyRow.taskPriority}</TableCell>
-                  <TableCell>{moment(historyRow.calculatedDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm')}</TableCell>
+                  <TableCell>{moment(historyRow.scheduledDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm')}</TableCell>
                   <TableCell>{historyRow.taskCategoryName}</TableCell>
                </TableRow>
             ))}
@@ -120,7 +111,6 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks, onSetWo
 
    return (
       <>
-         <Paper className={classes.root}>
             <TableContainer className={classes.container}>
                <Table stickyHeader aria-label="collapsible table" size="small">
                   <TableHead>
@@ -132,13 +122,12 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderTasks, onSetWo
                      </TableRow>
                   </TableHead>
                   <TableBody>
-                     {workOrderTasks.map((row) => (
-                        <CustomRow key={row.assetId} {...row} />
+                     {workQueueEquipments.map((row) => (
+                        <CustomRow key={row.equipmentId} {...row} />
                      ))}
                   </TableBody>
                </Table>
             </TableContainer>
-         </Paper>
       </>
    );
 };

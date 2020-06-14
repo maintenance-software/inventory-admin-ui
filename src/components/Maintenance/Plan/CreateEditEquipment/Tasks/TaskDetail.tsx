@@ -36,7 +36,8 @@ export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: CategoryQL
   //   }
   // });
 
-   const name = getFieldProps('name'); const nameField = getFieldMeta('name');
+   const name = getFieldProps('name');
+   const nameField = getFieldMeta('name');
    const taskCategoryId = getFieldProps('taskCategoryId');
    const priority = getFieldProps('priority');
    const durationDD = getFieldProps('durationDD');

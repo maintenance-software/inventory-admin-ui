@@ -1,11 +1,13 @@
 import {gql} from 'apollo-boost';
 import {PageQL} from "./Common.ql";
 import {EntityStatusQL} from "./User.ql";
+import {WorkQueueQL} from "./WorkOrder.ql";
 
 export interface EquipmentsQL {
    equipment: EquipmentQL;
    page: PageQL<EquipmentQL>;
    saveEquipment: EquipmentQL;
+   fetchWorkQueues: PageQL<EquipmentQL>;
 }
 
 export interface EquipmentQL {
@@ -25,6 +27,7 @@ export interface EquipmentQL {
    purchaseDate: string;
    children: EquipmentQL[];
    parent: EquipmentQL | null;
+   workQueues: WorkQueueQL[];
    createdDate: string;
    modifiedDate: String;
 }
@@ -46,6 +49,7 @@ export const getDefaultEquipmentInstance = ():EquipmentQL => ({
    purchaseDate: '',
    children: [],
    parent: null,
+   workQueues: [],
    createdDate: '',
    modifiedDate: ''
 });

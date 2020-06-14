@@ -1,6 +1,7 @@
 import {gql} from 'apollo-boost';
 import {PageQL} from "./Common.ql";
 import {EntityStatusQL} from "./User.ql";
+import {InventoryItemQL} from "./Inventory.ql";
 
 export interface ItemsQL {
    item: ItemQL;
@@ -24,6 +25,7 @@ export interface ItemQL {
    status: EntityStatusQL;
    category: CategoryQL;
    unit: UnitQL;
+   inventoryItems: PageQL<InventoryItemQL>;
    createdDate: string;
    modifiedDate: string;
 }
@@ -84,6 +86,16 @@ export const getItemDefaultInstance = ():ItemQL => ({
       categoryId: 0,
       name: '',
       description: ''
+   },
+   inventoryItems: {
+      content: [],
+      pageInfo: {
+         hasNext: false,
+         hasPreview: false,
+         pageIndex: 0,
+         pageSize: 0
+      },
+      totalCount: 0
    },
    createdDate: '',
    modifiedDate: ''

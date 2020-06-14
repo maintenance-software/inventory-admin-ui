@@ -24,3 +24,13 @@ export const GET_USER_SESSION_GQL = gql`
   }
 `;
 
+
+export const getSessionDefaultInstance = ():SessionQL => ({
+   authId: '',
+   username: '',
+   email: '',
+   firstName: '',
+   lastName: '',
+   locale: '',
+   permissions: [],
+});

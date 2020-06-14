@@ -4,7 +4,7 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import {Redirect} from "react-router";
 import {MaintenancePlanComp} from "./Plan";
 import {CreateEditMaintenancePlanComp} from "./Plan/CreateEditEquipment/CreateEditMaintenancePlanComp";
-import {TaskActivityListContainer} from "./TaskActivity/TaskActivityListContainer";
+import {WorkQueueListContainer} from "./WorkQueue/WorkQueueListContainer";
 import {WorkOrderContainer} from "./WorkOrder/WorkOrderContainer";
 
 interface IMaintenancePlanContext {
@@ -51,7 +51,7 @@ const TaskActivityRoutes: React.FC =  () => {
    const { path } = useRouteMatch();
    return (
       <Switch>
-         <Route exact path={path} component={TaskActivityListContainer}/>
+         <Route exact path={path} component={WorkQueueListContainer}/>
       </Switch>
    );
 };

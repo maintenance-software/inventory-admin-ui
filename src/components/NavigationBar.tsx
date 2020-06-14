@@ -62,38 +62,40 @@ export const NavigationBar = () => {
 
    return (
       <>
-         <Box>
-            <IconButton onClick={handleGoBack} aria-label="go-back" size="small"  className={styles.margin}>
-               <ReplyIcon/>
-            </IconButton>
-            <IconButton onClick={handleGoUp} aria-label="go-up"  size="small" className={styles.margin}>
-               <ArrowUpwardIcon/>
-            </IconButton>
-         </Box>
-         <Box>
-            <Breadcrumbs aria-label="breadcrumb">
-               {pathItems.map((pathItem, index) => {
-                  if(index === 0) {
-                     return (<StyledBreadcrumb
+         <Box display="flex" className={styles.breadcrumbsContainer} justifyContent="space-between">
+            <Box>
+               <IconButton onClick={handleGoBack} aria-label="go-back" size="small"  className={styles.margin}>
+                  <ReplyIcon/>
+               </IconButton>
+               <IconButton onClick={handleGoUp} aria-label="go-up"  size="small" className={styles.margin}>
+                  <ArrowUpwardIcon/>
+               </IconButton>
+            </Box>
+            <Box>
+               <Breadcrumbs aria-label="breadcrumb">
+                  {pathItems.map((pathItem, index) => {
+                     if(index === 0) {
+                        return (<StyledBreadcrumb
+                              key={pathItem}
+                              component="a"
+                              href="#"
+                              label={pathItem}
+                              icon={<HomeIcon fontSize="small"/>}
+                              onClick={(event: React.MouseEvent<Element, MouseEvent>) => {event.preventDefault(); handleBreadcrumbItem(index)}}
+                           />
+                        );
+                     } else {
+                        return (<StyledBreadcrumb
                            key={pathItem}
                            component="a"
                            href="#"
                            label={pathItem}
-                           icon={<HomeIcon fontSize="small"/>}
                            onClick={(event: React.MouseEvent<Element, MouseEvent>) => {event.preventDefault(); handleBreadcrumbItem(index)}}
-                        />
-                     );
-                  } else {
-                     return (<StyledBreadcrumb
-                        key={pathItem}
-                        component="a"
-                        href="#"
-                        label={pathItem}
-                        onClick={(event: React.MouseEvent<Element, MouseEvent>) => {event.preventDefault(); handleBreadcrumbItem(index)}}
-                     />);
-                  }
-               })}
-            </Breadcrumbs>
+                        />);
+                     }
+                  })}
+               </Breadcrumbs>
+            </Box>
          </Box>
       </>
    );
