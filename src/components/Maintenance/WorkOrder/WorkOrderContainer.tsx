@@ -8,7 +8,7 @@ import {useParams, useRouteMatch} from 'react-router-dom';
 import {
    GET_TASK_RESOURCE_BY_ID_QL,
    GET_WORK_ORDER_BY_ID_QL, SAVE_WORK_ORDER_QL,
-   WorkOrderQL
+   WorkOrderQL, WorkOrderResourceQL, WorkOrdersQL
 } from "../../../graphql/WorkOrder.ql";
 import {IWorkQueueEquipment} from "../WorkQueue/WorkQueueListContainer";
 import {WorkOrderTasks} from "./WorkOrderTasks";
@@ -17,32 +17,9 @@ import {WorkOrderResourceDialog} from "./WorkOrderResourceDialog";
 import {MaintenancesQL, TaskResourceQL} from "../../../graphql/Maintenance.ql";
 import Box from '@material-ui/core/Box';
 import {GET_USER_SESSION_GQL, getSessionDefaultInstance, SessionQL} from "../../../graphql/Session.ql";
-import {buildFullName} from "../../../utils/globalUtil";
-
-export interface IWorkOrder {
-   workOrderId: number;
-   workOrderCode: string;
-   workOrderStatus: string;
-   estimateDuration: number;
-   executionDuration: number;
-   rate: number;
-   totalCost: number;
-   percentage: number;
-   notes: string;
-   workQueueEquipments: IWorkQueueEquipment[];
-}
-
-export interface IWorkOrderResource {
-   resourceId: number;
-   description: string;
-   resource: string;
-   itemId: number;
-   inventoryItemId: number;
-   employeeCategoryId: number;
-   personId: number;
-   resourceType: string;
-   amount: number;
-}
+import {buildFullName, clearCache} from "../../../utils/globalUtil";
+import {getIWorkOrderDefaultInstance, IWorkOrder, IWorkOrderEquipment, IWorkOrderResource} from "./WorkOrderTypes";
+import {EntityStatusQL} from "../../../graphql/User.ql";
 
 export interface IWorkOrderForm {
    workOrderCode: string;
@@ -60,19 +37,6 @@ export interface IWorkOrderForm {
    responsible: {personId: number, fullName: string};
 }
 
-const getIWorkOrderDefaultInstance = ():IWorkOrder => ({
-   workOrderId: 0,
-   workOrderCode: '',
-   workOrderStatus: '',
-   estimateDuration: 0,
-   executionDuration: 0,
-   rate: 0,
-   totalCost: 0,
-   percentage: 0,
-   notes: '',
-   workQueueEquipments: []
-});
-
 export const WorkOrderContainer: React.FC =  () => {
    const history = useHistory();
    const { path } = useRouteMatch();
@@ -81,16 +45,66 @@ export const WorkOrderContainer: React.FC =  () => {
    const [workOrder, setWorOrder] = React.useState<IWorkOrder>(getIWorkOrderDefaultInstance());
    const [workOrderResource, setWorkOrderResource] = React.useState<IWorkOrderResource[]>([]);
    const [[workQueueTaskId, equipmentId, taskId], setWorkQueueTask] = React.useState([0, 0, 0]);
-   const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{maintenances: {workOrder: WorkOrderQL}}, any>(GET_WORK_ORDER_BY_ID_QL);
+   const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{workOrders: WorkOrdersQL}, any>(GET_WORK_ORDER_BY_ID_QL);
    const [getTaskById, taskResponse] = useLazyQuery<{maintenances: MaintenancesQL}, any>(GET_TASK_RESOURCE_BY_ID_QL);
    const [saveWorkOrder, saveWorkOrderResponse] = useMutation<{maintenances: MaintenancesQL}, any>(SAVE_WORK_ORDER_QL);
+   const [isValid, setIsValid] = useState(false);
 
    const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
    const workOrderId = +params.workOrderId;
 
    useEffect(() => {
       if(called && !loading && data) {
-         // setWorOrder(data.maintenances.workOrder);
+         const bWorkOrder: WorkOrderQL = data.workOrders.workOrder;
+         const resources: WorkOrderResourceQL[] = data.workOrders.workOrder.workOrderResources;
+         const newWorkOrder: IWorkOrder = {
+            workOrderId: bWorkOrder.workOrderId,
+            workOrderCode: bWorkOrder.workOrderCode,
+            workOrderStatus: bWorkOrder.workOrderStatus,
+            estimateDuration: bWorkOrder.estimateDuration,
+            executionDuration: bWorkOrder.executionDuration,
+            rate: bWorkOrder.rate,
+            totalCost: bWorkOrder.totalCost,
+            percentage: bWorkOrder.percentage,
+            notes: bWorkOrder.notes,
+            responsibleId: bWorkOrder.responsible.personId,
+            responsibleName: buildFullName(bWorkOrder.responsible.firstName, bWorkOrder.responsible.lastName),
+            generatedById: bWorkOrder.generatedBy.personId,
+            generatedByName: buildFullName(bWorkOrder.generatedBy.firstName, bWorkOrder.generatedBy.lastName),
+            equipments: bWorkOrder.equipments.map(e => ({
+               equipmentId: e.equipmentId,
+               name: e.name,
+               code: e.code,
+               taskCount: 0,
+               maintenanceCount: 0,
+               workOrderTasks: e.workQueues.map(wq => ({
+                  workOrderTaskId: wq.workQueueId,
+                  rescheduledDate: wq.rescheduledDate,
+                  scheduledDate: wq.scheduledDate,
+                  status: wq.status,
+                  taskId: wq.task.taskId,
+                  taskName: wq.task.name,
+                  taskPriority: wq.task.priority,
+                  taskCategoryId: wq.task.taskCategory? wq.task.taskCategory.categoryId : 0,
+                  taskCategoryName: wq.task.taskCategory? wq.task.taskCategory.name: '',
+                  triggerDescription: wq.taskTrigger.description,
+                  taskTriggerId: wq.taskTrigger.taskTriggerId,
+                  taskResources: resources.filter(r => r.workQueue.workQueueId === wq.workQueueId).map(r => ({
+                     resourceId: r.workOrderResourceId,
+                     description: '',
+                     resource: r.humanResource? buildFullName(r.humanResource.firstName, r.humanResource.lastName) : r.inventoryItem.item.name,
+                     itemId: r.inventoryItem ? r.inventoryItem.item.itemId : 0,
+                     inventoryItemId: r.inventoryItem? r.inventoryItem.inventoryItemId : 0,
+                     employeeCategoryId: 0,
+                     personId: r.humanResource? r.humanResource.personId : 0,
+                     resourceType: r.humanResource? 'HUMAN' : 'INVENTORY',
+                     amount: r.amount,
+                  })),
+                  valid: true
+               }))
+            })),
+         };
+         setWorOrder(newWorkOrder);
       }
    }, [called, loading, data]);
 
@@ -108,7 +122,32 @@ export const WorkOrderContainer: React.FC =  () => {
             totalCost: workOrder.totalCost,
             percentage: workOrder.percentage,
             notes: workOrder.notes,
-            workQueueEquipments: history.location.state.workQueueEquipments || []
+            generatedById: workOrder.generatedById,
+            generatedByName: workOrder.generatedByName,
+            responsibleId: workOrder.responsibleId,
+            responsibleName: workOrder.responsibleName,
+            equipments: (history.location.state.workQueueEquipments || []).map((w: IWorkQueueEquipment) =>({
+               equipmentId: w.equipmentId,
+               name: w.name,
+               code: w.code,
+               taskCount: 0,
+               maintenanceCount: 0,
+               workOrderTasks: w.workQueueTasks.map(wt => ({
+                  workOrderTaskId: wt.workQueueTaskId,
+                  rescheduledDate: wt.rescheduledDate,
+                  scheduledDate: wt.scheduledDate,
+                  status: wt.status,
+                  taskName: wt.taskName,
+                  taskPriority: wt.taskPriority,
+                  taskCategoryId: wt.taskCategoryId,
+                  taskCategoryName: wt.taskCategoryName,
+                  triggerDescription: wt.triggerDescription,
+                  taskId: wt.taskId,
+                  taskTriggerId: wt.taskTriggerId,
+                  taskResources: [],
+                  valid: false,
+               })),
+            }))
          };
          setWorOrder(newWorkOrder);
       }
@@ -116,8 +155,8 @@ export const WorkOrderContainer: React.FC =  () => {
 
    useEffect(() => {
       if(workQueueTaskId && equipmentId && taskId) {
-         const [workQueueEquipment] = workOrder.workQueueEquipments.filter(workQueueEquipment =>  workQueueEquipment.equipmentId === equipmentId);
-         const [workQueueTask] = workQueueEquipment.workQueueTasks.filter(workQueueTask => workQueueTask.workQueueTaskId === workQueueTaskId);
+         const [workOrderEquipment] = workOrder.equipments.filter(e =>  e.equipmentId === equipmentId);
+         const [workQueueTask] = workOrderEquipment.workOrderTasks.filter(workQueueTask => workQueueTask.workOrderTaskId === workQueueTaskId);
          if(workQueueTask.taskResources.length > 0) {
             setWorkOrderResource(workQueueTask.taskResources);
          } else {
@@ -174,13 +213,14 @@ export const WorkOrderContainer: React.FC =  () => {
    };
 
    const handleWorkOrderResourceAcceptDialog = (resources: IWorkOrderResource[]) => {
-      const [workQueueEquipment] = workOrder.workQueueEquipments.filter(workQueueEquipment =>  workQueueEquipment.equipmentId === equipmentId);
-      workQueueEquipment.workQueueTasks.forEach(workQueueTask => {
-         if(workQueueTask.workQueueTaskId === workQueueTaskId) {
-            workQueueTask.taskResources = resources;
+      const [workEquipment] = workOrder.equipments.filter(e =>  e.equipmentId === equipmentId);
+      workEquipment.workOrderTasks.forEach(workOrderTask => {
+         if(workOrderTask.workOrderTaskId === workQueueTaskId) {
+            workOrderTask.taskResources = resources;
+            workOrderTask.valid = true;
          }
       });
-      const newWorkOrder = {
+      const newWorkOrder: IWorkOrder = {
          workOrderId: workOrder.workOrderId,
          workOrderCode: workOrder.workOrderCode,
          workOrderStatus: workOrder.workOrderStatus,
@@ -190,10 +230,21 @@ export const WorkOrderContainer: React.FC =  () => {
          totalCost: workOrder.totalCost,
          percentage: workOrder.percentage,
          notes: workOrder.notes,
-         workQueueEquipments: workOrder.workQueueEquipments.concat()
+         generatedById: workOrder.generatedById,
+         generatedByName: workOrder.generatedByName,
+         responsibleId: workOrder.responsibleId,
+         responsibleName: workOrder.responsibleName,
+         equipments: workOrder.equipments.concat()
       };
       setWorOrder(newWorkOrder);
       setResourceDialogOpen(false);
+      let isValid = true;
+      newWorkOrder.equipments.map(w => {
+         w.workOrderTasks.forEach(t => {
+            isValid = isValid && t.valid;
+         });
+      });
+      setIsValid(isValid);
    };
 
    const session = sessionQL.data? sessionQL.data.session : getSessionDefaultInstance();
@@ -204,7 +255,7 @@ export const WorkOrderContainer: React.FC =  () => {
       percentage: workOrder.percentage,
       notes: workOrder.notes,
       generatedBy: {personId: +session.authId, fullName: buildFullName(session.firstName, session.lastName)},
-      responsible: {personId: 0, fullName: ''},
+      responsible: {personId: workOrder.responsibleId, fullName: workOrder.responsibleName},
       estimateDurationDD: Math.floor(workOrder.estimateDuration / 1440),
       estimateDurationHH: Math.floor((workOrder.estimateDuration % 1440) / 60),
       estimateDurationMM: Math.round(workOrder.estimateDuration% 60),
@@ -213,18 +264,18 @@ export const WorkOrderContainer: React.FC =  () => {
       executionDurationMM: Math.round(workOrder.executionDuration % 60)
    };
 
-   const handleOnsubmit = (form: IWorkOrderForm): void => {
+   const handleOnsubmit = async (form: IWorkOrderForm) => {
       const workQueueTaskIds: number[] = [];
-      let workOrderResources: { workOrderResourceId: number, amount: number, humanResourceId: number, inventoryItemId: number, workQueueTaskId: number}[] = [];
-      workOrder.workQueueEquipments.forEach(w =>{
-         w.workQueueTasks.forEach(t => {
-            workQueueTaskIds.push(t.workQueueTaskId);
+      let workOrderResources: { workOrderResourceId: number, amount: number, humanResourceId: number | null, inventoryItemId: number | null, workQueueTaskId: number}[] = [];
+      workOrder.equipments.forEach(w =>{
+         w.workOrderTasks.forEach(t => {
+            workQueueTaskIds.push(t.workOrderTaskId);
             workOrderResources = workOrderResources.concat(t.taskResources.map(r =>({
                workOrderResourceId: r.resourceId,
                amount: r.amount,
-               humanResourceId: r.personId,
-               inventoryItemId: r.inventoryItemId,
-               workQueueTaskId: t.workQueueTaskId
+               humanResourceId: !r.personId? null : r.personId,
+               inventoryItemId: !r.inventoryItemId? null : r.inventoryItemId,
+               workQueueTaskId: t.workOrderTaskId
             })));
          });
       });
@@ -238,15 +289,26 @@ export const WorkOrderContainer: React.FC =  () => {
          workQueueIds: workQueueTaskIds,
          resources: workOrderResources
       };
-      console.log(workOrderSaveRequest);
+
+      const response = await saveWorkOrder({
+         variables: workOrderSaveRequest
+         , update: (cache) => {
+            clearCache(cache, 'equipments.fetchWorkQueues');
+         }
+      });
+      if(!response.data)
+         return;
+      // getEquipmentById({variables: { equipmentId: response.data.equipments.saveEquipment.equipmentId }});
+      // history.push(response.data.equipments.saveEquipment.equipmentId.toString());
+      // console.log(response);
    };
 
   return (
      <>
      <Box display="flex" flex='1'>
         <Box display="flex" flexDirection='column' style={{maxWidth: '60rem'}}>
-           <WorkOrderFormDetails form={workOrderform} onSubmit={handleOnsubmit}/>
-           <WorkOrderTasks workQueueEquipments={workOrder.workQueueEquipments} onSetWorkOrderResource={handleWorkOrderResourceOpenDialog}/>
+           <WorkOrderFormDetails form={workOrderform} onSubmit={handleOnsubmit} error={!isValid}/>
+           <WorkOrderTasks workOrderEquipments={workOrder.equipments} onSetWorkOrderResource={handleWorkOrderResourceOpenDialog}/>
            <WorkOrderResourceDialog
               resources={workOrderResource}
               open={resourceDialogOpen}

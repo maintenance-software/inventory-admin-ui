@@ -21,6 +21,7 @@ import {FETCH_EMPLOYEES, IEmployeesQL, PersonQL} from "../../../graphql/Person.q
 import {buildFullName} from "../../../utils/globalUtil";
 import {ISimpleSelectorOption, SimpleSelector} from "../../common/SimpleSelector";
 import {IWorkOrderForm} from "./WorkOrderContainer";
+import {PersonPaginatorSelector} from "../../Human/PersonSelectorDialog";
 
 const useDateStyles = makeStyles((theme: Theme) =>
    createStyles({
@@ -43,25 +44,26 @@ const useButtonStyles = makeStyles(theme => ({
    },
 }));
 
-export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): void, form: IWorkOrderForm}> =  ({onSubmit, form}) => {
+export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): void, form: IWorkOrderForm, error: boolean}> =  ({onSubmit, form, error}) => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const params = useParams();
    const buttonClasses = useButtonStyles();
-   const [pageIndex, setPageIndex] = React.useState(0);
-   const [pageSize, setPageSize] = React.useState(10);
-   const [searchString, setSearchString] = React.useState<string>('');
-   // const [responsibleId, setResponsibleId] = useState(0);
-   const [fetchEmployees, { called, loading, data }] = useLazyQuery<{employees: IEmployeesQL}, any>(FETCH_EMPLOYEES);
 
+   // const [pageIndex, setPageIndex] = React.useState(0);
+   // const [pageSize, setPageSize] = React.useState(10);
+   // const [searchString, setSearchString] = React.useState<string>('');
+   const [externalError, setExternalError] = useState(error);
+   // const [fetchEmployees, { called, loading, data }] = useLazyQuery<{employees: IEmployeesQL}, any>(FETCH_EMPLOYEES);
 
-   const {getFieldProps, getFieldMeta, setFieldValue, handleSubmit, submitForm} = useFormik<IWorkOrderForm>({
+   const {getFieldProps, getFieldMeta, setFieldValue, handleSubmit, dirty, isValid, setErrors} = useFormik<IWorkOrderForm>({
       enableReinitialize: true,
+      isInitialValid: error,
       initialValues: form,
       validationSchema: Yup.object().shape({
-         estimateDurationDD: Yup.number().moreThan(-1),
-         estimateDurationHH: Yup.number().moreThan(-1).lessThan(24),
-         estimateDurationMM: Yup.number().moreThan(-1).lessThan(60),
+         estimateDurationDD: Yup.number().required().moreThan(-1),
+         estimateDurationHH: Yup.number().required().moreThan(-1).lessThan(24),
+         estimateDurationMM: Yup.number().required().moreThan(-1).lessThan(60),
       }),
       onSubmit: (values, bag) => {
          onSubmit(values);
@@ -69,31 +71,8 @@ export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): v
    });
 
    useEffect(() => {
-      fetchEmployees({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize}});
-   }, []);
-
-   useEffect(() => {
-      fetchEmployees({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize}});
-   }, [pageIndex, pageSize, searchString]);
-
-   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-      setPageIndex(newPage);
-   };
-
-   const handleSearch = (searchString: string) => {
-      setSearchString(searchString);
-      setPageIndex(0);
-   };
-
-   const fetchEmployeeOptions = (): ISimpleSelectorOption[] => {
-      if(data && data.employees) {
-         return data.employees.page.content.map(e => ({
-            value: e.employeeId,
-            label: buildFullName(e.firstName, e.lastName)
-         }));
-      }
-      return [];
-   };
+      setExternalError(error);
+   }, [error]);
 
    const workOrderCode = getFieldProps('workOrderCode');
    const responsible = getFieldProps('responsible');
@@ -109,6 +88,7 @@ export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): v
    const executionDurationHH = getFieldProps('executionDurationHH');
    const executionDurationMM = getFieldProps('executionDurationMM');
 
+   // console.log(responsible);
    return (
      <>
         <Grid container>
@@ -121,6 +101,7 @@ export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): v
                        startIcon={<SaveIcon/>}
                        className={buttonClasses.button}
                        type="submit"
+                       disabled={!isValid || !dirty || externalError}
                     >
                        Save
                     </Button>
@@ -164,28 +145,28 @@ export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): v
                     </Grid>
 
                     <Grid item xs={2} container alignItems='center'>Gererated By</Grid>
-                    <Grid item xs={4}>{form.generatedBy.fullName}</Grid>
-
-                    <Grid item xs={2} container alignItems='center'>
-                       Responsible
-                    </Grid>
                     <Grid item xs={4}>
-                       <SimpleSelector
-                          value={responsible.value.personId}
-                          options={fetchEmployeeOptions()}
-                          paging={{
-                             pageIndex: data? data.employees.page.pageInfo.pageIndex : 0,
-                             pageSize: data? data.employees.page.pageInfo.pageSize : 0,
-                             totalCount: data? data.employees.page.totalCount : 0,
-                             searchString: searchString,
-                             onChangePage: handleChangePage,
-                             onSearch: handleSearch,
-                          }}
-                          onChange={(value : number) => setFieldValue('responsible', {personId: value})}
+                       <PersonPaginatorSelector
+                           value={{
+                              value: form.generatedBy.personId,
+                              label: form.generatedBy.fullName,
+                              selected: false
+                           }}
+                           readonly
                        />
                     </Grid>
 
-
+                    <Grid item xs={2} container alignItems='center'>Responsible</Grid>
+                    <Grid item xs={4}>
+                       <PersonPaginatorSelector
+                          value={{
+                             value: responsible.value.personId,
+                             label: responsible.value.fullName,
+                             selected: false
+                          }}
+                          onChange={(value : number, label) => setFieldValue('responsible', {personId: value, fullName: label})}
+                       />
+                    </Grid>
                  </Grid>
               </Grid>
            </form>

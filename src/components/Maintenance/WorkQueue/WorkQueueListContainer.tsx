@@ -16,7 +16,7 @@ import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
 import {EntityStatusQL} from "../../../graphql/User.ql";
 import {EquipmentQL, EquipmentsQL} from "../../../graphql/Equipment.ql";
 import {FETCH_WORK_QUEUES_QL, WorkQueueQL} from "../../../graphql/WorkOrder.ql";
-import {IWorkOrderResource} from "../WorkOrder/WorkOrderContainer";
+import {IWorkOrderResource} from "../WorkOrder/WorkOrderTypes";
 
 export interface IWorkQueueEquipment {
    equipmentId: number;
@@ -31,7 +31,7 @@ export interface IWorkQueueTask {
    workQueueTaskId: number;
    rescheduledDate: string;
    scheduledDate: string;
-   status: EntityStatusQL;
+   status: string;
    taskName: string;
    taskPriority: number;
    taskCategoryId: number;
@@ -40,6 +40,7 @@ export interface IWorkQueueTask {
    taskId: number;
    taskTriggerId: number;
    taskResources: IWorkOrderResource[];
+   valid: boolean;
 }
 
 export const WorkQueueListContainer: React.FC = () => {
@@ -83,7 +84,7 @@ export const WorkQueueListContainer: React.FC = () => {
       code: equipment.code,
       taskCount: 0,
       maintenanceCount: 0,
-      workQueueTasks: equipment.workQueues.map((workQueueTask: WorkQueueQL) =>({
+      workQueueTasks: equipment.workQueues.filter(wq => wq.status === 'PENDING').map((workQueueTask: WorkQueueQL) =>({
          workQueueTaskId: workQueueTask.workQueueId,
          rescheduledDate: workQueueTask.rescheduledDate,
          scheduledDate: workQueueTask.scheduledDate,
@@ -95,7 +96,8 @@ export const WorkQueueListContainer: React.FC = () => {
          triggerDescription: workQueueTask.taskTrigger.triggerType,
          taskId: workQueueTask.task.taskId,
          taskTriggerId: workQueueTask.taskTrigger.taskTriggerId,
-         taskResources: []
+         taskResources: [],
+         valid: false
       }))
    }));
 
@@ -156,7 +158,8 @@ export const WorkQueueListContainer: React.FC = () => {
                triggerDescription: workQueueTask.triggerDescription,
                taskId: workQueueTask.taskId,
                taskTriggerId: workQueueTask.taskTriggerId,
-               taskResources: []
+               taskResources: [],
+               valid: false
             })
          }
       } else {

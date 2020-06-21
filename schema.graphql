@@ -3,6 +3,12 @@ type Privileges {
     list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [Privilege!]!
 }
 
+type WorkOrders {
+    workOrder(entityId: Int!): WorkOrder!
+    page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkOrder!
+    createUpdateWorkOrder(workOrderId: Int!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int!, responsibleId: Int!, parentId: Int, workQueueIds: [Int!]!, resources: [WorkOrderResourceArg!]!): WorkOrder!
+}
+
 type InventoryItems {
     inventoryItem(entityId: Int!): InventoryItem!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_InventoryItem!
@@ -14,7 +20,6 @@ type Inventories {
     list: [Inventory!]!
     saveInventory(inventoryId: Int!, name: String!, description: String!, allowNegativeStocks: Boolean!, status: String!): Inventory!
     saveInventoryItems(level: Int!, maxLevelAllowed: Int!, minLevelAllowed: Int!, price: Float!, location: String!, dateExpiry: String, inventoryId: Int!, itemIds: [Int!]!): [InventoryItem!]!
-    fetchInventoriesForItem(entityId: Int!): [Inventory!]!
 }
 
 type TaskResource {
@@ -71,6 +76,8 @@ type WorkOrder {
     generatedBy: Person!
     responsible: Person!
     parent: WorkOrder
+    equipments: [Equipment!]!
+    workOrderResources: [WorkOrderResource!]!
     createdDate: String!
     modifiedDate: String
 }
@@ -126,7 +133,6 @@ type Page_User {
     totalCount: Int!
     content: [User!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 type Maintenance {
@@ -173,14 +179,12 @@ type Page_WorkOrder {
     totalCount: Int!
     content: [WorkOrder!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 type Page_InventoryItem {
     totalCount: Int!
     content: [InventoryItem!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 input TaskResourceArg {
@@ -210,7 +214,6 @@ type Page_Equipment {
     totalCount: Int!
     content: [Equipment!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 type Items {
@@ -224,7 +227,6 @@ type Page_Person {
     totalCount: Int!
     content: [Person!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 input PersonArg {
@@ -249,7 +251,6 @@ type Page_Maintenance {
     totalCount: Int!
     content: [Maintenance!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 type User {
@@ -288,6 +289,7 @@ type Mutation {
     employees: Employees!
     inventories: Inventories!
     maintenances: Maintenances!
+    workOrders: WorkOrders!
 }
 
 type Role {
@@ -319,12 +321,6 @@ input ContactInfoArg {
     contactType: String!
 }
 
-type Sort {
-    isUnsorted: Boolean!
-    isSorted: Boolean!
-    direction: String!
-}
-
 type Query {
     session: Session!
     privileges: Privileges!
@@ -339,6 +335,7 @@ type Query {
     employees: Employees!
     inventoryItems: InventoryItems!
     maintenances: Maintenances!
+    workOrders: WorkOrders!
 }
 
 type Equipment {
@@ -358,16 +355,10 @@ type Equipment {
     purchaseDate: String
     children(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
     parent: Equipment
-    category: Category!
+    category: Category
     workQueues: [WorkQueue!]!
     createdDate: String!
     modifiedDate: String
-}
-
-type WoAssetTask {
-    taskId: Int!
-    name: String!
-    requiredResource: Boolean!
 }
 
 type Item {
@@ -408,6 +399,16 @@ type TaskTrigger {
     modifiedDate: String
 }
 
+type WorkOrderResource {
+    workOrderResourceId: Int!
+    amount: Int!
+    humanResource: Person
+    inventoryItem: InventoryItem
+    workQueue: WorkQueue!
+    createdDate: String!
+    modifiedDate: String
+}
+
 type Task {
     taskId: Int!
     name: String!
@@ -435,12 +436,6 @@ input SubTaskArg {
     subTaskCategoryId: Int
 }
 
-type WoAssets {
-    assetId: Int!
-    name: String!
-    tasks: [WoAssetTask!]!
-}
-
 type Maintenances {
     maintenance(entityId: Int!): Maintenance!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Maintenance!
@@ -451,17 +446,12 @@ type Maintenances {
     createUpdateTasks(maintenanceId: Int, tasks: [TaskArg!]!): [Task!]!
     task(entityId: Int!): Task!
     equipmentTasks(entityId: Int!): [Task!]!
-    workOrder(entityId: Int!): WorkOrder!
-    workOrders(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkOrder!
-    createUpdateWorkOrder(workOrderId: Int!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int!, responsibleId: Int!, parentId: Int, workQueueIds: [Int!]!, resources: [WorkOrderResourceArg!]!): WorkOrder!
-    woPreResources(entityIds: [Int!]!): [WoAssets!]!
 }
 
 type Page_Employee {
     totalCount: Int!
     content: [Employee!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 type Persons {
@@ -530,7 +520,6 @@ type Page_Item {
     totalCount: Int!
     content: [Item!]!
     pageInfo: PageInfo!
-    sort: Sort!
 }
 
 input TaskArg {

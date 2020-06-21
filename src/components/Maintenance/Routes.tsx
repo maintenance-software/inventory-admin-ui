@@ -6,6 +6,7 @@ import {MaintenancePlanComp} from "./Plan";
 import {CreateEditMaintenancePlanComp} from "./Plan/CreateEditEquipment/CreateEditMaintenancePlanComp";
 import {WorkQueueListContainer} from "./WorkQueue/WorkQueueListContainer";
 import {WorkOrderContainer} from "./WorkOrder/WorkOrderContainer";
+import {WorkOrdersContainer} from "./WorkOrder/WorkOrdersContainer";
 
 interface IMaintenancePlanContext {
    maintenanceId: number;
@@ -32,17 +33,14 @@ interface IWorkOrderContext {
    setTaskActivities(a: number[]): void;
 }
 
-export const WorkOrderContext = createContext<IWorkOrderContext>({taskActivities: [], setTaskActivities: ()=>{}});
+// export const WorkOrderContext = createContext<IWorkOrderContext>({taskActivities: [], setTaskActivities: ()=>{}});
 
 const WorkOrderRoutes: React.FC =  () => {
-   const [taskActivities, setTaskActivities] = React.useState<number[]>([1,2,3]);
    const { path } = useRouteMatch();
    return (
       <Switch>
-         <WorkOrderContext.Provider value={{taskActivities, setTaskActivities}}>
-            {/*<Route exact path={path} component={MaintenancePlanComp}/>*/}
-            <Route path={`${path}/:workOrderId`} component={WorkOrderContainer}/>
-         </WorkOrderContext.Provider>
+         <Route exact path={path} component={WorkOrdersContainer}/>
+         <Route path={`${path}/:workOrderId`} component={WorkOrderContainer}/>
       </Switch>
    );
 };

@@ -2,6 +2,15 @@ import {gql} from 'apollo-boost';
 import {getPersonDefaultInstance, PersonQL} from "./Person.ql";
 import {EntityStatusQL} from "./User.ql";
 import {ITaskTriggerQL, TaskQL} from "./Maintenance.ql";
+import {EquipmentQL} from "./Equipment.ql";
+import {InventoryItemQL} from "./Inventory.ql";
+import {PageQL} from "./Common.ql";
+
+export interface WorkOrdersQL {
+   workOrder: WorkOrderQL;
+   page: PageQL<WorkOrderQL>;
+   createUpdateWorkOrder: WorkOrderQL;
+}
 
 export interface WorkOrderQL {
    workOrderId: number;
@@ -16,8 +25,8 @@ export interface WorkOrderQL {
    generatedBy: PersonQL;
    responsible: PersonQL;
    parent?: WorkOrderQL;
-   workQueues: WorkQueueQL[];
-   // workOrderResource: WorkOrderResourceQL[];
+   equipments: EquipmentQL[];
+   workOrderResources: WorkOrderResourceQL[];
    createdDate: string;
    modifiedDate: string;
 }
@@ -28,7 +37,7 @@ export interface WorkQueueQL {
    scheduledDate: string;
    incidentDate: string;
    rescheduled: boolean;
-   status: EntityStatusQL;
+   status: string;
    workType: string;
    task: TaskQL;
    taskTrigger: ITaskTriggerQL;
@@ -37,14 +46,13 @@ export interface WorkQueueQL {
 }
 
 export interface WorkOrderResourceQL {
-   resourceId: number;
-   name: string;
-   itemId: number;
-   inventoryItemId: number;
-   employeeCategoryId: number;
-   personId: number;
-   resourceType: string;
+   workOrderResourceId: number;
    amount: number;
+   humanResource: PersonQL;
+   inventoryItem: InventoryItemQL;
+   workQueue: WorkQueueQL;
+   createdDate: string;
+   modifiedDate: string;
 }
 
 export const getWorkOrderDefaultInstance = ():WorkOrderQL => ({
@@ -59,9 +67,10 @@ export const getWorkOrderDefaultInstance = ():WorkOrderQL => ({
    notes: '',
    generatedBy: getPersonDefaultInstance(),
    responsible: getPersonDefaultInstance(),
-   workQueues: [],
+   equipments: [],
+   workOrderResources: [],
    createdDate: '',
-   modifiedDate: ''
+   modifiedDate: '',
 });
 
 
@@ -127,18 +136,33 @@ export const GET_INVENTORY_ITEMS_BY_ITEM_ID_QL = gql`
 
 export const FETCH_WORK_ORDERS_QL = gql`
    query fetchWorkOrders {
-      maintenances {
-         workOrders {
+      workOrders {
+         page {
             content {
                workOrderId
                workOrderCode
                workOrderStatus
+               estimateDuration
+               executionDuration
+               rate
+               totalCost
+               percentage
+               notes
+               generatedBy {
+                  personId
+                  firstName
+                  lastName
+               }
                responsible {
                   personId
                   firstName
                   lastName
                }
-               percentage
+               equipments {
+                  equipmentId
+                  name
+                  code
+               }
             }
             totalCount
             pageInfo {
@@ -155,7 +179,7 @@ export const FETCH_WORK_ORDERS_QL = gql`
 
 export const GET_WORK_ORDER_BY_ID_QL = gql`
    query getWorkOrderById($workOrderId: Int!) {
-      maintenances {
+      workOrders {
          workOrder(entityId: $workOrderId) {
             workOrderId
             workOrderCode
@@ -176,6 +200,48 @@ export const GET_WORK_ORDER_BY_ID_QL = gql`
                firstName
                lastName
             }
+            equipments {
+               equipmentId
+               name
+               code
+               workQueues {
+                  workQueueId
+                  workType
+                  scheduledDate
+                  task {
+                     taskId
+                     name
+                     priority
+                     taskCategory {
+                        categoryId
+                        name
+                     }
+                  }
+                  taskTrigger {
+                     taskTriggerId
+                     triggerType
+                  }
+               }
+            }
+            workOrderResources {
+               workOrderResourceId
+               amount
+               humanResource {
+                  personId
+                  firstName
+                  lastName
+               }
+               inventoryItem {
+                  inventoryItemId
+                  item {
+                     itemId
+                     name
+                  }
+               }
+               workQueue {
+                  workQueueId
+               }
+            }
             createdDate
             modifiedDate
          }
@@ -194,7 +260,7 @@ export const SAVE_WORK_ORDER_QL = gql`
       $workQueueIds: [Int!]!
       $resources: [WorkOrderResourceArg!]!
    ) {
-      maintenances {
+      workOrders {
          createUpdateWorkOrder(
             workOrderId: $workOrderId
             estimateDuration: $estimateDuration

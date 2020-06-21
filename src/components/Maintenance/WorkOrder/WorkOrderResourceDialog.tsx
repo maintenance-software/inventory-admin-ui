@@ -21,9 +21,9 @@ import {
 } from "../../../graphql/Inventory.ql";
 import { useLazyQuery } from '@apollo/react-hooks';
 import {InventoryChooser} from "./InventoryChooser";
-import {IWorkOrderResource} from "./WorkOrderContainer";
 import {GET_INVENTORY_ITEMS_BY_ITEM_ID_QL} from "../../../graphql/WorkOrder.ql";
 import {ItemsQL} from "../../../graphql/Item.ql";
+import {IWorkOrderResource} from "./WorkOrderTypes";
 
 const useDialogStyles = makeStyles((theme: Theme) => createStyles({
    root: {
