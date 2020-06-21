@@ -22,6 +22,7 @@ import Box from '@material-ui/core/Box';
 import {FETCH_EMPLOYEES, IEmployeesQL} from "../../graphql/Person.ql";
 import { useLazyQuery } from '@apollo/react-hooks';
 import {buildFullName} from "../../utils/globalUtil";
+import {ISimpleSelectorOption} from "../common/CommonTypes";
 
 const useStyles = makeStyles({
    root: {
@@ -59,12 +60,6 @@ const useStyles = makeStyles({
       width: '20rem!important'
    }
 });
-
-export interface ISimpleSelectorOption {
-   value: string | number;
-   label: string;
-   selected?: boolean
-}
 
 interface ISimpleSelectorPros {
    value: ISimpleSelectorOption;
@@ -130,6 +125,7 @@ export const PersonPaginatorSelector: FC<ISimpleSelectorPros> = ({value, readonl
             <Button aria-controls="simple-selector"
                     aria-haspopup="true"
                     variant="outlined"
+                    size="small"
                     disabled={readonly}
                     onClick={()=> setOpen(true)}
                     endIcon={<UnfoldMoreIcon/>}

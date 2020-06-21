@@ -19,9 +19,8 @@ import Select from '@material-ui/core/Select';
 import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
 import {FETCH_EMPLOYEES, IEmployeesQL, PersonQL} from "../../../graphql/Person.ql";
 import {buildFullName} from "../../../utils/globalUtil";
-import {ISimpleSelectorOption, SimpleSelector} from "../../common/SimpleSelector";
 import {IWorkOrderForm} from "./WorkOrderContainer";
-import {PersonPaginatorSelector} from "../../Human/PersonSelectorDialog";
+import {PersonPaginatorSelector} from "../../Human/PersonPaginatorSelector";
 
 const useDateStyles = makeStyles((theme: Theme) =>
    createStyles({

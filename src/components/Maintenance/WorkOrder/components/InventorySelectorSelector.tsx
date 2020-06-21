@@ -1,4 +1,4 @@
-import React, { useState, FC, FormEvent } from 'react';
+import React, { useState, FC, FormEvent, useEffect } from 'react';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
@@ -9,17 +9,16 @@ import DraftsIcon from '@material-ui/icons/Drafts';
 import SendIcon from '@material-ui/icons/Send';
 import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
 import Button from '@material-ui/core/Button';
-import {EmployeeChooserComp} from "../Assets/Commons/PersonChooser/EmployeeChooserComp";
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import {SearchInput} from "../SearchInput/SearchInput";
 import Grid from '@material-ui/core/Grid';
 import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
-import {ISimplePerson} from "../Assets/Commons/PersonChooser/PersonChooser";
-import {TablePaginationActions} from "../../utils/TableUtils";
 import TablePagination from '@material-ui/core/TablePagination';
-import Box from '@material-ui/core/Box';
-import {ISimpleSelectorOption} from "./CommonTypes";
+import { useLazyQuery } from '@apollo/react-hooks';
+import {ISimpleSelectorOption} from "../../../common/CommonTypes";
+import {ItemsQL} from "../../../../graphql/Item.ql";
+import {GET_INVENTORY_ITEMS_BY_ITEM_ID_QL} from "../../../../graphql/WorkOrder.ql";
+import {IInventoryResource} from "../WorkOrderResourceDialog";
 
 const useStyles = makeStyles({
    root: {
@@ -59,34 +58,45 @@ const useStyles = makeStyles({
 });
 
 interface ISimpleSelectorPros {
-   value: string | number;
-   options: ISimpleSelectorOption[];
+   value: IInventoryResource;
    readonly?: boolean;
-   onChange?(v: string | number): void;
-   paging?: {
-      pageIndex: number;
-      pageSize: number;
-      totalCount: number;
-      searchString: string;
-      onChangePage(event: React.MouseEvent<HTMLButtonElement> | null, newPage: number): void;
-      onSearch(searchString: string) : void;
-   };
+   itemId: number;
+   onChange?(option: IInventoryResource): void;
 }
 
-export const SimpleSelector: FC<ISimpleSelectorPros> = ({value, options, readonly, onChange, paging}) => {
+export const InventorySelectorSelector: FC<ISimpleSelectorPros> = ({value, itemId, readonly, onChange}) => {
    const classes = useStyles();
    const [open, setOpen] = useState(false);
    const [searchInput, setSearchInput] = React.useState<string>( '');
-   const calcOption = options.find(o => o.value === value);
 
+   const [fetchInventorItems, { called, loading, data }] = useLazyQuery<{items: ItemsQL}, any>(GET_INVENTORY_ITEMS_BY_ITEM_ID_QL);
+   const [inventoryItems, setInventoryItems] = React.useState<IInventoryResource[]>([]);
+   const [selectedInventoryItem, setSelectedInventoryItem] = useState<IInventoryResource>(value);
 
-   const onSearch = (event: FormEvent) => {
-      event.preventDefault();
-      paging && paging.onSearch(searchInput);
-   };
+   useEffect(() => {
+      setSelectedInventoryItem(value);
+   }, [value]);
 
-   const handOnleSelect = (v: string | number) => {
-      onChange && onChange(v);
+   useEffect(() => {
+      if(open) {
+         fetchInventorItems({variables: {itemId}});
+      }
+   }, [open]);
+
+   useEffect(() => {
+      if(data) {
+         const newInventoryItems = data.items.item.inventoryItems.content.map(inventoryItem => ({
+            inventoryItemId: inventoryItem.inventoryItemId,
+            inventoryId: inventoryItem.inventory.inventoryId,
+            name: inventoryItem.inventory.name,
+            description: inventoryItem.inventory.description
+         }));
+         setInventoryItems(newInventoryItems);
+      }
+   }, [called, loading, data]);
+
+   const handOnleSelect = (option: IInventoryResource) => {
+      onChange && onChange(option);
       setOpen(false);
    };
 
@@ -95,42 +105,24 @@ export const SimpleSelector: FC<ISimpleSelectorPros> = ({value, options, readonl
             <Button aria-controls="simple-selector"
                     aria-haspopup="true"
                     variant="outlined"
+                    size="small"
                     disabled={readonly}
                     onClick={()=> setOpen(true)}
                     endIcon={<UnfoldMoreIcon/>}
                     className={classes.root}
             >
-               {calcOption? calcOption.label : <h6>&nbsp;</h6>}
+               {selectedInventoryItem.name? selectedInventoryItem.name : <h6>&nbsp;</h6>}
             </Button>
          <Dialog onClose={() => setOpen(false)} aria-labelledby="Simple Selector" open={open}>
             <DialogContent className={classes.dialogContent}>
-               <Grid style={{margin:'1rem'}}>
-                  <form  noValidate autoComplete="off" onSubmit={onSearch}>
-                     <SearchInput placeholder="Search" value={searchInput} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchInput(event.target.value)}/>
-                  </form>
-               </Grid>
                <MenuList className={classes.optionContent}>
-                  { options.length === 0? <h6 style={{paddingLeft:'1rem', paddingRight:'1rem'}}>No results</h6>:
-                     options.map(o => (
-                     <MenuItem onClick={() => handOnleSelect(o.value)}>
-                        <Typography variant="inherit">{o.label}</Typography>
+                  { inventoryItems.length === 0? <h6 style={{paddingLeft:'1rem', paddingRight:'1rem'}}>No results</h6>:
+                     inventoryItems.map(o => (
+                     <MenuItem key={o.name} onClick={() => handOnleSelect(o)}>
+                        <Typography variant="inherit">{o.name}</Typography>
                      </MenuItem>
                   ))}
                </MenuList>
-               {paging && paging.totalCount >= 10 ?
-                  <TablePagination
-                     className={classes.pagination}
-                     component="div"
-                     labelRowsPerPage=''
-                     rowsPerPageOptions={[]}
-                     count={paging.totalCount}
-                     rowsPerPage={paging.pageSize}
-                     page={paging.pageIndex}
-                     onChangePage={paging.onChangePage || (() =>{})}
-                     ActionsComponent={TablePaginationActions}
-                  />
-                  : ''
-               }
             </DialogContent>
          </Dialog>
       </>
