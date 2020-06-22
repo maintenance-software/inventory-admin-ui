@@ -4,16 +4,11 @@ import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {WorkOrders} from './components/WorkOrders';
 import {
-   FETCH_TASK_ACTIVITIES_GQL,
    MaintenancesQL,
-   TaskActivityQL,
    SAVE_TASK_ACTIVITY_EVENT_GQL
 } from "../../../graphql/Maintenance.ql";
 import {buildFullName, clearCache} from "../../../utils/globalUtil";
-import moment from 'moment';
 import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
-import {EntityStatusQL} from "../../../graphql/User.ql";
-import {EquipmentQL, EquipmentsQL} from "../../../graphql/Equipment.ql";
 import {
    FETCH_WORK_ORDERS_QL,
    FETCH_WORK_QUEUES_QL,
@@ -22,31 +17,6 @@ import {
    WorkQueueQL
 } from "../../../graphql/WorkOrder.ql";
 import {IWorkOrder, IWorkOrderEquipment, IWorkOrderResource} from "./WorkOrderTypes";
-
-// export interface IWorkOrderEquipment {
-//    equipmentId: number;
-//    name: string;
-//    code: string;
-//    taskCount: number;
-//    maintenanceCount: number;
-//    workQueues: IWorkQueues[];
-// }
-//
-// export interface IWorkQueues {
-//    workQueueTaskId: number;
-//    rescheduledDate: string;
-//    scheduledDate: string;
-//    status: EntityStatusQL;
-//    taskName: string;
-//    taskPriority: number;
-//    taskCategoryId: number;
-//    taskCategoryName: string;
-//    triggerDescription: string;
-//    taskId: number;
-//    taskTriggerId: number;
-//    taskResources: IWorkOrderResource[];
-//    valid: boolean;
-// }
 
 export const WorkOrdersContainer: React.FC = () => {
    const history = useHistory();
@@ -58,7 +28,7 @@ export const WorkOrdersContainer: React.FC = () => {
    const [searchString, setSearchString] = React.useState<string>('');
    const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
    const [fetchWorkOrders, { called, loading, data }] = useLazyQuery<{workOrders: WorkOrdersQL}, any>(FETCH_WORK_ORDERS_QL);
-   const [saveTaskActivityEvent, saveActivityStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_TASK_ACTIVITY_EVENT_GQL);
+   // const [saveTaskActivityEvent, saveActivityStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_TASK_ACTIVITY_EVENT_GQL);
    useEffect(() => {
       fetchWorkOrders({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize }});
    }, []);

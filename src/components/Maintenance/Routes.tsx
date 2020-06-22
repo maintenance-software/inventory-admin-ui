@@ -7,6 +7,7 @@ import {CreateEditMaintenancePlanComp} from "./Plan/CreateEditEquipment/CreateEd
 import {WorkQueueListContainer} from "./WorkQueue/WorkQueueListContainer";
 import {WorkOrderContainer} from "./WorkOrder/WorkOrderContainer";
 import {WorkOrdersContainer} from "./WorkOrder/WorkOrdersContainer";
+import {WorkOrderKanban} from "./WorkOrder/WorkOrderKanban";
 
 interface IMaintenancePlanContext {
    maintenanceId: number;
@@ -40,6 +41,7 @@ const WorkOrderRoutes: React.FC =  () => {
    return (
       <Switch>
          <Route exact path={path} component={WorkOrdersContainer}/>
+         <Route path={`${path}/karban`} component={WorkOrderKanban}/>
          <Route path={`${path}/:workOrderId`} component={WorkOrderContainer}/>
       </Switch>
    );

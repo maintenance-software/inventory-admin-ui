@@ -14,8 +14,8 @@ import ListIcon from '@material-ui/icons/List';
 import { useHistory } from "react-router";
 import Button from '@material-ui/core/Button';
 import {Checkbox, Typography} from '@material-ui/core';
-import {InventoryQL} from "../../../graphql/Inventory.ql";
-import {IInventoryResource} from "./WorkOrderResourceDialog";
+import {InventoryQL} from "../../../../graphql/Inventory.ql";
+import {IInventoryResource} from "../WorkOrderResourceDialog";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {

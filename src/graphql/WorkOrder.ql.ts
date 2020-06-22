@@ -163,6 +163,8 @@ export const FETCH_WORK_ORDERS_QL = gql`
                   name
                   code
                }
+               createdDate
+               modifiedDate
             }
             totalCount
             pageInfo {
