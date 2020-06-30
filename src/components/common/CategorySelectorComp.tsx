@@ -93,7 +93,7 @@ export const CategorySelectorComp: FC<ICategorySelectorPros> = ({value, readonly
       }
    }, [called, loading, data]);
 
-   const onSaveEditCategory = async (option: ISimpleSelectorOption, nopersist: boolean) => {
+   const handleSaveEditCategory = async (option: ISimpleSelectorOption, nopersist: boolean) => {
       if(nopersist) {
          setEditableOption(option);
          if(option.value <= 0 && !options.find(o => o.value === option.value)) {
@@ -117,6 +117,12 @@ export const CategorySelectorComp: FC<ICategorySelectorPros> = ({value, readonly
             setEditableOption(null);
          }
       }
+   };
+
+   const handleCancelCategory = () => {
+      const newOptions = options.filter(o => o.value >= 0).map(o => ({...o}));
+      setOptions(newOptions);
+      setEditableOption(null);
    };
 
    const handOnleSelect = (v: ISimpleSelectorOption) => {
@@ -144,7 +150,7 @@ export const CategorySelectorComp: FC<ICategorySelectorPros> = ({value, readonly
                   <form  noValidate autoComplete="off" style={{marginTop: 'auto', marginBottom: 'auto'}}>
                      <SearchInput placeholder="Search" value={searchInput} onChange={(event: React.ChangeEvent<{value: string}>) => setSearchInput(event.target.value)}/>
                   </form>
-                  <Button variant="contained" size="small" color="primary" onClick={() => onSaveEditCategory({value: -1, label: ''}, true)}>New</Button>
+                  <Button variant="contained" size="small" color="primary" onClick={() => handleSaveEditCategory({value: -1, label: ''}, true)}>New</Button>
                </Grid>
                <List className={classes.optionContent}>
                   { options.length === 0? <h6 style={{paddingLeft:'1rem', paddingRight:'1rem'}}>No results</h6>:
@@ -161,10 +167,10 @@ export const CategorySelectorComp: FC<ICategorySelectorPros> = ({value, readonly
                                  <ListItemText primary={o.label}/>
                               }
                               <ListItemSecondaryAction>
-                                 <IconButton size="small" edge="end" onClick={() => onSaveEditCategory(o, !(editableOption && editableOption.value === o.value))}>
+                                 <IconButton size="small" edge="end" onClick={() => handleSaveEditCategory(o, !(editableOption && editableOption.value === o.value))}>
                                     {editableOption && editableOption.value === o.value? <CheckIcon/> : <EditIcon/>}
                                  </IconButton>
-                                 {editableOption && editableOption.value === o.value? <IconButton size="small" edge="end" onClick={() => setEditableOption(null)}><CancelIcon/></IconButton> : ''}
+                                 {editableOption && editableOption.value === o.value? <IconButton size="small" edge="end" onClick={() => handleCancelCategory()}><CancelIcon/></IconButton> : ''}
                               </ListItemSecondaryAction>
                            </ListItem>
                            <Divider />
