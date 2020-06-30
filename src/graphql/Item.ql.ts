@@ -229,6 +229,16 @@ export const FETCH_CATEGORIES = gql`
    }
 `;
 
+export const SAVE_CATEGORY = gql`
+   mutation saveCategory($categoryId: Int!, $name: String!, $scope: String!) {
+      saveCategory(categoryId: $categoryId, name: $name, scope: $scope, description: "") {
+         categoryId
+         name
+         scope
+      }
+   }
+`;
+
 export const FETCH_UNITS = gql`
    query fetchUnits {
       units {

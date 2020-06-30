@@ -7,6 +7,8 @@ type WorkOrders {
     workOrder(entityId: Int!): WorkOrder!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkOrder!
     createUpdateWorkOrder(workOrderId: Int!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int!, responsibleId: Int!, parentId: Int, workQueueIds: [Int!]!, resources: [WorkOrderResourceArg!]!): WorkOrder!
+    changeStatus(entityIds: [Int!]!, status: String!): Boolean!
+    addWorkOrderSubTasks(workOrderId: Int!, workQueueId: Int!, workOrderSubTasks: [WorkOrderSubTaskArg!]!): Boolean!
 }
 
 type InventoryItems {
@@ -78,6 +80,7 @@ type WorkOrder {
     parent: WorkOrder
     equipments: [Equipment!]!
     workOrderResources: [WorkOrderResource!]!
+    workOrderSubTask: [WorkOrderSubTask!]!
     createdDate: String!
     modifiedDate: String
 }
@@ -361,6 +364,12 @@ type Equipment {
     modifiedDate: String
 }
 
+input WorkOrderSubTaskArg {
+    workOrderSubTaskId: Int!
+    value: String!
+    subTaskId: Int!
+}
+
 type Item {
     itemId: Int!
     code: String!
@@ -484,6 +493,15 @@ type Session {
     lastName: String!
     locale: String!
     permissions: [String!]!
+}
+
+type WorkOrderSubTask {
+    workOrderSubTaskId: Int!
+    value: String!
+    subTask: SubTask!
+    workQueue: WorkQueue!
+    createdDate: String!
+    modifiedDate: String
 }
 
 input TaskTriggerArg {

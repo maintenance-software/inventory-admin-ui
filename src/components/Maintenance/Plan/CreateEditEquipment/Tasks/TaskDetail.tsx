@@ -9,11 +9,12 @@ import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import MenuItem from '@material-ui/core/MenuItem';
 import {CategoryQL} from "../../../../../graphql/Item.ql";
+import {CategorySelectorComp} from "../../../../common/CategorySelectorComp";
 
-const useSliderStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
    createStyles({
       root: {
-         width: 300,
+         width: '60rem',
       },
       margin: {
          height: theme.spacing(3),
@@ -23,7 +24,7 @@ const useSliderStyles = makeStyles((theme: Theme) =>
 
 export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: CategoryQL[]}> =  ({taskDetailForm, taskCategories}) => {
    const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid, setFieldValue } = taskDetailForm;
-   const classes = useSliderStyles();
+   const classes = useStyles();
   //  const { values, resetForm, getFieldProps, getFieldMeta, handleSubmit, errors, dirty, isValid, setFieldValue } = useFormik<ITaskDetail>({
   //   initialValues: taskDetail,
   //   validationSchema: Yup.object().shape({
@@ -52,21 +53,15 @@ export const TaskDetailComp: FC<{taskDetailForm: any, taskCategories: CategoryQL
    const downTimeDurationMMField = getFieldMeta('downTimeDurationMM');
    const downTimeDurationHH = getFieldProps('downTimeDurationHH');
    const downTimeDurationHHField = getFieldMeta('downTimeDurationHH');
-
   return (
     <>
-       <Grid container>
+       <Grid container className={classes.root}>
           <Grid container  spacing={2}>
              <Grid item xs={8}>
                 <TextField  id="name" label="Name" style={{width: '100%'}} required error={nameField.touched && !!nameField.error} {...name}/>
              </Grid>
-             <Grid item xs={4}>
-                <TextField  id="taskCategory" label="Task Category" select  style={{width: '100%'}} {...taskCategoryId}>
-                   <MenuItem key={-1} value="-1">--Select--</MenuItem>
-                   {taskCategories.map(c => (
-                      <MenuItem key={c.categoryId} value={c.categoryId}>{c.name}</MenuItem>
-                   ))}
-                </TextField>
+             <Grid item xs={4} alignContent="flex-end">
+                <CategorySelectorComp value={taskCategoryId.value} scope="TASK_CATEGORY" onChange={(value) => setFieldValue('taskCategoryId', value)}/>
              </Grid>
 
              <Grid item xs={6}>
