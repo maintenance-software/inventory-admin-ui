@@ -18,7 +18,7 @@ import {
    FETCH_TASK_ACTIVITIES_GQL,
    MaintenancesQL,
    TaskActivityQL,
-   SAVE_TASK_ACTIVITY_EVENT_GQL
+   SAVE_TASK_ACTIVITY_EVENT_GQL, GET_MAINTENANCE_PLAN_BY_ID
 } from "../../../graphql/Maintenance.ql";
 import {buildFullName, clearCache} from "../../../utils/globalUtil";
 import moment from 'moment';
@@ -27,7 +27,7 @@ import {EntityStatusQL} from "../../../graphql/User.ql";
 import {EquipmentQL, EquipmentsQL} from "../../../graphql/Equipment.ql";
 import {
    FETCH_WORK_ORDERS_QL,
-   FETCH_WORK_QUEUES_QL,
+   FETCH_WORK_QUEUES_QL, WORK_ORDER_CHANGE_STATUS_QL,
    WorkOrderQL,
    WorkOrdersQL,
    WorkQueueQL
@@ -124,6 +124,7 @@ export const WorkOrderKanban: FC = () => {
    const [completedItems, setCompletedItems] = useState<IWorkOrderCard[]>([]);
    const [closedItems, setClosedItems] = useState<IWorkOrderCard[]>([]);
    const [fetchWorkOrders, { called, loading, data }] = useLazyQuery<{workOrders: WorkOrdersQL}, any>(FETCH_WORK_ORDERS_QL);
+   const [workOrderChangeStatus] = useMutation<{workOrders: WorkOrdersQL}, any>(WORK_ORDER_CHANGE_STATUS_QL);
 
    useEffect(() => {
       fetchWorkOrders({variables: { pageIndex: 0, pageSize: 100 }});
@@ -145,14 +146,20 @@ export const WorkOrderKanban: FC = () => {
       }
    }, [called, loading, data]);
 
-   const changeTaskStatus = useCallback((id, status) => {
-         let [task] = workOrders.filter(task => task.workOrderId === id);
-         const taskIndex = workOrders.indexOf(task);
-         task = { ...task, status };
-         let newTasks = update(workOrders, {
-            [taskIndex]: { $set: task }
-         });
-         setWorkOrders(newTasks);
+   const changeTaskStatus = useCallback(async (id : number, status: WorkOrderStatus) => {
+         // @ts-ignore
+         let [key] = Object.keys(WorkOrderStatus).filter(key => WorkOrderStatus[key] === status);
+         const changeStatusQL = await workOrderChangeStatus({variables: {entityIds: [id], status: key}, refetchQueries: [{query: FETCH_WORK_ORDERS_QL, variables: { pageIndex: 0, pageSize: 100 }}],});
+         if(changeStatusQL.data && changeStatusQL.data.workOrders.changeStatus) {
+            // console.log('dummy change');
+            // let [task] = workOrders.filter(task => task.workOrderId === id);
+            // const taskIndex = workOrders.indexOf(task);
+            // task = { ...task, status };
+            // let newTasks = update(workOrders, {
+            //    [taskIndex]: { $set: task }
+            // });
+            // setWorkOrders(newTasks);
+         }
       },
       [workOrders]
    );
@@ -176,7 +183,7 @@ export const WorkOrderKanban: FC = () => {
       );
    };
 
-   const KanbanColumn: FC<{status: string, changeTaskStatus(id: number, status: string): void}> = ({ status, changeTaskStatus, children }) => {
+   const KanbanColumn: FC<{status: WorkOrderStatus, changeTaskStatus(id: number, status: WorkOrderStatus): void}> = ({ status, changeTaskStatus, children }) => {
       const ref = useRef(null);
       const [ , drop] = useDrop({
          accept: 'card',

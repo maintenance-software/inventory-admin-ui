@@ -10,6 +10,7 @@ export interface WorkOrdersQL {
    workOrder: WorkOrderQL;
    page: PageQL<WorkOrderQL>;
    createUpdateWorkOrder: WorkOrderQL;
+   changeStatus: boolean;
 }
 
 export interface WorkOrderQL {
@@ -276,6 +277,17 @@ export const SAVE_WORK_ORDER_QL = gql`
             workOrderId
             workOrderCode
          }
+      }
+   }
+`;
+
+export const WORK_ORDER_CHANGE_STATUS_QL = gql`
+   mutation workOrderChangeStatus(
+      $entityIds: [Int!]!
+      $status: String!
+   ) {
+      workOrders {
+         changeStatus(entityIds: $entityIds, status: $status)
       }
    }
 `;
