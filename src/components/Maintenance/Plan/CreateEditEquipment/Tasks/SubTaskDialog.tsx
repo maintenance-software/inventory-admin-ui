@@ -35,6 +35,7 @@ export const SubTaskDialog: FC<ISubTaskDialogProps> = ({open, setOpen, subTask, 
       onSaveSubTask(subTaskCategories.find(k => k.categoryId === kind) || {
          categoryId: 0,
          name: '',
+         key: '',
          description: ''
       }, description, mandatory);
    };

@@ -27,7 +27,6 @@ export interface EquipmentQL {
    purchaseDate: string;
    children: EquipmentQL[];
    parent: EquipmentQL | null;
-   workQueues: WorkQueueQL[];
    createdDate: string;
    modifiedDate: String;
 }
@@ -49,7 +48,6 @@ export const getDefaultEquipmentInstance = ():EquipmentQL => ({
    purchaseDate: '',
    children: [],
    parent: null,
-   workQueues: [],
    createdDate: '',
    modifiedDate: ''
 });

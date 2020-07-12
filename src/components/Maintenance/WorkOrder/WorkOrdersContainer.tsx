@@ -3,10 +3,6 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {WorkOrders} from './components/WorkOrders';
-import {
-   MaintenancesQL,
-   SAVE_TASK_ACTIVITY_EVENT_GQL
-} from "../../../graphql/Maintenance.ql";
 import {buildFullName, clearCache} from "../../../utils/globalUtil";
 import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
 import {
@@ -16,13 +12,14 @@ import {
    WorkOrdersQL,
    WorkQueueQL
 } from "../../../graphql/WorkOrder.ql";
-import {IWorkOrder, IWorkOrderEquipment, IWorkOrderResource} from "./WorkOrderTypes";
+import {IWorkOrder, IWorkQueueEquipment, IWorkOrderResource} from "./WorkOrderTypes";
+import {workQueuesConverter} from "./converter";
 
 export const WorkOrdersContainer: React.FC = () => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const [open, setOpen] = React.useState(false);
-   const [workQueueEquipmentSelected, setWorkQueueEquipmentSelected] = React.useState<IWorkOrderEquipment[]>([]);
+   const [workQueueEquipmentSelected, setWorkQueueEquipmentSelected] = React.useState<IWorkQueueEquipment[]>([]);
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
@@ -71,14 +68,7 @@ export const WorkOrdersContainer: React.FC = () => {
       responsibleName: buildFullName(workOrder.responsible.firstName, workOrder.responsible.lastName),
       generatedById: workOrder.generatedBy.personId,
       generatedByName: buildFullName(workOrder.generatedBy.firstName, workOrder.generatedBy.lastName),
-      equipments: workOrder.equipments.map(e => ({
-         equipmentId: e.equipmentId,
-         name: e.name,
-         code: e.code,
-         taskCount: 0,
-         maintenanceCount: 0,
-         workOrderTasks: [],
-      }))
+      equipments:  workQueuesConverter(workOrder.workQueues)
    }));
 
    return(

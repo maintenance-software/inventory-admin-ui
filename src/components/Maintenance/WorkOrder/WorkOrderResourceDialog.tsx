@@ -77,14 +77,14 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
    };
 
    const handleRemoveWorkOrderResource = (resourceId: number) => {
-      const newResources = workOrderResources.filter(r => r.resourceId !== resourceId);
+      const newResources = workOrderResources.filter(r => r.workOrderResourceId !== resourceId);
       setWorkOrderResources(newResources);
    };
 
    const handleSelectedEmployee = (workOrderResourceId: number, value: number, label: string) => {
          const newWorkOrderResources = workOrderResources.map(resource => ({...resource}));
          newWorkOrderResources.forEach(r => {
-            if(r.resourceId === workOrderResourceId) {
+            if(r.workOrderResourceId === workOrderResourceId) {
                r.resource = label;
                r.personId = value;
             }
@@ -95,7 +95,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
    const handleSelectedInventory = (inventoryResourceId: number, inventory: IInventoryResource) => {
          const newWorkOrderResources = workOrderResources.map(resource => ({...resource}));
          newWorkOrderResources.forEach(r => {
-            if(r.resourceId === inventoryResourceId) {
+            if(r.workOrderResourceId === inventoryResourceId) {
                r.resource = inventory.name;
                r.inventoryItemId = inventory.inventoryItemId;
             }
@@ -133,7 +133,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
                     </TableHead>
                     <TableBody>
                        {workOrderResources.map((row: IWorkOrderResource, index) => (
-                          <TableRow key={row.resourceId} hover>
+                          <TableRow key={row.workOrderResourceId} hover>
                              <TableCell>{row.resourceType}</TableCell>
                              <TableCell>{row.description}</TableCell>
                              <TableCell>
@@ -144,7 +144,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
                                          label: row.resource,
                                          selected: false
                                       }}
-                                      onChange={(value: number, label: string) => handleSelectedEmployee(row.resourceId, value, label)}
+                                      onChange={(value: number, label: string) => handleSelectedEmployee(row.workOrderResourceId, value, label)}
                                    />:
                                    <InventorySelectorSelector
                                        value={{
@@ -154,13 +154,13 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
                                           description: ''
                                        }}
                                        itemId={row.itemId}
-                                       onChange={option => {handleSelectedInventory(row.resourceId, option)}}
+                                       onChange={option => {handleSelectedInventory(row.workOrderResourceId, option)}}
                                    />
                                 }
                              </TableCell>
                              <TableCell>{row.resourceType === 'INVENTORY'?row.amount : ''}</TableCell>
                              <TableCell align="center">
-                                <IconButton aria-label="Remove resource" size='small' color='secondary' onClick={() => handleRemoveWorkOrderResource(row.resourceId)}>
+                                <IconButton aria-label="Remove resource" size='small' color='secondary' onClick={() => handleRemoveWorkOrderResource(row.workOrderResourceId)}>
                                    <DeleteForeverIcon/>
                                 </IconButton>
                              </TableCell>

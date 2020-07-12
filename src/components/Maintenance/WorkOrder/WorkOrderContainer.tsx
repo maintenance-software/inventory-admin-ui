@@ -7,19 +7,25 @@ import {useHistory} from "react-router";
 import {useParams, useRouteMatch} from 'react-router-dom';
 import {
    GET_TASK_RESOURCE_BY_ID_QL,
-   GET_WORK_ORDER_BY_ID_QL, SAVE_WORK_ORDER_QL,
-   WorkOrderQL, WorkOrderResourceQL, WorkOrdersQL
+   GET_WORK_ORDER_BY_ID_QL, SAVE_WORK_ORDER_PROGRESS_GQL, SAVE_WORK_ORDER_QL,
+   WorkOrderQL, WorkOrdersQL
 } from "../../../graphql/WorkOrder.ql";
-import {IWorkQueueEquipment} from "../WorkQueue/WorkQueueListContainer";
 import {WorkOrderTasks} from "./WorkOrderTasks";
 import {WorkOrderFormDetails} from "./WorkOrderFormDetails";
 import {WorkOrderResourceDialog} from "./WorkOrderResourceDialog";
-import {MaintenancesQL, TaskResourceQL} from "../../../graphql/Maintenance.ql";
+import {MaintenancesQL, SubTaskQL, TaskResourceQL} from "../../../graphql/Maintenance.ql";
 import Box from '@material-ui/core/Box';
 import {GET_USER_SESSION_GQL, getSessionDefaultInstance, SessionQL} from "../../../graphql/Session.ql";
 import {buildFullName, clearCache} from "../../../utils/globalUtil";
-import {getIWorkOrderDefaultInstance, IWorkOrder, IWorkOrderEquipment, IWorkOrderResource} from "./WorkOrderTypes";
-import {EntityStatusQL} from "../../../graphql/User.ql";
+import {
+   getIWorkOrderDefaultInstance,
+   IWorkOrder,
+   IWorkQueueEquipment,
+   IWorkOrderResource,
+   getIWorkOrderTaskDefaultInstance, IWorkOrderTask
+} from "./WorkOrderTypes";
+import {workOrderResourceConverter, workQueuesConverter} from "./converter";
+import {WorkOrderSubTaskDialog} from "./WorkOrderSubTaskDialog";
 
 export interface IWorkOrderForm {
    workOrderCode: string;
@@ -42,12 +48,16 @@ export const WorkOrderContainer: React.FC =  () => {
    const { path } = useRouteMatch();
    const params = useParams();
    const [resourceDialogOpen, setResourceDialogOpen] = React.useState(false);
+   const [subTaskDialogOpen, setSubTaskDialogOpen] = React.useState(false);
    const [workOrder, setWorOrder] = React.useState<IWorkOrder>(getIWorkOrderDefaultInstance());
-   const [workOrderResource, setWorkOrderResource] = React.useState<IWorkOrderResource[]>([]);
+   const [workOrderTask, setWorkOrderTask] = React.useState<IWorkOrderTask>(getIWorkOrderTaskDefaultInstance());
+   // const [workOrderResource, setWorkOrderResource] = React.useState<IWorkOrderResource[]>([]);
    const [[workQueueTaskId, equipmentId, taskId], setWorkQueueTask] = React.useState([0, 0, 0]);
    const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{workOrders: WorkOrdersQL}, any>(GET_WORK_ORDER_BY_ID_QL);
    const [getTaskById, taskResponse] = useLazyQuery<{maintenances: MaintenancesQL}, any>(GET_TASK_RESOURCE_BY_ID_QL);
    const [saveWorkOrder, saveWorkOrderResponse] = useMutation<{maintenances: MaintenancesQL}, any>(SAVE_WORK_ORDER_QL);
+   const [saveWorkOrderTaskProgress, saveWorkOrderTaskProgressResponse] = useMutation<{workOrders: WorkOrdersQL}, any>(SAVE_WORK_ORDER_PROGRESS_GQL);
+
    const [isValid, setIsValid] = useState(false);
 
    const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
@@ -56,7 +66,6 @@ export const WorkOrderContainer: React.FC =  () => {
    useEffect(() => {
       if(called && !loading && data) {
          const bWorkOrder: WorkOrderQL = data.workOrders.workOrder;
-         const resources: WorkOrderResourceQL[] = data.workOrders.workOrder.workOrderResources;
          const newWorkOrder: IWorkOrder = {
             workOrderId: bWorkOrder.workOrderId,
             workOrderCode: bWorkOrder.workOrderCode,
@@ -71,39 +80,9 @@ export const WorkOrderContainer: React.FC =  () => {
             responsibleName: buildFullName(bWorkOrder.responsible.firstName, bWorkOrder.responsible.lastName),
             generatedById: bWorkOrder.generatedBy.personId,
             generatedByName: buildFullName(bWorkOrder.generatedBy.firstName, bWorkOrder.generatedBy.lastName),
-            equipments: bWorkOrder.equipments.map(e => ({
-               equipmentId: e.equipmentId,
-               name: e.name,
-               code: e.code,
-               taskCount: 0,
-               maintenanceCount: 0,
-               workOrderTasks: e.workQueues.map(wq => ({
-                  workOrderTaskId: wq.workQueueId,
-                  rescheduledDate: wq.rescheduledDate,
-                  scheduledDate: wq.scheduledDate,
-                  status: wq.status,
-                  taskId: wq.task.taskId,
-                  taskName: wq.task.name,
-                  taskPriority: wq.task.priority,
-                  taskCategoryId: wq.task.taskCategory? wq.task.taskCategory.categoryId : 0,
-                  taskCategoryName: wq.task.taskCategory? wq.task.taskCategory.name: '',
-                  triggerDescription: wq.taskTrigger.description,
-                  taskTriggerId: wq.taskTrigger.taskTriggerId,
-                  taskResources: resources.filter(r => r.workQueue.workQueueId === wq.workQueueId).map(r => ({
-                     resourceId: r.workOrderResourceId,
-                     description: '',
-                     resource: r.humanResource? buildFullName(r.humanResource.firstName, r.humanResource.lastName) : r.inventoryItem.item.name,
-                     itemId: r.inventoryItem ? r.inventoryItem.item.itemId : 0,
-                     inventoryItemId: r.inventoryItem? r.inventoryItem.inventoryItemId : 0,
-                     employeeCategoryId: 0,
-                     personId: r.humanResource? r.humanResource.personId : 0,
-                     resourceType: r.humanResource? 'HUMAN' : 'INVENTORY',
-                     amount: r.amount,
-                  })),
-                  valid: true
-               }))
-            })),
+            equipments: workQueuesConverter(bWorkOrder.workQueues).sort((e1, e2) => e1.equipmentId - e2.equipmentId),
          };
+         console.log(newWorkOrder);
          setWorOrder(newWorkOrder);
       }
    }, [called, loading, data]);
@@ -132,8 +111,8 @@ export const WorkOrderContainer: React.FC =  () => {
                code: w.code,
                taskCount: 0,
                maintenanceCount: 0,
-               workOrderTasks: w.workQueueTasks.map(wt => ({
-                  workOrderTaskId: wt.workQueueTaskId,
+               workQueueTasks: w.workQueueTasks.map(wt => ({
+                  workQueueTaskId: wt.workQueueTaskId,
                   rescheduledDate: wt.rescheduledDate,
                   scheduledDate: wt.scheduledDate,
                   status: wt.status,
@@ -154,56 +133,47 @@ export const WorkOrderContainer: React.FC =  () => {
    }, []);
 
    useEffect(() => {
+      if(saveWorkOrderTaskProgressResponse.data && saveWorkOrderTaskProgressResponse.data.workOrders.saveWorkOrderProgress) {
+         setSubTaskDialogOpen(false);
+      }
+   }, [saveWorkOrderTaskProgressResponse, saveWorkOrderTaskProgressResponse.data]);
+
+   useEffect(() => {
       if(workQueueTaskId && equipmentId && taskId) {
-         const [workOrderEquipment] = workOrder.equipments.filter(e =>  e.equipmentId === equipmentId);
-         const [workQueueTask] = workOrderEquipment.workOrderTasks.filter(workQueueTask => workQueueTask.workOrderTaskId === workQueueTaskId);
-         if(workQueueTask.taskResources.length > 0) {
-            setWorkOrderResource(workQueueTask.taskResources);
-         } else {
-            getTaskById({variables: {taskId: taskId}});
-         }
+         // const [workOrderEquipment] = workOrder.equipments.filter(e =>  e.equipmentId === equipmentId);
+         // const [workQueueTask] = workOrderEquipment.workQueueTasks.filter(workQueueTask => workQueueTask.workQueueTaskId === workQueueTaskId);
+         // if(workQueueTask.taskResources.length > 0) {
+         //    setWorkOrderResource(workQueueTask.taskResources);
+         // } else {
+         //    getTaskById({variables: {taskId: taskId}});
+         // }
+         getTaskById({variables: {taskId: taskId}});
       }
    }, [workQueueTaskId, equipmentId, taskId]);
 
    useEffect(() => {
       if(taskResponse && taskResponse.data) {
          const resources: TaskResourceQL[] = taskResponse.data? taskResponse.data.maintenances.task.taskResources : [];
-         let workOrderResources: IWorkOrderResource[] = [];
-         let index = 0;
-         resources.forEach(r => {
-            if(r.resourceType === 'INVENTORY' && r.inventoryResource) {
-               workOrderResources.push({
-                  resourceId: -index,
-                  description: r.inventoryResource.name,
-                  resource: '',
-                  itemId: r.inventoryResource.itemId,
-                  inventoryItemId: 0,
-                  employeeCategoryId: 0,
-                  personId: 0,
-                  resourceType: 'INVENTORY',
-                  amount: r.amount
-               });
-               index++;
-            } else if(r.resourceType === 'HUMAN' && r.employeeCategory) {
-               const humanResources: IWorkOrderResource[] = [];
-               for (let i = 0; i < r.amount; i++) {
-                  humanResources.push({
-                     resourceId: -index,
-                     description: r.employeeCategory.name,
-                     resource: '',
-                     itemId: 0,
-                     inventoryItemId: 0,
-                     employeeCategoryId: r.employeeCategory.categoryId,
-                     personId: 0,
-                     resourceType: 'HUMAN',
-                     amount: 1
-                  });
-                  index++;
-               }
-               workOrderResources = workOrderResources.concat(humanResources);
-            }
+         const subTasks: SubTaskQL[] = taskResponse.data? taskResponse.data.maintenances.task.subTasks : [];
+         const newWorkOrderResources = workOrderResourceConverter(resources);
+
+         const [workOrderTaskTemp] = workOrder.equipments.map(woe => {
+            const [temp] = woe.workQueueTasks.filter(wot => wot.workQueueTaskId === workQueueTaskId);
+            return temp
+         }).filter(wot => wot);
+
+         const newWorkOrderSubTasks = subTasks.map((st, index) => {
+            const workOrderSubTaskTemp = workOrderTaskTemp.subTasks.find(wost => wost.subTaskId === st.subTaskId);
+            return {
+               workOrderSubTaskId: workOrderSubTaskTemp? workOrderSubTaskTemp.workOrderSubTaskId : -index,
+               subTaskId: st.subTaskId,
+               subTaskCategoryKey: st.subTaskCategory.key,
+               subTaskDescription: st.description,
+               value: workOrderSubTaskTemp? workOrderSubTaskTemp.value : ''
+            };
          });
-         setWorkOrderResource(workOrderResources);
+         const newWorkOrderTask: IWorkOrderTask = {...workOrderTaskTemp, taskResources: newWorkOrderResources, subTasks: newWorkOrderSubTasks};
+         setWorkOrderTask(newWorkOrderTask);
       }
    }, [taskResponse, taskResponse.data]);
 
@@ -212,14 +182,19 @@ export const WorkOrderContainer: React.FC =  () => {
       setResourceDialogOpen(true);
    };
 
+   const handleWorkOrderSubTaskOpenDialog = async (workQueueTaskId: number, equipmentId: number, taskId: number) => {
+      setWorkQueueTask([workQueueTaskId, equipmentId, taskId]);
+      setSubTaskDialogOpen(true);
+   };
+
    const handleWorkOrderResourceAcceptDialog = (resources: IWorkOrderResource[]) => {
-      const [workEquipment] = workOrder.equipments.filter(e =>  e.equipmentId === equipmentId);
-      workEquipment.workOrderTasks.forEach(workOrderTask => {
-         if(workOrderTask.workOrderTaskId === workQueueTaskId) {
-            workOrderTask.taskResources = resources;
-            workOrderTask.valid = true;
-         }
-      });
+      // const [workEquipment] = workOrder.equipments.filter(e =>  e.equipmentId === equipmentId);
+      // workEquipment.workQueueTasks.forEach(workOrderTask => {
+      //    if(workOrderTask.workQueueTaskId === workQueueTaskId) {
+      //       workOrderTask.taskResources = resources;
+      //       workOrderTask.valid = true;
+      //    }
+      // });
       const newWorkOrder: IWorkOrder = {
          workOrderId: workOrder.workOrderId,
          workOrderCode: workOrder.workOrderCode,
@@ -240,7 +215,7 @@ export const WorkOrderContainer: React.FC =  () => {
       setResourceDialogOpen(false);
       let isValid = true;
       newWorkOrder.equipments.map(w => {
-         w.workOrderTasks.forEach(t => {
+         w.workQueueTasks.forEach(t => {
             isValid = isValid && t.valid;
          });
       });
@@ -268,14 +243,14 @@ export const WorkOrderContainer: React.FC =  () => {
       const workQueueTaskIds: number[] = [];
       let workOrderResources: { workOrderResourceId: number, amount: number, humanResourceId: number | null, inventoryItemId: number | null, workQueueTaskId: number}[] = [];
       workOrder.equipments.forEach(w =>{
-         w.workOrderTasks.forEach(t => {
-            workQueueTaskIds.push(t.workOrderTaskId);
+         w.workQueueTasks.forEach(t => {
+            workQueueTaskIds.push(t.workQueueTaskId);
             workOrderResources = workOrderResources.concat(t.taskResources.map(r =>({
-               workOrderResourceId: r.resourceId,
+               workOrderResourceId: r.workOrderResourceId,
                amount: r.amount,
                humanResourceId: !r.personId? null : r.personId,
                inventoryItemId: !r.inventoryItemId? null : r.inventoryItemId,
-               workQueueTaskId: t.workOrderTaskId
+               workQueueTaskId: t.workQueueTaskId
             })));
          });
       });
@@ -303,17 +278,44 @@ export const WorkOrderContainer: React.FC =  () => {
       // console.log(response);
    };
 
+   const handleSaveWorkOrderTask = (workOrderTask: IWorkOrderTask, finalize: boolean) => {
+      saveWorkOrderTaskProgress({variables: {
+            workQueueId: workOrderTask.workQueueTaskId,
+            workOrderId: workOrderId,
+            startWorkDate: workOrderTask.startDate,
+            finishedWorkDate: workOrderTask.endDate,
+            notes: workOrderTask.notes,
+            status: !finalize? workOrderTask.status : 'WO_TASK_COMPLETED',
+            workOrderSubTasks: workOrderTask.subTasks.map(st => ({
+               workOrderSubTaskId: st.workOrderSubTaskId,
+               value: st.value,
+               subTaskId: st.subTaskId
+            })),
+         },
+         refetchQueries: [{query: GET_WORK_ORDER_BY_ID_QL, variables: {workOrderId}}],
+      });
+   };
   return (
      <>
      <Box display="flex" flex='1'>
         <Box display="flex" flexDirection='column' style={{maxWidth: '60rem'}}>
            <WorkOrderFormDetails form={workOrderform} onSubmit={handleOnsubmit} error={!isValid}/>
-           <WorkOrderTasks workOrderEquipments={workOrder.equipments} onSetWorkOrderResource={handleWorkOrderResourceOpenDialog}/>
+           <WorkOrderTasks
+              workOrderEquipments={workOrder.equipments}
+              onSetWorkOrderResource={handleWorkOrderResourceOpenDialog}
+              onWorkOrderSubTask={handleWorkOrderSubTaskOpenDialog}
+           />
            <WorkOrderResourceDialog
-              resources={workOrderResource}
+              resources={workOrderTask.taskResources}
               open={resourceDialogOpen}
               setOpen={setResourceDialogOpen}
               onAccept={handleWorkOrderResourceAcceptDialog}
+           />
+           <WorkOrderSubTaskDialog
+              task={workOrderTask}
+              open={subTaskDialogOpen}
+              setOpen={setSubTaskDialogOpen}
+              onSaveWorkOrderTask={handleSaveWorkOrderTask}
            />
         </Box>
      </Box>

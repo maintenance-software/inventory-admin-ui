@@ -33,6 +33,7 @@ export interface ItemQL {
 export interface CategoryQL {
    categoryId: number;
    name: string;
+   key: string;
    description: string;
 }
 
@@ -85,6 +86,7 @@ export const getItemDefaultInstance = ():ItemQL => ({
    category: {
       categoryId: 0,
       name: '',
+      key: '',
       description: ''
    },
    inventoryItems: {

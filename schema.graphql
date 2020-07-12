@@ -3,12 +3,18 @@ type Privileges {
     list(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): [Privilege!]!
 }
 
+type Page_WorkQueue {
+    totalCount: Int!
+    content: [WorkQueue!]!
+    pageInfo: PageInfo!
+}
+
 type WorkOrders {
     workOrder(entityId: Int!): WorkOrder!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkOrder!
     createUpdateWorkOrder(workOrderId: Int!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int!, responsibleId: Int!, parentId: Int, workQueueIds: [Int!]!, resources: [WorkOrderResourceArg!]!): WorkOrder!
     changeStatus(entityIds: [Int!]!, status: String!): Boolean!
-    addWorkOrderSubTasks(workOrderId: Int!, workQueueId: Int!, workOrderSubTasks: [WorkOrderSubTaskArg!]!): Boolean!
+    saveWorkOrderProgress(workQueueId: Int!, workOrderId: Int!, startWorkDate: String!, finishedWorkDate: String!, notes: String!, status: String!, workOrderSubTasks: [WorkOrderSubTaskArg!]!): Boolean!
 }
 
 type InventoryItems {
@@ -78,9 +84,7 @@ type WorkOrder {
     generatedBy: Person!
     responsible: Person!
     parent: WorkOrder
-    equipments: [Equipment!]!
-    workOrderResources: [WorkOrderResource!]!
-    workOrderSubTask: [WorkOrderSubTask!]!
+    workQueues: [WorkQueue!]!
     createdDate: String!
     modifiedDate: String
 }
@@ -161,10 +165,17 @@ type WorkQueue {
     rescheduledDate: String
     scheduledDate: String!
     incidentDate: String
+    startWorkDate: String
+    finishedWorkDate: String
+    notes: String
+    outOfServiceInterval: Int!
     status: String!
     workType: String!
+    equipment: Equipment!
     task: Task!
     taskTrigger: TaskTrigger!
+    workOrderResources: [WorkOrderResource!]!
+    workOrderSubTask: [WorkOrderSubTask!]!
     createdDate: String!
     modifiedDate: String
 }
@@ -172,6 +183,7 @@ type WorkQueue {
 type Category {
     categoryId: Int!
     name: String!
+    key: String
     scope: String!
     description: String!
     createdDate: String!
@@ -247,7 +259,6 @@ type Equipments {
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
     saveEquipment(equipmentId: Int!, name: String!, description: String, code: String!, partNumber: String, manufacturer: String, model: String, notes: String, status: String!, images: [String!]!, priority: Int!, hoursAverageDailyUse: Int!, outOfService: Boolean!, purchaseDate: String, parentId: Int): Equipment!
     setMaintenance(equipmentId: Int!, maintenanceId: Int!): Boolean!
-    fetchWorkQueues(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
 }
 
 type Page_Maintenance {
@@ -284,7 +295,7 @@ type Mutation {
     saveRole(roleId: Int!, key: String!, name: String!, description: String, active: Boolean!): Role!
     persons: Persons!
     users: Users!
-    saveCategory(categoryId: Int!, name: String!, scope: String!, description: String!): Category!
+    saveCategory(categoryId: Int!, name: String!, key: String, scope: String!, description: String!): Category!
     saveUnit(unitId: Int!, key: String!, label: String!): Unit!
     inventoryItems: InventoryItems!
     items: Items!
@@ -292,6 +303,7 @@ type Mutation {
     employees: Employees!
     inventories: Inventories!
     maintenances: Maintenances!
+    workQueues: WorkQueues!
     workOrders: WorkOrders!
 }
 
@@ -338,6 +350,7 @@ type Query {
     employees: Employees!
     inventoryItems: InventoryItems!
     maintenances: Maintenances!
+    workQueues: WorkQueues!
     workOrders: WorkOrders!
 }
 
@@ -359,7 +372,6 @@ type Equipment {
     children(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
     parent: Equipment
     category: Category
-    workQueues: [WorkQueue!]!
     createdDate: String!
     modifiedDate: String
 }
@@ -445,12 +457,16 @@ input SubTaskArg {
     subTaskCategoryId: Int
 }
 
+type WorkQueues {
+    fetchPendingWorkQueues(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkQueue!
+    addWorkQueueDate(lastMaintenanceDate: String!, assetId: Int!, maintenanceId: Int!): Boolean!
+    addWorkQueueEvent(assetId: Int!, taskId: Int!, taskTriggerId: Int!, maintenanceId: Int, reportedById: Int!, hasAssetFailure: Boolean!, incidentDate: String): Boolean!
+}
+
 type Maintenances {
     maintenance(entityId: Int!): Maintenance!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Maintenance!
     availableEquipments(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_Equipment!
-    addWorkQueueDate(lastMaintenanceDate: String!, assetId: Int!, maintenanceId: Int!): Boolean!
-    addWorkQueueEvent(assetId: Int!, taskId: Int!, taskTriggerId: Int!, maintenanceId: Int, reportedById: Int!, hasAssetFailure: Boolean!, incidentDate: String): Boolean!
     saveMaintenance(maintenanceId: Int!, name: String!, description: String, status: String!): Maintenance!
     createUpdateTasks(maintenanceId: Int, tasks: [TaskArg!]!): [Task!]!
     task(entityId: Int!): Task!

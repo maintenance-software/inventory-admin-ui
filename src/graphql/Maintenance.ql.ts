@@ -179,6 +179,7 @@ export const getSubTaskDefaultInstance = ():SubTaskQL => ({
    subTaskCategory: {
       categoryId: 0,
       name: '',
+      key: '',
       description: ''
    },
 });
@@ -416,42 +417,6 @@ export const SAVE_MAINTENANCE_PLAN = gql`
          ) {
             maintenanceId
          }
-      }
-   }
-`;
-
-export const SAVE_TASK_ACTIVITY_DATE_GQL = gql`
-   mutation saveTaskActivityDate(
-   $lastMaintenanceDate: String!
-   $assetId: Int!
-   $maintenanceId: Int!
-   ) {
-      maintenances {
-         addTaskActivityDate(lastMaintenanceDate: $lastMaintenanceDate, assetId: $assetId, maintenanceId: $maintenanceId)
-      }
-   }
-`;
-
-export const SAVE_TASK_ACTIVITY_EVENT_GQL = gql`
-   mutation saveTaskActivityEvent(
-    $taskTriggerId: Int!
-    $taskId: Int!
-    $maintenanceId: Int
-    $assetId: Int!
-    $hasAssetFailure: Boolean!
-    $incidentDate: String
-    $reportedById: Int!
-   ) {
-      maintenances {
-         addTaskActivityEvent(
-            taskTriggerId: $taskTriggerId,
-            taskId: $taskId,
-            maintenanceId: $maintenanceId,
-            assetId: $assetId,
-            hasAssetFailure: $hasAssetFailure,
-            incidentDate: $incidentDate,
-            reportedById: $reportedById 
-         )
       }
    }
 `;

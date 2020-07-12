@@ -1,8 +1,13 @@
 import {gql} from 'apollo-boost';
 import {getPersonDefaultInstance, PersonQL} from "./Person.ql";
-import {EntityStatusQL} from "./User.ql";
-import {ITaskTriggerQL, TaskQL} from "./Maintenance.ql";
-import {EquipmentQL} from "./Equipment.ql";
+import {
+   getTaskDefaultInstance,
+   getTaskTriggerDefaultInstance,
+   ITaskTriggerQL,
+   SubTaskQL,
+   TaskQL
+} from "./Maintenance.ql";
+import {EquipmentQL, getDefaultEquipmentInstance} from "./Equipment.ql";
 import {InventoryItemQL} from "./Inventory.ql";
 import {PageQL} from "./Common.ql";
 
@@ -11,6 +16,7 @@ export interface WorkOrdersQL {
    page: PageQL<WorkOrderQL>;
    createUpdateWorkOrder: WorkOrderQL;
    changeStatus: boolean;
+   saveWorkOrderProgress: boolean;
 }
 
 export interface WorkOrderQL {
@@ -26,10 +32,15 @@ export interface WorkOrderQL {
    generatedBy: PersonQL;
    responsible: PersonQL;
    parent?: WorkOrderQL;
-   equipments: EquipmentQL[];
-   workOrderResources: WorkOrderResourceQL[];
+   workQueues: WorkQueueQL[];
    createdDate: string;
    modifiedDate: string;
+}
+
+export interface WorkQueuesQL {
+   fetchPendingWorkQueues: PageQL<WorkQueueQL>;
+   addWorkQueueDate: boolean;
+   addWorkQueueEvent: boolean;
 }
 
 export interface WorkQueueQL {
@@ -40,8 +51,15 @@ export interface WorkQueueQL {
    rescheduled: boolean;
    status: string;
    workType: string;
+   equipment: EquipmentQL;
    task: TaskQL;
    taskTrigger: ITaskTriggerQL;
+   startWorkDate: string;
+   finishedWorkDate: string;
+   notes: string;
+   outOfServiceInterval: number;
+   workOrderResources: WorkOrderResourceQL[];
+   workOrderSubTask: WorkOrderSubTaskQL[];
    createdDate: string;
    modifiedDate: string;
 }
@@ -51,6 +69,15 @@ export interface WorkOrderResourceQL {
    amount: number;
    humanResource: PersonQL;
    inventoryItem: InventoryItemQL;
+   workQueue: WorkQueueQL;
+   createdDate: string;
+   modifiedDate: string;
+}
+
+export interface WorkOrderSubTaskQL {
+   workOrderSubTaskId: number;
+   value: string;
+   subTask: SubTaskQL;
    workQueue: WorkQueueQL;
    createdDate: string;
    modifiedDate: string;
@@ -68,41 +95,96 @@ export const getWorkOrderDefaultInstance = ():WorkOrderQL => ({
    notes: '',
    generatedBy: getPersonDefaultInstance(),
    responsible: getPersonDefaultInstance(),
-   equipments: [],
-   workOrderResources: [],
+   workQueues: [],
    createdDate: '',
    modifiedDate: '',
 });
 
+export const getWorkQueueDefaultInstance = ():WorkQueueQL => ({
+   workQueueId: 0,
+   rescheduledDate: '',
+   scheduledDate: '',
+   incidentDate: '',
+   rescheduled: false,
+   status: '',
+   workType: '',
+   equipment: getDefaultEquipmentInstance(),
+   task: getTaskDefaultInstance(),
+   taskTrigger: getTaskTriggerDefaultInstance(),
+   startWorkDate: '',
+   finishedWorkDate: '',
+   notes: '',
+   outOfServiceInterval: 0,
+   workOrderResources: [],
+   workOrderSubTask: [],
+   createdDate: '',
+   modifiedDate: '',
+});
+
+export const SAVE_TASK_ACTIVITY_DATE_GQL = gql`
+   mutation saveTaskActivityDate(
+      $lastMaintenanceDate: String!
+      $assetId: Int!
+      $maintenanceId: Int!
+   ) {
+      workQueues {
+         addWorkQueueDate(lastMaintenanceDate: $lastMaintenanceDate, assetId: $assetId, maintenanceId: $maintenanceId)
+      }
+   }
+`;
+
+export const SAVE_TASK_ACTIVITY_EVENT_GQL = gql`
+   mutation saveTaskActivityEvent(
+      $taskTriggerId: Int!
+      $taskId: Int!
+      $maintenanceId: Int
+      $assetId: Int!
+      $hasAssetFailure: Boolean!
+      $incidentDate: String
+      $reportedById: Int!
+   ) {
+      workQueues {
+         addWorkQueueEvent(
+            taskTriggerId: $taskTriggerId,
+            taskId: $taskId,
+            maintenanceId: $maintenanceId,
+            assetId: $assetId,
+            hasAssetFailure: $hasAssetFailure,
+            incidentDate: $incidentDate,
+            reportedById: $reportedById
+         )
+      }
+   }
+`;
 
 export const FETCH_WORK_QUEUES_QL = gql`
    query fetchWorkQueues($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]) {
-      equipments {
-         fetchWorkQueues(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+      workQueues {
+         fetchPendingWorkQueues(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
             content {
-               equipmentId
-               name
-               code
-               workQueues {
-                  workQueueId
-                  rescheduledDate
-                  scheduledDate
-                  incidentDate
-                  status
-                  workType
-                  task {
-                     taskId
+               workQueueId
+               rescheduledDate
+               scheduledDate
+               incidentDate
+               status
+               workType
+               equipment {
+                  equipmentId
+                  name
+                  code
+               }
+               task {
+                  taskId
+                  name
+                  taskCategory {
+                     categoryId
                      name
-                     taskCategory {
-                        categoryId
-                        name
-                     }
                   }
-                  taskTrigger {
-                     taskTriggerId
-                     description
-                     triggerType
-                  }
+               }
+               taskTrigger {
+                  taskTriggerId
+                  description
+                  triggerType
                }
             }
             totalCount
@@ -159,10 +241,21 @@ export const FETCH_WORK_ORDERS_QL = gql`
                   firstName
                   lastName
                }
-               equipments {
-                  equipmentId
-                  name
-                  code
+               workQueues {
+                  equipment {
+                     equipmentId
+                     name
+                     code
+                  }
+                  task {
+                     taskId
+                     name
+                  }
+                  taskTrigger {
+                     taskTriggerId
+                     description
+                     triggerType
+                  }
                }
                createdDate
                modifiedDate
@@ -203,46 +296,61 @@ export const GET_WORK_ORDER_BY_ID_QL = gql`
                firstName
                lastName
             }
-            equipments {
-               equipmentId
-               name
-               code
-               workQueues {
-                  workQueueId
-                  workType
-                  scheduledDate
-                  task {
-                     taskId
+            workQueues {
+               workQueueId
+               workType
+               scheduledDate
+               status
+               startWorkDate
+               finishedWorkDate
+               notes
+               equipment {
+                  equipmentId
+                  name
+                  code
+               }
+               task {
+                  taskId
+                  name
+                  priority
+                  duration
+                  taskCategory {
+                     categoryId
                      name
-                     priority
-                     taskCategory {
-                        categoryId
+                  }
+               }
+               taskTrigger {
+                  taskTriggerId
+                  triggerType
+               }
+               workOrderResources {
+                  workOrderResourceId
+                  amount
+                  humanResource {
+                     personId
+                     firstName
+                     lastName
+                  }
+                  inventoryItem {
+                     inventoryItemId
+                     item {
+                        itemId
                         name
                      }
                   }
-                  taskTrigger {
-                     taskTriggerId
-                     triggerType
+               }
+               workOrderSubTask {
+                  workOrderSubTaskId
+                  value
+                  subTask {
+                     subTaskId
+                     subTaskCategory {
+                        categoryId
+                        name
+                        key
+                     }
+                     description
                   }
-               }
-            }
-            workOrderResources {
-               workOrderResourceId
-               amount
-               humanResource {
-                  personId
-                  firstName
-                  lastName
-               }
-               inventoryItem {
-                  inventoryItemId
-                  item {
-                     itemId
-                     name
-                  }
-               }
-               workQueue {
-                  workQueueId
                }
             }
             createdDate
@@ -292,6 +400,30 @@ export const WORK_ORDER_CHANGE_STATUS_QL = gql`
    }
 `;
 
+export const SAVE_WORK_ORDER_PROGRESS_GQL = gql`
+   mutation saveWorkOrderProgress(
+       $workQueueId: Int!,
+       $workOrderId: Int!,
+       $startWorkDate: String!,
+       $finishedWorkDate: String!,
+       $notes: String!,
+       $status: String!,
+       $workOrderSubTasks: [WorkOrderSubTaskArg!]!
+   ) {
+      workOrders {
+         saveWorkOrderProgress(
+            workQueueId: $workQueueId
+            workOrderId: $workOrderId
+            startWorkDate: $startWorkDate
+            finishedWorkDate: $finishedWorkDate
+            notes: $notes
+            status: $status
+            workOrderSubTasks: $workOrderSubTasks
+         )
+      }
+   }
+`;
+
 export const GET_TASK_RESOURCE_BY_ID_QL = gql`
    query getTaskForWorkOrderById($taskId: Int!) {
       maintenances {
@@ -314,6 +446,17 @@ export const GET_TASK_RESOURCE_BY_ID_QL = gql`
                   itemId
                   code
                   name
+               }
+            }
+            subTasks {
+               subTaskId
+               order
+               description
+               mandatory
+               subTaskCategory {
+                  categoryId
+                  name
+                  key
                }
             }
          }

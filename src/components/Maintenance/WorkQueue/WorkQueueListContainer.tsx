@@ -5,9 +5,7 @@ import {useRouteMatch} from "react-router-dom";
 import {WorkQueueList} from './WorkQueueList';
 import {
    FETCH_TASK_ACTIVITIES_GQL,
-   MaintenancesQL,
-   TaskActivityQL,
-   SAVE_TASK_ACTIVITY_EVENT_GQL
+   MaintenancesQL
 } from "../../../graphql/Maintenance.ql";
 import {TaskAvailableDialog} from "./WorkQueueEventDialog";
 import {clearCache} from "../../../utils/globalUtil";
@@ -15,33 +13,39 @@ import moment from 'moment';
 import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
 import {EntityStatusQL} from "../../../graphql/User.ql";
 import {EquipmentQL, EquipmentsQL} from "../../../graphql/Equipment.ql";
-import {FETCH_WORK_QUEUES_QL, WorkQueueQL} from "../../../graphql/WorkOrder.ql";
-import {IWorkOrderResource} from "../WorkOrder/WorkOrderTypes";
+import {
+   FETCH_WORK_QUEUES_QL,
+   SAVE_TASK_ACTIVITY_EVENT_GQL,
+   WorkQueueQL,
+   WorkQueuesQL
+} from "../../../graphql/WorkOrder.ql";
+import {IWorkQueueEquipment, IWorkOrderResource} from "../WorkOrder/WorkOrderTypes";
+import {workQueuesConverter} from "../WorkOrder/converter";
 
-export interface IWorkQueueEquipment {
-   equipmentId: number;
-   name: string;
-   code: string;
-   taskCount: number;
-   maintenanceCount: number;
-   workQueueTasks: IWorkQueueTask[];
-}
-
-export interface IWorkQueueTask {
-   workQueueTaskId: number;
-   rescheduledDate: string;
-   scheduledDate: string;
-   status: string;
-   taskName: string;
-   taskPriority: number;
-   taskCategoryId: number;
-   taskCategoryName: string;
-   triggerDescription: string;
-   taskId: number;
-   taskTriggerId: number;
-   taskResources: IWorkOrderResource[];
-   valid: boolean;
-}
+// export interface IWorkQueueEquipment {
+//    equipmentId: number;
+//    name: string;
+//    code: string;
+//    taskCount: number;
+//    maintenanceCount: number;
+//    workQueueTasks: IWorkQueueTask[];
+// }
+//
+// export interface IWorkQueueTask {
+//    workQueueTaskId: number;
+//    rescheduledDate: string;
+//    scheduledDate: string;
+//    status: string;
+//    taskName: string;
+//    taskPriority: number;
+//    taskCategoryId: number;
+//    taskCategoryName: string;
+//    triggerDescription: string;
+//    taskId: number;
+//    taskTriggerId: number;
+//    taskResources: IWorkOrderResource[];
+//    valid: boolean;
+// }
 
 export const WorkQueueListContainer: React.FC = () => {
    const history = useHistory();
@@ -52,7 +56,7 @@ export const WorkQueueListContainer: React.FC = () => {
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
    const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
-   const [fetchWorkQueues, { called, loading, data }] = useLazyQuery<{equipments: EquipmentsQL}, any>(FETCH_WORK_QUEUES_QL);
+   const [fetchWorkQueues, { called, loading, data }] = useLazyQuery<{workQueues: WorkQueuesQL}, any>(FETCH_WORK_QUEUES_QL);
    const [saveTaskActivityEvent, saveActivityStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_TASK_ACTIVITY_EVENT_GQL);
    useEffect(() => {
       fetchWorkQueues({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize }});
@@ -78,28 +82,30 @@ export const WorkQueueListContainer: React.FC = () => {
       setPageIndex(0);
    };
 
-   const workQueueEquipments: IWorkQueueEquipment[] = data.equipments.fetchWorkQueues.content.map((equipment: EquipmentQL) => ({
-      equipmentId: equipment.equipmentId,
-      name: equipment.name,
-      code: equipment.code,
-      taskCount: 0,
-      maintenanceCount: 0,
-      workQueueTasks: equipment.workQueues.filter(wq => wq.status === 'PENDING').map((workQueueTask: WorkQueueQL) =>({
-         workQueueTaskId: workQueueTask.workQueueId,
-         rescheduledDate: workQueueTask.rescheduledDate,
-         scheduledDate: workQueueTask.scheduledDate,
-         status: workQueueTask.status,
-         taskName: workQueueTask.task.name,
-         taskPriority: workQueueTask.task.priority,
-         taskCategoryId: workQueueTask.task.taskCategory? workQueueTask.task.taskCategory.categoryId : 0,
-         taskCategoryName: workQueueTask.task.taskCategory? workQueueTask.task.taskCategory.name : '',
-         triggerDescription: workQueueTask.taskTrigger.triggerType,
-         taskId: workQueueTask.task.taskId,
-         taskTriggerId: workQueueTask.taskTrigger.taskTriggerId,
-         taskResources: [],
-         valid: false
-      }))
-   }));
+   const workQueueEquipments: IWorkQueueEquipment[] = workQueuesConverter(data.workQueues.fetchPendingWorkQueues.content);
+
+   // const workQueueEquipments: IWorkQueueEquipment[] = data.equipments.fetchWorkQueues.content.map((equipment: EquipmentQL) => ({
+   //    equipmentId: equipment.equipmentId,
+   //    name: equipment.name,
+   //    code: equipment.code,
+   //    taskCount: 0,
+   //    maintenanceCount: 0,
+   //    workQueueTasks: equipment.workQueues.filter(wq => wq.status === 'PENDING').map((workQueueTask: WorkQueueQL) =>({
+   //       workQueueTaskId: workQueueTask.workQueueId,
+   //       rescheduledDate: workQueueTask.rescheduledDate,
+   //       scheduledDate: workQueueTask.scheduledDate,
+   //       status: workQueueTask.status,
+   //       taskName: workQueueTask.task.name,
+   //       taskPriority: workQueueTask.task.priority,
+   //       taskCategoryId: workQueueTask.task.taskCategory? workQueueTask.task.taskCategory.categoryId : 0,
+   //       taskCategoryName: workQueueTask.task.taskCategory? workQueueTask.task.taskCategory.name : '',
+   //       triggerDescription: workQueueTask.taskTrigger.triggerType,
+   //       taskId: workQueueTask.task.taskId,
+   //       taskTriggerId: workQueueTask.taskTrigger.taskTriggerId,
+   //       taskResources: [],
+   //       valid: false
+   //    }))
+   // }));
 
    // const sortedTasksActivities = data.maintenances.taskActivities.content.sort((a, b) => a.assetId - b.assetId);
    const onAcceptHandle = (equipmentId: number, taskId: number, triggerId: number, maintenanceId: number, hasAssetFailure: boolean, incidentDate: string) => {
@@ -152,13 +158,19 @@ export const WorkQueueListContainer: React.FC = () => {
                scheduledDate: workQueueTask.scheduledDate,
                status: workQueueTask.status,
                taskName: workQueueTask.taskName,
+               taskDuration: 0,
                taskPriority: workQueueTask.taskPriority,
                taskCategoryId: workQueueTask.taskCategoryId,
                taskCategoryName: workQueueTask.taskCategoryName,
                triggerDescription: workQueueTask.triggerDescription,
                taskId: workQueueTask.taskId,
                taskTriggerId: workQueueTask.taskTriggerId,
+               startDate: '',
+               endDate: '',
+               duration: 0,
+               notes: '',
                taskResources: [],
+               subTasks: [],
                valid: false
             })
          }
@@ -179,9 +191,9 @@ export const WorkQueueListContainer: React.FC = () => {
    <>
       <WorkQueueList
          workQueues={workQueueEquipments}
-         totalCount={data.equipments.fetchWorkQueues.totalCount}
-         pageIndex={data.equipments.fetchWorkQueues.pageInfo.pageIndex}
-         pageSize={data.equipments.fetchWorkQueues.pageInfo.pageSize}
+         totalCount={data.workQueues.fetchPendingWorkQueues.totalCount}
+         pageIndex={data.workQueues.fetchPendingWorkQueues.pageInfo.pageIndex}
+         pageSize={data.workQueues.fetchPendingWorkQueues.pageInfo.pageSize}
          searchString={searchString}
          taskActivitiesSelected={workQueueEquipmentSelected.map(ta => ta.workQueueTasks.map(a => a.workQueueTaskId)).flat()}
          onChangePage={handleChangePage}

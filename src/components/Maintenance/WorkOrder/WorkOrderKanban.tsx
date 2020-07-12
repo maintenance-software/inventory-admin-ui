@@ -13,13 +13,6 @@ import ApartmentIcon from '@material-ui/icons/Apartment';
 import CloseIcon from '@material-ui/icons/Close';
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
-import {WorkOrders} from './components/WorkOrders';
-import {
-   FETCH_TASK_ACTIVITIES_GQL,
-   MaintenancesQL,
-   TaskActivityQL,
-   SAVE_TASK_ACTIVITY_EVENT_GQL, GET_MAINTENANCE_PLAN_BY_ID
-} from "../../../graphql/Maintenance.ql";
 import {buildFullName, clearCache} from "../../../utils/globalUtil";
 import moment from 'moment';
 import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
@@ -32,7 +25,7 @@ import {
    WorkOrdersQL,
    WorkQueueQL
 } from "../../../graphql/WorkOrder.ql";
-import {IWorkOrder, IWorkOrderEquipment, IWorkOrderResource} from "./WorkOrderTypes";
+import {IWorkOrder, IWorkQueueEquipment, IWorkOrderResource} from "./WorkOrderTypes";
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import {TablePaginationActions} from "../../../utils/TableUtils";
@@ -137,7 +130,7 @@ export const WorkOrderKanban: FC = () => {
             responsibleFullName: buildFullName(w.responsible.firstName, w.responsible.lastName),
             code: w.workOrderCode,
             status: toWorkOrderStatusEnum(w.workOrderStatus),
-            equipments: w.equipments.length === 1 ? w.equipments[0].name : 'Equipments: ' + w.equipments.length,
+            equipments: '',//w.equipments.length === 1 ? w.equipments[0].name : 'Equipments: ' + w.equipments.length,
             createdDate: w.createdDate,
             percentage: w.percentage,
             modifiedDate: w.modifiedDate? 'Last Updated: ' + w.modifiedDate : 'n/a'

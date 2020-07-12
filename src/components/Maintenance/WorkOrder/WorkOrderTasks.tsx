@@ -25,7 +25,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
 import moment from 'moment';
-import {IWorkOrderEquipment} from "./WorkOrderTypes";
+import {IWorkQueueEquipment} from "./WorkOrderTypes";
 import Link from '@material-ui/core/Link';
 
 const useButtonStyles = makeStyles(theme => ({
@@ -63,16 +63,17 @@ const useRowStyles = makeStyles({
 });
 
 interface IWorkOrderTaskProps {
-   workOrderEquipments: IWorkOrderEquipment[];
+   workOrderEquipments: IWorkQueueEquipment[];
    onSetWorkOrderResource(workQueueTaskId: number, equipmentId: number, taskId: number): void;
+   onWorkOrderSubTask(workQueueTaskId: number, equipmentId: number, taskId: number): void;
 }
 
-export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, onSetWorkOrderResource}) => {
+export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, onSetWorkOrderResource, onWorkOrderSubTask}) => {
    const history = useHistory();
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
 
-   const CustomRow: FC<IWorkOrderEquipment> = (props) => {
+   const CustomRow: FC<IWorkQueueEquipment> = (props) => {
       const [open, setOpen] = React.useState(true);
       const classes = useRowStyles();
       return (
@@ -91,18 +92,20 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, on
                   </Button>
                </TableCell>
             </TableRow>
-            {open && props.workOrderTasks.map((workQueueTask, index) => (
-               <TableRow key={workQueueTask.workOrderTaskId}>
+            {open && props.workQueueTasks.map((workQueueTask, index) => (
+               <TableRow key={workQueueTask.workQueueTaskId}>
                   <TableCell padding="checkbox"
-                             className={index + 1 == props.workOrderTasks.length? '' : classes.noBorder}
+                             className={index + 1 == props.workQueueTasks.length? '' : classes.noBorder}
                              style={{paddingRight: 0}}
                   >
-                     {
-                        workQueueTask.valid ? <IconButton size="small" onClick={() => onSetWorkOrderResource(workQueueTask.workOrderTaskId, props.equipmentId, workQueueTask.taskId)}><VisibilityIcon/></IconButton> :
-                           <IconButton color="secondary" aria-label="Set Task Resources" onClick={() => onSetWorkOrderResource(workQueueTask.workOrderTaskId, props.equipmentId, workQueueTask.taskId)}>
-                              <NoteAddIcon/>
-                           </IconButton>
-                     }
+                     <div style={{display: 'flex'}}>
+                        <IconButton size="small" onClick={() => onWorkOrderSubTask(workQueueTask.workQueueTaskId, props.equipmentId, workQueueTask.taskId)}>
+                           <VisibilityIcon/>
+                        </IconButton>
+                        <IconButton size="small" color="primary" onClick={() => onSetWorkOrderResource(workQueueTask.workQueueTaskId, props.equipmentId, workQueueTask.taskId)}>
+                           <NoteAddIcon/>
+                        </IconButton>
+                     </div>
                   </TableCell>
                   <TableCell>{workQueueTask.taskName}</TableCell>
                   <TableCell>{workQueueTask.taskPriority}</TableCell>

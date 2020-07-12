@@ -1,4 +1,3 @@
-import {EntityStatusQL} from "../../../graphql/User.ql";
 
 export interface IWorkOrder {
    workOrderId: number;
@@ -14,36 +13,54 @@ export interface IWorkOrder {
    responsibleName: string;
    generatedById: number;
    generatedByName: string;
-   equipments: IWorkOrderEquipment[];
+   equipments: IWorkQueueEquipment[];
 }
 
-export interface IWorkOrderEquipment {
+export interface IWorkQueueEquipment {
    equipmentId: number;
    name: string;
    code: string;
    taskCount: number;
    maintenanceCount: number;
-   workOrderTasks: IWorkOrderTask[];
+   workQueueTasks: IWorkOrderTask[];
 }
 
-interface IWorkOrderTask {
-   workOrderTaskId: number;
+// export interface IWorkOrderTaskProgress {
+//    assetId: number;
+//    assetName: string;
+//    taskId: number;
+//    taskName: string;
+//    startDate: string;
+//    endDate: string;
+//    duration: number;
+//    notes: string;
+//    status: string;
+// }
+
+export interface IWorkOrderTask {
+   workQueueTaskId: number;
    rescheduledDate: string;
    scheduledDate: string;
    status: string;
    taskName: string;
+   taskDuration: number;
    taskPriority: number;
    taskCategoryId: number;
    taskCategoryName: string;
    triggerDescription: string;
    taskId: number;
    taskTriggerId: number;
+   startDate: string;
+   endDate: string;
+   duration: number;
+   notes: string;
    taskResources: IWorkOrderResource[];
+   subTasks: IWorkOrderSubTask[];
    valid: boolean;
 }
 
 export interface IWorkOrderResource {
-   resourceId: number;
+   workOrderResourceId: number;
    description: string;
    resource: string;
    itemId: number;
@@ -52,6 +69,14 @@ export interface IWorkOrderResource {
    personId: number;
    resourceType: string;
    amount: number;
+}
+
+export interface IWorkOrderSubTask {
+   workOrderSubTaskId: number;
+   subTaskId: number;
+   subTaskCategoryKey: string;
+   subTaskDescription: string;
+   value: string;
 }
 
 export const getIWorkOrderDefaultInstance = ():IWorkOrder => ({
@@ -69,4 +94,26 @@ export const getIWorkOrderDefaultInstance = ():IWorkOrder => ({
    generatedById: 0,
    generatedByName: '',
    equipments: [],
+});
+
+export const getIWorkOrderTaskDefaultInstance = ():IWorkOrderTask => ({
+   workQueueTaskId: 0,
+   rescheduledDate: '',
+   scheduledDate: '',
+   status: '',
+   taskName: '',
+   taskDuration: 0,
+   taskPriority: 0,
+   taskCategoryId: 0,
+   taskCategoryName: '',
+   triggerDescription: '',
+   taskId: 0,
+   taskTriggerId: 0,
+   startDate: '',
+   endDate: '',
+   duration: 0,
+   notes: '',
+   taskResources: [],
+   subTasks: [],
+   valid: false
 });

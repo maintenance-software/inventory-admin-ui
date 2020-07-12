@@ -3,14 +3,14 @@ import {useParams} from "react-router-dom";
 import {Equipment} from './Equipment';
 import {
    GET_MAINTENANCE_PLAN_BY_ID, getMaintenancePlanDefaultInstance,
-   MaintenancesQL,
-   SAVE_TASK_ACTIVITY_DATE_GQL
+   MaintenancesQL
 } from "../../../../../graphql/Maintenance.ql";
 import { useMutation, useLazyQuery } from '@apollo/react-hooks';
 import {MaintenanceEquipmentDialog} from "./MaintenanceEquipmentDialog";
 import moment from 'moment';
 import {clearCache} from "../../../../../utils/globalUtil";
 import {EquipmentQL, SET_MAINTENANCE_GQL} from "../../../../../graphql/Equipment.ql";
+import {SAVE_TASK_ACTIVITY_DATE_GQL} from "../../../../../graphql/WorkOrder.ql";
 
 export const PlanEquipmentContainer: React.FC = () => {
    const params = useParams();
