@@ -13,10 +13,10 @@ export interface IWorkOrder {
    responsibleName: string;
    generatedById: number;
    generatedByName: string;
-   equipments: IWorkQueueEquipment[];
+   equipments: IWorkOrderEquipment[];
 }
 
-export interface IWorkQueueEquipment {
+export interface IWorkOrderEquipment {
    equipmentId: number;
    name: string;
    code: string;
@@ -54,6 +54,7 @@ export interface IWorkOrderTask {
    endDate: string;
    duration: number;
    notes: string;
+   lastModified: string;
    taskResources: IWorkOrderResource[];
    subTasks: IWorkOrderSubTask[];
    valid: boolean;
@@ -61,12 +62,11 @@ export interface IWorkOrderTask {
 
 export interface IWorkOrderResource {
    workOrderResourceId: number;
-   description: string;
-   resource: string;
+   resourceName: string;
    itemId: number;
    inventoryItemId: number;
    employeeCategoryId: number;
-   personId: number;
+   humanResourceId: number;
    resourceType: string;
    amount: number;
 }
@@ -113,6 +113,7 @@ export const getIWorkOrderTaskDefaultInstance = ():IWorkOrderTask => ({
    endDate: '',
    duration: 0,
    notes: '',
+   lastModified: '',
    taskResources: [],
    subTasks: [],
    valid: false

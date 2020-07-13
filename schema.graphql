@@ -12,9 +12,10 @@ type Page_WorkQueue {
 type WorkOrders {
     workOrder(entityId: Int!): WorkOrder!
     page(searchString: String, pageIndex: Int, pageSize: Int, filters: [Predicate!]): Page_WorkOrder!
-    createUpdateWorkOrder(workOrderId: Int!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int!, responsibleId: Int!, parentId: Int, workQueueIds: [Int!]!, resources: [WorkOrderResourceArg!]!): WorkOrder!
+    createUpdateWorkOrder(workOrderId: Int!, estimateDuration: Int!, rate: Int!, notes: String!, generatedById: Int, responsibleId: Int, parentId: Int, workQueueIds: [Int!]!): WorkOrder!
     changeStatus(entityIds: [Int!]!, status: String!): Boolean!
     saveWorkOrderProgress(workQueueId: Int!, workOrderId: Int!, startWorkDate: String!, finishedWorkDate: String!, notes: String!, status: String!, workOrderSubTasks: [WorkOrderSubTaskArg!]!): Boolean!
+    saveWorkOrderResources(arg: [WorkOrderResourceArg!]!): Boolean!
 }
 
 type InventoryItems {
@@ -81,8 +82,8 @@ type WorkOrder {
     totalCost: Float!
     percentage: Float!
     notes: String!
-    generatedBy: Person!
-    responsible: Person!
+    generatedBy: Person
+    responsible: Person
     parent: WorkOrder
     workQueues: [WorkQueue!]!
     createdDate: String!
@@ -423,6 +424,9 @@ type TaskTrigger {
 type WorkOrderResource {
     workOrderResourceId: Int!
     amount: Int!
+    resourceType: String!
+    employeeCategoryId: Int
+    itemId: Int
     humanResource: Person
     inventoryItem: InventoryItem
     workQueue: WorkQueue!
@@ -545,7 +549,10 @@ type Employees {
 input WorkOrderResourceArg {
     workOrderResourceId: Int!
     amount: Int!
+    resourceType: String!
+    employeeCategoryId: Int
     humanResourceId: Int
+    itemId: Int
     inventoryItemId: Int
     workQueueTaskId: Int!
 }

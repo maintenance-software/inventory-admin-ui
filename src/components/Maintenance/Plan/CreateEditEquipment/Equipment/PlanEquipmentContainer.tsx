@@ -47,7 +47,7 @@ export const PlanEquipmentContainer: React.FC = () => {
          refetchQueries: [{query: GET_MAINTENANCE_PLAN_BY_ID, variables: {maintenanceId}}],
          update: (cache) => {
             clearCache(cache, 'maintenances.availableEquipments');
-            clearCache(cache, 'maintenances.taskActivities');
+            clearCache(cache, 'workQueues.fetchPendingWorkQueues');
          }
       });
       setOpen(false);

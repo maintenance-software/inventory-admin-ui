@@ -60,10 +60,10 @@ interface IWorkOrderResourceProds {
    resources: IWorkOrderResource[];
    open: boolean;
    setOpen(open: boolean): void;
-   onAccept(resources: IWorkOrderResource[]) : void;
+   onSaveWorkOrderResources(resources: IWorkOrderResource[]) : void;
 }
 
-export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({resources, open, setOpen, onAccept}) => {
+export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({resources, open, setOpen, onSaveWorkOrderResources}) => {
    const history = useHistory();
    const dialogClasses = useDialogStyles();
    const [workOrderResources, setWorkOrderResources] = React.useState(resources.concat());
@@ -73,7 +73,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
    }, [resources]);
 
    const handleAcceptWorkOrderResource = () => {
-      onAccept(workOrderResources);
+      onSaveWorkOrderResources(workOrderResources);
    };
 
    const handleRemoveWorkOrderResource = (resourceId: number) => {
@@ -85,8 +85,8 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
          const newWorkOrderResources = workOrderResources.map(resource => ({...resource}));
          newWorkOrderResources.forEach(r => {
             if(r.workOrderResourceId === workOrderResourceId) {
-               r.resource = label;
-               r.personId = value;
+               r.resourceName = label;
+               r.humanResourceId = value;
             }
          });
          setWorkOrderResources(newWorkOrderResources);
@@ -96,7 +96,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
          const newWorkOrderResources = workOrderResources.map(resource => ({...resource}));
          newWorkOrderResources.forEach(r => {
             if(r.workOrderResourceId === inventoryResourceId) {
-               r.resource = inventory.name;
+               r.resourceName = inventory.name;
                r.inventoryItemId = inventory.inventoryItemId;
             }
          });
@@ -109,7 +109,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
    };
 
    const isInvalid = () => {
-      return workOrderResources.find(r => (r.resourceType === 'HUMAN' && !r.personId) || (r.resourceType === 'INVENTORY' && !r.inventoryItemId))
+      return !workOrderResources.length || workOrderResources.find(r => (r.resourceType === 'HUMAN' && !r.humanResourceId) || (r.resourceType === 'INVENTORY' && !r.inventoryItemId))
    };
 
   return (
@@ -125,7 +125,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
                     <TableHead>
                        <TableRow>
                           <TableCell>Resource Type</TableCell>
-                          <TableCell>Description</TableCell>
+                          <TableCell>Resource Name</TableCell>
                           <TableCell>Resource</TableCell>
                           <TableCell>Amount</TableCell>
                           <TableCell align="center">Options</TableCell>
@@ -135,13 +135,13 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
                        {workOrderResources.map((row: IWorkOrderResource, index) => (
                           <TableRow key={row.workOrderResourceId} hover>
                              <TableCell>{row.resourceType}</TableCell>
-                             <TableCell>{row.description}</TableCell>
+                             <TableCell>{row.resourceName}</TableCell>
                              <TableCell>
                                 { row.resourceType === 'HUMAN'?
                                    <PersonPaginatorSelector
                                       value={{
-                                         value: row.personId,
-                                         label: row.resource,
+                                         value: row.humanResourceId,
+                                         label: row.resourceName,
                                          selected: false
                                       }}
                                       onChange={(value: number, label: string) => handleSelectedEmployee(row.workOrderResourceId, value, label)}
@@ -150,7 +150,7 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
                                        value={{
                                           inventoryItemId: row.inventoryItemId,
                                           inventoryId: 0,
-                                          name: row.resource,
+                                          name: row.resourceName,
                                           description: ''
                                        }}
                                        itemId={row.itemId}
@@ -171,13 +171,20 @@ export const WorkOrderResourceDialog: React.FC<IWorkOrderResourceProds> =  ({res
               </TableContainer>
            </DialogContent>
            <DialogActions className={dialogClasses.dialogFooter}>
-              <Button variant="outlined"
+              <Button variant="contained"
+                      color="secondary"
+                      size="small"
+                      onClick={handleCloseDialog}
+              >
+                 Cancel
+              </Button>
+              <Button variant="contained"
                       color="primary"
                       size="small"
                       disabled={!!isInvalid()}
                       onClick={handleAcceptWorkOrderResource}
               >
-                 Accept
+                 Save
               </Button>
            </DialogActions>
         </Dialog>

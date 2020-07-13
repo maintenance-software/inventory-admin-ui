@@ -3,61 +3,32 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/react-hooks";
 import {useHistory} from "react-router";
 import {useRouteMatch} from "react-router-dom";
 import {WorkQueueList} from './WorkQueueList';
-import {
-   FETCH_TASK_ACTIVITIES_GQL,
-   MaintenancesQL
-} from "../../../graphql/Maintenance.ql";
+import { MaintenancesQL } from "../../../graphql/Maintenance.ql";
 import {TaskAvailableDialog} from "./WorkQueueEventDialog";
 import {clearCache} from "../../../utils/globalUtil";
 import moment from 'moment';
 import {GET_USER_SESSION_GQL, SessionQL} from "../../../graphql/Session.ql";
-import {EntityStatusQL} from "../../../graphql/User.ql";
-import {EquipmentQL, EquipmentsQL} from "../../../graphql/Equipment.ql";
 import {
    FETCH_WORK_QUEUES_QL,
-   SAVE_TASK_ACTIVITY_EVENT_GQL,
-   WorkQueueQL,
+   SAVE_TASK_ACTIVITY_EVENT_GQL, SAVE_WORK_ORDER_QL, WorkOrdersQL,
    WorkQueuesQL
 } from "../../../graphql/WorkOrder.ql";
-import {IWorkQueueEquipment, IWorkOrderResource} from "../WorkOrder/WorkOrderTypes";
+import { IWorkOrderEquipment } from "../WorkOrder/WorkOrderTypes";
 import {workQueuesConverter} from "../WorkOrder/converter";
-
-// export interface IWorkQueueEquipment {
-//    equipmentId: number;
-//    name: string;
-//    code: string;
-//    taskCount: number;
-//    maintenanceCount: number;
-//    workQueueTasks: IWorkQueueTask[];
-// }
-//
-// export interface IWorkQueueTask {
-//    workQueueTaskId: number;
-//    rescheduledDate: string;
-//    scheduledDate: string;
-//    status: string;
-//    taskName: string;
-//    taskPriority: number;
-//    taskCategoryId: number;
-//    taskCategoryName: string;
-//    triggerDescription: string;
-//    taskId: number;
-//    taskTriggerId: number;
-//    taskResources: IWorkOrderResource[];
-//    valid: boolean;
-// }
 
 export const WorkQueueListContainer: React.FC = () => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const [open, setOpen] = React.useState(false);
-   const [workQueueEquipmentSelected, setWorkQueueEquipmentSelected] = React.useState<IWorkQueueEquipment[]>([]);
+   const [workQueueEquipmentSelected, setWorkQueueEquipmentSelected] = React.useState<IWorkOrderEquipment[]>([]);
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
    const sessionQL = useQuery<{session: SessionQL}, any>(GET_USER_SESSION_GQL);
    const [fetchWorkQueues, { called, loading, data }] = useLazyQuery<{workQueues: WorkQueuesQL}, any>(FETCH_WORK_QUEUES_QL);
-   const [saveTaskActivityEvent, saveActivityStatus] = useMutation<{ maintenances: MaintenancesQL }, any>(SAVE_TASK_ACTIVITY_EVENT_GQL);
+   const [saveTaskActivityEvent, saveActivityStatus] = useMutation<{ workQueues: MaintenancesQL }, any>(SAVE_TASK_ACTIVITY_EVENT_GQL);
+   const [saveWorkOrder, saveWorkOrderResponse] = useMutation<{workOrders: WorkOrdersQL}, any>(SAVE_WORK_ORDER_QL);
+
    useEffect(() => {
       fetchWorkQueues({variables: { searchString, pageIndex: pageIndex, pageSize: pageSize }});
    }, []);
@@ -65,6 +36,12 @@ export const WorkQueueListContainer: React.FC = () => {
    useEffect(() => {
       fetchWorkQueues({variables: { searchString, pageIndex, pageSize }});
    }, [pageIndex, pageSize, searchString]);
+
+   useEffect(() => {
+      if(saveWorkOrderResponse.data && saveWorkOrderResponse.data.workOrders.createUpdateWorkOrder.workOrderId) {
+         history.push({pathname: '/maintenances/workOrders/' + saveWorkOrderResponse.data.workOrders.createUpdateWorkOrder.workOrderId});
+      }
+   }, [saveWorkOrderResponse, saveWorkOrderResponse.data]);
 
    if (loading || !data) return <div>Loading</div>;
 
@@ -82,32 +59,8 @@ export const WorkQueueListContainer: React.FC = () => {
       setPageIndex(0);
    };
 
-   const workQueueEquipments: IWorkQueueEquipment[] = workQueuesConverter(data.workQueues.fetchPendingWorkQueues.content);
+   const workQueueEquipments: IWorkOrderEquipment[] = workQueuesConverter(data.workQueues.fetchPendingWorkQueues.content);
 
-   // const workQueueEquipments: IWorkQueueEquipment[] = data.equipments.fetchWorkQueues.content.map((equipment: EquipmentQL) => ({
-   //    equipmentId: equipment.equipmentId,
-   //    name: equipment.name,
-   //    code: equipment.code,
-   //    taskCount: 0,
-   //    maintenanceCount: 0,
-   //    workQueueTasks: equipment.workQueues.filter(wq => wq.status === 'PENDING').map((workQueueTask: WorkQueueQL) =>({
-   //       workQueueTaskId: workQueueTask.workQueueId,
-   //       rescheduledDate: workQueueTask.rescheduledDate,
-   //       scheduledDate: workQueueTask.scheduledDate,
-   //       status: workQueueTask.status,
-   //       taskName: workQueueTask.task.name,
-   //       taskPriority: workQueueTask.task.priority,
-   //       taskCategoryId: workQueueTask.task.taskCategory? workQueueTask.task.taskCategory.categoryId : 0,
-   //       taskCategoryName: workQueueTask.task.taskCategory? workQueueTask.task.taskCategory.name : '',
-   //       triggerDescription: workQueueTask.taskTrigger.triggerType,
-   //       taskId: workQueueTask.task.taskId,
-   //       taskTriggerId: workQueueTask.taskTrigger.taskTriggerId,
-   //       taskResources: [],
-   //       valid: false
-   //    }))
-   // }));
-
-   // const sortedTasksActivities = data.maintenances.taskActivities.content.sort((a, b) => a.assetId - b.assetId);
    const onAcceptHandle = (equipmentId: number, taskId: number, triggerId: number, maintenanceId: number, hasAssetFailure: boolean, incidentDate: string) => {
       const date = moment(incidentDate, 'YYYY-MM-DD').format("YYYY-MM-DD HH:mm:ss.SSSSSS UTC");
       saveTaskActivityEvent({
@@ -120,17 +73,28 @@ export const WorkQueueListContainer: React.FC = () => {
             incidentDate: date,
             reportedById: sessionQL.data? +sessionQL.data.session.authId : -1
          },
-         refetchQueries: [{query: FETCH_TASK_ACTIVITIES_GQL, variables: { searchString, pageIndex, pageSize }}],
+         refetchQueries: [{query: FETCH_WORK_QUEUES_QL, variables: { searchString, pageIndex, pageSize }}],
          update: (cache) => {
             // clearCache(cache, 'maintenances.availableEquipments');
-            clearCache(cache, 'maintenances.taskActivities');
+            // clearCache(cache, 'workQueues.fetchPendingWorkQueues');
          }
       });
       setOpen(false);
    };
 
    const handleNeWorkOrder = () => {
-      history.push({pathname: '/maintenances/workOrders/0', state: {workQueueEquipments: workQueueEquipmentSelected}});
+      saveWorkOrder({variables: {
+            workOrderId: 0,
+            estimateDuration: workQueueEquipmentSelected.map(woe => woe.workQueueTasks.map(wot => wot.taskDuration)).flat().reduce((s, v) => s + v),
+            rate: 0,
+            notes: '',
+            workQueueIds: workQueueEquipmentSelected.map(woe => woe.workQueueTasks.map(wot => wot.workQueueTaskId)).flat()
+         },
+         refetchQueries: [{query: FETCH_WORK_QUEUES_QL, variables: { searchString, pageIndex, pageSize }}],
+         update: (cache) => {
+            clearCache(cache, 'workOrders.page');
+         }
+      });
    };
 
    const handleSelectTaskActivity = (workQueueTaskId: number, equipmentId: number, taskId: number, checked: boolean) => {
@@ -158,7 +122,7 @@ export const WorkQueueListContainer: React.FC = () => {
                scheduledDate: workQueueTask.scheduledDate,
                status: workQueueTask.status,
                taskName: workQueueTask.taskName,
-               taskDuration: 0,
+               taskDuration: workQueueTask.taskDuration,
                taskPriority: workQueueTask.taskPriority,
                taskCategoryId: workQueueTask.taskCategoryId,
                taskCategoryName: workQueueTask.taskCategoryName,
@@ -169,6 +133,7 @@ export const WorkQueueListContainer: React.FC = () => {
                endDate: '',
                duration: 0,
                notes: '',
+               lastModified: '',
                taskResources: [],
                subTasks: [],
                valid: false

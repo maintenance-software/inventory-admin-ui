@@ -17,6 +17,7 @@ export interface WorkOrdersQL {
    createUpdateWorkOrder: WorkOrderQL;
    changeStatus: boolean;
    saveWorkOrderProgress: boolean;
+   saveWorkOrderResources: boolean;
 }
 
 export interface WorkOrderQL {
@@ -29,8 +30,8 @@ export interface WorkOrderQL {
    totalCost: number;
    percentage: number;
    notes: string;
-   generatedBy: PersonQL;
-   responsible: PersonQL;
+   generatedBy?: PersonQL;
+   responsible?: PersonQL;
    parent?: WorkOrderQL;
    workQueues: WorkQueueQL[];
    createdDate: string;
@@ -67,6 +68,9 @@ export interface WorkQueueQL {
 export interface WorkOrderResourceQL {
    workOrderResourceId: number;
    amount: number;
+   resourceType: string;
+   employeeCategoryId: number;
+   itemId: number;
    humanResource: PersonQL;
    inventoryItem: InventoryItemQL;
    workQueue: WorkQueueQL;
@@ -176,6 +180,7 @@ export const FETCH_WORK_QUEUES_QL = gql`
                task {
                   taskId
                   name
+                  duration
                   taskCategory {
                      categoryId
                      name
@@ -304,6 +309,7 @@ export const GET_WORK_ORDER_BY_ID_QL = gql`
                startWorkDate
                finishedWorkDate
                notes
+               modifiedDate
                equipment {
                   equipmentId
                   name
@@ -326,6 +332,9 @@ export const GET_WORK_ORDER_BY_ID_QL = gql`
                workOrderResources {
                   workOrderResourceId
                   amount
+                  resourceType
+                  employeeCategoryId
+                  itemId
                   humanResource {
                      personId
                      firstName
@@ -333,10 +342,10 @@ export const GET_WORK_ORDER_BY_ID_QL = gql`
                   }
                   inventoryItem {
                      inventoryItemId
-                     item {
-                        itemId
-                        name
-                     }
+#                     item {
+#                        itemId
+#                        name
+#                     }
                   }
                }
                workOrderSubTask {
@@ -366,10 +375,9 @@ export const SAVE_WORK_ORDER_QL = gql`
       $estimateDuration: Int!
       $rate: Int!
       $notes: String!
-      $generatedById: Int!
-      $responsibleId: Int!
+      $generatedById: Int
+      $responsibleId: Int
       $workQueueIds: [Int!]!
-      $resources: [WorkOrderResourceArg!]!
    ) {
       workOrders {
          createUpdateWorkOrder(
@@ -380,7 +388,6 @@ export const SAVE_WORK_ORDER_QL = gql`
             generatedById: $generatedById
             responsibleId: $responsibleId
             workQueueIds: $workQueueIds
-            resources: $resources
          ) {
             workOrderId
             workOrderCode
@@ -396,6 +403,16 @@ export const WORK_ORDER_CHANGE_STATUS_QL = gql`
    ) {
       workOrders {
          changeStatus(entityIds: $entityIds, status: $status)
+      }
+   }
+`;
+
+export const SAVE_WORK_ORDER_RESOURCES_GQL = gql`
+   mutation saveWorkOrderProgress(
+    $resources: [WorkOrderResourceArg!]!
+   ) {
+      workOrders {
+         saveWorkOrderResources(arg: $resources)
       }
    }
 `;

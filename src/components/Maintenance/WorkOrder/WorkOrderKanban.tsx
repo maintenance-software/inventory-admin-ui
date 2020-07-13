@@ -25,7 +25,7 @@ import {
    WorkOrdersQL,
    WorkQueueQL
 } from "../../../graphql/WorkOrder.ql";
-import {IWorkOrder, IWorkQueueEquipment, IWorkOrderResource} from "./WorkOrderTypes";
+import {IWorkOrder, IWorkOrderEquipment, IWorkOrderResource} from "./WorkOrderTypes";
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import {TablePaginationActions} from "../../../utils/TableUtils";
@@ -127,7 +127,7 @@ export const WorkOrderKanban: FC = () => {
       if(data) {
          const newWorkOrders: IWorkOrderCard[] = data.workOrders.page.content.map(w => ({
             workOrderId: w.workOrderId,
-            responsibleFullName: buildFullName(w.responsible.firstName, w.responsible.lastName),
+            responsibleFullName: w.responsible? buildFullName(w.responsible.firstName, w.responsible.lastName) : '',
             code: w.workOrderCode,
             status: toWorkOrderStatusEnum(w.workOrderStatus),
             equipments: '',//w.equipments.length === 1 ? w.equipments[0].name : 'Equipments: ' + w.equipments.length,

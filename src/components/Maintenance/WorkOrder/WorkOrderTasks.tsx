@@ -25,7 +25,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
 import moment from 'moment';
-import {IWorkQueueEquipment} from "./WorkOrderTypes";
+import {IWorkOrderEquipment} from "./WorkOrderTypes";
 import Link from '@material-ui/core/Link';
 
 const useButtonStyles = makeStyles(theme => ({
@@ -63,7 +63,7 @@ const useRowStyles = makeStyles({
 });
 
 interface IWorkOrderTaskProps {
-   workOrderEquipments: IWorkQueueEquipment[];
+   workOrderEquipments: IWorkOrderEquipment[];
    onSetWorkOrderResource(workQueueTaskId: number, equipmentId: number, taskId: number): void;
    onWorkOrderSubTask(workQueueTaskId: number, equipmentId: number, taskId: number): void;
 }
@@ -73,7 +73,7 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, on
    const classes = useStyles2();
    const buttonClasses = useButtonStyles();
 
-   const CustomRow: FC<IWorkQueueEquipment> = (props) => {
+   const CustomRow: FC<IWorkOrderEquipment> = (props) => {
       const [open, setOpen] = React.useState(true);
       const classes = useRowStyles();
       return (
@@ -92,24 +92,24 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, on
                   </Button>
                </TableCell>
             </TableRow>
-            {open && props.workQueueTasks.map((workQueueTask, index) => (
+            {open && props.workQueueTasks.sort((e1, e2) => e1.workQueueTaskId - e2.workQueueTaskId).map((workQueueTask, index) => (
                <TableRow key={workQueueTask.workQueueTaskId}>
                   <TableCell padding="checkbox"
                              className={index + 1 == props.workQueueTasks.length? '' : classes.noBorder}
                              style={{paddingRight: 0}}
                   >
                      <div style={{display: 'flex'}}>
-                        <IconButton size="small" onClick={() => onWorkOrderSubTask(workQueueTask.workQueueTaskId, props.equipmentId, workQueueTask.taskId)}>
+                        <IconButton size="small" color="primary" disabled={!workQueueTask.taskResources.length} onClick={() => onWorkOrderSubTask(workQueueTask.workQueueTaskId, props.equipmentId, workQueueTask.taskId)}>
                            <VisibilityIcon/>
                         </IconButton>
-                        <IconButton size="small" color="primary" onClick={() => onSetWorkOrderResource(workQueueTask.workQueueTaskId, props.equipmentId, workQueueTask.taskId)}>
+                        <IconButton size="small" color={!workQueueTask.taskResources.length? 'secondary' : 'primary'} onClick={() => onSetWorkOrderResource(workQueueTask.workQueueTaskId, props.equipmentId, workQueueTask.taskId)}>
                            <NoteAddIcon/>
                         </IconButton>
                      </div>
                   </TableCell>
                   <TableCell>{workQueueTask.taskName}</TableCell>
                   <TableCell>{workQueueTask.taskPriority}</TableCell>
-                  <TableCell>{moment(workQueueTask.scheduledDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm')}</TableCell>
+                  <TableCell>{workQueueTask.lastModified? moment(workQueueTask.lastModified, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm') : 'N/A'}</TableCell>
                   <TableCell>{workQueueTask.taskCategoryName}</TableCell>
                </TableRow>
             ))}
@@ -125,12 +125,12 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, on
                      <TableRow>
                         <TableCell colSpan={2}>Assets / Task</TableCell>
                         <TableCell>Priority</TableCell>
-                        <TableCell>Date</TableCell>
+                        <TableCell>Last Modified</TableCell>
                         <TableCell>Task Type</TableCell>
                      </TableRow>
                   </TableHead>
                   <TableBody>
-                     {workOrderEquipments.map((row) => (
+                     {workOrderEquipments.sort((e1, e2) => e1.equipmentId - e2.equipmentId).map((row) => (
                         <CustomRow key={row.equipmentId} {...row} />
                      ))}
                   </TableBody>

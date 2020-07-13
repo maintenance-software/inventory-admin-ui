@@ -20,7 +20,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
 import Checkbox from '@material-ui/core/Checkbox';
-import {IWorkQueueEquipment} from "../WorkOrder/WorkOrderTypes";
+import {IWorkOrderEquipment} from "../WorkOrder/WorkOrderTypes";
 
 const useButtonStyles = makeStyles(theme => ({
    button: {
@@ -57,7 +57,7 @@ const useRowStyles = makeStyles({
 });
 
 interface IWorkQueueProps {
-   workQueues: IWorkQueueEquipment[];
+   workQueues: IWorkOrderEquipment[];
    pageIndex: number;
    pageSize: number;
    totalCount: number;
@@ -81,7 +81,7 @@ export const WorkQueueList: FC<IWorkQueueProps> = ({workQueues, pageIndex, pageS
       onSearchTaskActivity && onSearchTaskActivity(searchInput);
    };
 
-   const CustomRow: FC<IWorkQueueEquipment> = (props) => {
+   const CustomRow: FC<IWorkOrderEquipment> = (props) => {
       const [open, setOpen] = React.useState(true);
       const classes = useRowStyles();
       return (
@@ -117,7 +117,7 @@ export const WorkQueueList: FC<IWorkQueueProps> = ({workQueues, pageIndex, pageS
       );
    };
 
-   const  CollapsibleTable: FC<{taskActivities: IWorkQueueEquipment[]}> = ({taskActivities}) => {
+   const  CollapsibleTable: FC<{taskActivities: IWorkOrderEquipment[]}> = ({taskActivities}) => {
       const classes = useStyles2();
       return (
          <TableContainer className={classes.container}>

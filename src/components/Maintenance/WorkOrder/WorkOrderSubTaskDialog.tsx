@@ -161,7 +161,7 @@ export const WorkOrderSubTaskDialog: React.FC<IWOSubTaskDialogProps> = ({task, o
       };
       return <>
          <Grid container  spacing={2}>
-            <Grid item xs={12} style={{paddingBottom: 0}}>{subTasks[props.index].subTaskDescription}</Grid>
+            <Grid item xs={12} style={{paddingBottom: 0, fontWeight: 'bold'}}>{(1 + props.index) + '. ' + subTasks[props.index].subTaskDescription}</Grid>
             <Grid item xs={12} style={{paddingTop: 0}}>
                <ToggleButtonGroup size="small" value={alignment} exclusive onChange={handleChange}>
                   <ToggleButton
@@ -189,7 +189,7 @@ export const WorkOrderSubTaskDialog: React.FC<IWOSubTaskDialogProps> = ({task, o
       const [refresh, setRefresh] = useState(0);
       return <>
          <Grid container  spacing={2}>
-            <Grid item xs={12} style={{paddingBottom: 0}}>{subTasks[props.index].subTaskDescription}</Grid>
+            <Grid item xs={12} style={{paddingBottom: 0, fontWeight: 'bold'}}>{(1 + props.index) + '. ' + subTasks[props.index].subTaskDescription}</Grid>
             <Grid item xs={12} style={{paddingTop: 0}}>
                <FormControl component="fieldset">
                   <RadioGroup row aria-label="position" name="position" defaultValue="top">
@@ -222,7 +222,7 @@ export const WorkOrderSubTaskDialog: React.FC<IWOSubTaskDialogProps> = ({task, o
       const [refresh, setRefresh] = useState(0);
       return <>
          <Grid container  spacing={2}>
-            <Grid item xs={12} style={{paddingBottom: 0}}>{subTasks[props.index].subTaskDescription}</Grid>
+            <Grid item xs={12} style={{paddingBottom: 0, fontWeight: 'bold'}}>{(1 + props.index) + '. ' + subTasks[props.index].subTaskDescription}</Grid>
             <Grid item xs={12} style={{paddingTop: 0}}>
                { subTasks[props.index].subTaskCategoryKey === 'NUMBER'?
                   <TextField

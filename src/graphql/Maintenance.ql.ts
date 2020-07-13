@@ -249,40 +249,40 @@ export const FETCH_TASKS_FOR_EQUIPMENT_QL = gql`
    }
 `;
 
-export const FETCH_TASK_ACTIVITIES_GQL = gql`
-   query fetchTaskActivities($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]) {
-      maintenances {
-         taskActivities(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
-            totalCount
-            content {
-               taskActivityId
-               scheduledDate
-               calculatedDate
-               rescheduled
-               status
-               assetId
-               assetName
-               assetCode
-               maintenanceId
-               maintenanceName
-               taskId
-               taskName
-               taskPriority
-               taskCategoryId
-               taskCategoryName
-               taskTriggerId
-               triggerDescription
-            }
-            pageInfo {
-               hasNext
-               hasPreview
-               pageSize
-               pageIndex
-            }
-         }
-      }
-   }
-`;
+// export const FETCH_TASK_ACTIVITIES_GQL = gql`
+//    query fetchTaskActivities($searchString: String, $pageIndex: Int, $pageSize: Int, $filters: [Predicate!]) {
+//       maintenances {
+//          taskActivities(searchString: $searchString, pageIndex: $pageIndex, pageSize: $pageSize, filters: $filters) {
+//             totalCount
+//             content {
+//                taskActivityId
+//                scheduledDate
+//                calculatedDate
+//                rescheduled
+//                status
+//                assetId
+//                assetName
+//                assetCode
+//                maintenanceId
+//                maintenanceName
+//                taskId
+//                taskName
+//                taskPriority
+//                taskCategoryId
+//                taskCategoryName
+//                taskTriggerId
+//                triggerDescription
+//             }
+//             pageInfo {
+//                hasNext
+//                hasPreview
+//                pageSize
+//                pageIndex
+//             }
+//          }
+//       }
+//    }
+// `;
 
 export const GET_MAINTENANCE_PLAN_BY_ID = gql`
    query getMaintenancePlanById($maintenanceId: Int!) {

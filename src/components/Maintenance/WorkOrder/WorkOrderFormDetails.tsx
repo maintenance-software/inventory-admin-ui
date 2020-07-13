@@ -43,7 +43,7 @@ const useButtonStyles = makeStyles(theme => ({
    },
 }));
 
-export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): void, form: IWorkOrderForm, error: boolean}> =  ({onSubmit, form, error}) => {
+export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): void, form: IWorkOrderForm}> =  ({onSubmit, form}) => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const params = useParams();
@@ -52,12 +52,12 @@ export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): v
    // const [pageIndex, setPageIndex] = React.useState(0);
    // const [pageSize, setPageSize] = React.useState(10);
    // const [searchString, setSearchString] = React.useState<string>('');
-   const [externalError, setExternalError] = useState(error);
+   // const [externalError, setExternalError] = useState(error);
    // const [fetchEmployees, { called, loading, data }] = useLazyQuery<{employees: IEmployeesQL}, any>(FETCH_EMPLOYEES);
 
    const {getFieldProps, getFieldMeta, setFieldValue, handleSubmit, dirty, isValid, setErrors} = useFormik<IWorkOrderForm>({
       enableReinitialize: true,
-      isInitialValid: error,
+      // isInitialValid: error,
       initialValues: form,
       validationSchema: Yup.object().shape({
          estimateDurationDD: Yup.number().required().moreThan(-1),
@@ -68,10 +68,6 @@ export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): v
          onSubmit(values);
       }
    });
-
-   useEffect(() => {
-      setExternalError(error);
-   }, [error]);
 
    const workOrderCode = getFieldProps('workOrderCode');
    const responsible = getFieldProps('responsible');
@@ -100,7 +96,7 @@ export const WorkOrderFormDetails: React.FC<{onSubmit(values: IWorkOrderForm): v
                        startIcon={<SaveIcon/>}
                        className={buttonClasses.button}
                        type="submit"
-                       disabled={!isValid || !dirty || externalError}
+                       disabled={!isValid || !dirty }
                     >
                        Save
                     </Button>

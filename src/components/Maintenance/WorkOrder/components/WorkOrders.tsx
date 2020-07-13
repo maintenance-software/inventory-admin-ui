@@ -20,7 +20,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
 import Checkbox from '@material-ui/core/Checkbox';
-import {IWorkOrder, IWorkQueueEquipment} from "../WorkOrderTypes";
+import {IWorkOrder, IWorkOrderEquipment} from "../WorkOrderTypes";
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 const useButtonStyles = makeStyles(theme => ({

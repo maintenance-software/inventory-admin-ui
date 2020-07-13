@@ -12,14 +12,14 @@ import {
    WorkOrdersQL,
    WorkQueueQL
 } from "../../../graphql/WorkOrder.ql";
-import {IWorkOrder, IWorkQueueEquipment, IWorkOrderResource} from "./WorkOrderTypes";
+import {IWorkOrder, IWorkOrderEquipment, IWorkOrderResource} from "./WorkOrderTypes";
 import {workQueuesConverter} from "./converter";
 
 export const WorkOrdersContainer: React.FC = () => {
    const history = useHistory();
    const { path } = useRouteMatch();
    const [open, setOpen] = React.useState(false);
-   const [workQueueEquipmentSelected, setWorkQueueEquipmentSelected] = React.useState<IWorkQueueEquipment[]>([]);
+   const [workQueueEquipmentSelected, setWorkQueueEquipmentSelected] = React.useState<IWorkOrderEquipment[]>([]);
    const [pageIndex, setPageIndex] = React.useState(0);
    const [pageSize, setPageSize] = React.useState(10);
    const [searchString, setSearchString] = React.useState<string>('');
@@ -64,10 +64,10 @@ export const WorkOrdersContainer: React.FC = () => {
       totalCost: workOrder.totalCost,
       percentage: workOrder.percentage,
       notes: workOrder.notes,
-      responsibleId: workOrder.responsible.personId,
-      responsibleName: buildFullName(workOrder.responsible.firstName, workOrder.responsible.lastName),
-      generatedById: workOrder.generatedBy.personId,
-      generatedByName: buildFullName(workOrder.generatedBy.firstName, workOrder.generatedBy.lastName),
+      responsibleId: workOrder.responsible? workOrder.responsible.personId : 0,
+      responsibleName: workOrder.responsible? buildFullName(workOrder.responsible.firstName, workOrder.responsible.lastName) : '',
+      generatedById: workOrder.generatedBy? workOrder.generatedBy.personId : 0,
+      generatedByName: workOrder.generatedBy ? buildFullName(workOrder.generatedBy.firstName, workOrder.generatedBy.lastName) : '',
       equipments:  workQueuesConverter(workOrder.workQueues)
    }));
 
