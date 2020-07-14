@@ -4,9 +4,15 @@ import { useLazyQuery, useQuery, useMutation } from '@apollo/react-hooks';
 import {useHistory} from "react-router";
 import {useParams, useRouteMatch} from 'react-router-dom';
 import {
+   FETCH_WORK_ORDERS_QL,
    GET_TASK_RESOURCE_BY_ID_QL,
-   GET_WORK_ORDER_BY_ID_QL, SAVE_WORK_ORDER_PROGRESS_GQL, SAVE_WORK_ORDER_QL, SAVE_WORK_ORDER_RESOURCES_GQL,
-   WorkOrderQL, WorkOrdersQL
+   GET_WORK_ORDER_BY_ID_QL,
+   SAVE_WORK_ORDER_PROGRESS_GQL,
+   SAVE_WORK_ORDER_QL,
+   SAVE_WORK_ORDER_RESOURCES_GQL,
+   WORK_ORDER_CHANGE_STATUS_QL,
+   WorkOrderQL,
+   WorkOrdersQL
 } from "../../../graphql/WorkOrder.ql";
 import {WorkOrderTasks} from "./WorkOrderTasks";
 import {WorkOrderFormDetails} from "./WorkOrderFormDetails";
@@ -24,6 +30,7 @@ import {
 } from "./WorkOrderTypes";
 import {workOrderResourceCalcAndConverter, workQueuesConverter} from "./converter";
 import {WorkOrderSubTaskDialog} from "./WorkOrderSubTaskDialog";
+import {ConfirmDialog} from "../../common/ConfirmDialog";
 
 export interface IWorkOrderForm {
    workOrderCode: string;
@@ -47,10 +54,12 @@ export const WorkOrderContainer: React.FC =  () => {
    const params = useParams();
    const [resourceDialogOpen, setResourceDialogOpen] = React.useState(false);
    const [subTaskDialogOpen, setSubTaskDialogOpen] = React.useState(false);
+   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
    const [workOrder, setWorOrder] = React.useState<IWorkOrder>(getIWorkOrderDefaultInstance());
    const [workOrderTask, setWorkOrderTask] = React.useState<IWorkOrderTask>(getIWorkOrderTaskDefaultInstance());
    const [[workQueueTaskId, equipmentId, taskId, window], setWorkQueueTask] = React.useState([0, 0, 0, '']);
    const [getWorkOrderById, { called, loading, data }] = useLazyQuery<{workOrders: WorkOrdersQL}, any>(GET_WORK_ORDER_BY_ID_QL);
+   const [workOrderChangeStatus] = useMutation<{workOrders: WorkOrdersQL}, any>(WORK_ORDER_CHANGE_STATUS_QL);
    const [getTaskById, taskResponse] = useLazyQuery<{maintenances: MaintenancesQL}, any>(GET_TASK_RESOURCE_BY_ID_QL);
    const [saveWorkOrder, saveWorkOrderResponse] = useMutation<{maintenances: MaintenancesQL}, any>(SAVE_WORK_ORDER_QL);
    const [saveWorkOrderTaskProgress, saveWorkOrderTaskProgressResponse] = useMutation<{workOrders: WorkOrdersQL}, any>(SAVE_WORK_ORDER_PROGRESS_GQL);
@@ -238,6 +247,8 @@ export const WorkOrderContainer: React.FC =  () => {
    };
 
    const handleSaveWorkOrderSubTasks = (workOrderTask: IWorkOrderTask, finalize: boolean) => {
+
+
       saveWorkOrderTaskProgress({variables: {
             workQueueId: workOrderTask.workQueueTaskId,
             workOrderId: workOrderId,
@@ -252,6 +263,25 @@ export const WorkOrderContainer: React.FC =  () => {
             })),
          },
          refetchQueries: [{query: GET_WORK_ORDER_BY_ID_QL, variables: {workOrderId}}]
+      }).then(result => {
+         if(result.data && result.data.workOrders.saveWorkOrderProgress && finalize) {
+            const workOrderTaskTemp = workOrder.equipments.map(woe => woe.workQueueTasks.filter(wot => wot.workQueueTaskId !== workOrderTask.workQueueTaskId)).flat();
+            const finalizedTasks = workOrderTaskTemp.filter(wot => wot.status === 'WO_TASK_COMPLETED');
+            if(workOrderTaskTemp.length === finalizedTasks.length) {
+               setConfirmDialogOpen(true);
+            }
+         }
+      });
+   };
+
+   const handleFinalizeWorkOrder = () => {
+      workOrderChangeStatus({
+         variables: {entityIds: [workOrderId], status: 'COMPLETED'},
+         refetchQueries: [{query: FETCH_WORK_ORDERS_QL, variables: { pageIndex: 0, pageSize: 100 }}]
+      }).then(result => {
+            if(result.data && result.data.workOrders.changeStatus) {
+               setConfirmDialogOpen(false);
+            }
       });
    };
 
@@ -276,6 +306,12 @@ export const WorkOrderContainer: React.FC =  () => {
               open={subTaskDialogOpen}
               setOpen={setSubTaskDialogOpen}
               onSaveWorkOrderTask={handleSaveWorkOrderSubTasks}
+           />
+           <ConfirmDialog
+              tittle="Do you want to finalize WO?"
+              open={confirmDialogOpen}
+              setOpen={setConfirmDialogOpen}
+              onConfirmDialog={handleFinalizeWorkOrder}
            />
         </Box>
      </Box>

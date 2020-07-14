@@ -110,7 +110,7 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, on
                   <TableCell>{workQueueTask.taskName}</TableCell>
                   <TableCell>{workQueueTask.taskPriority}</TableCell>
                   <TableCell>{workQueueTask.lastModified? moment(workQueueTask.lastModified, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm') : 'N/A'}</TableCell>
-                  <TableCell>{workQueueTask.taskCategoryName}</TableCell>
+                  <TableCell>{workQueueTask.status === 'WO_TASK_COMPLETED'? 'Completed' : 'In Progress'}</TableCell>
                </TableRow>
             ))}
          </>
@@ -126,7 +126,7 @@ export const WorkOrderTasks: FC<IWorkOrderTaskProps> = ({workOrderEquipments, on
                         <TableCell colSpan={2}>Assets / Task</TableCell>
                         <TableCell>Priority</TableCell>
                         <TableCell>Last Modified</TableCell>
-                        <TableCell>Task Type</TableCell>
+                        <TableCell>Task Status</TableCell>
                      </TableRow>
                   </TableHead>
                   <TableBody>
